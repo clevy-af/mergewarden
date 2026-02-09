@@ -230,7 +230,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
               style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.04, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50)),
             ),
           Text(
-            "Total needed for ${targetItem!.count} Stage ${targetItem!.stage} Items: ${MergeCalculator.totalBaseNeeded(targetItem!.stage, targetItem!.count)}",
+            "Total needed for ${targetItem!.count} Stage ${targetItem!.stage} ${HiveProvider.appBox.get('type')=='wildlife'?'Wildlife':'Items'}: ${MergeCalculator.totalBaseNeeded(targetItem!.stage, targetItem!.count)}",
             style: TextStyle(letterSpacing: 1.5, fontSize:MediaQuery.of(context).size.width*0.02, fontWeight: FontWeight.bold),
           ),
           // SizedBox(height: 5,),
