@@ -21,6 +21,7 @@ List<Map> chains= [
   {"name": "Berry Bushes", "id": "Berry_Bushes", "stages": 13,"masterpiece":true},
   {"name": "Ornamental Vases", "id": "Ornamental_Vases", "stages": 11,"masterpiece":true},
   {"name": "Exotic Flora", "id": "Exotic_Flora", "stages": 11,"masterpiece":true},
+
   {"name": "Coins", "id": "Coins", "stages": 10},
   {"name": "Coin Storage", "id": "Coin_Storage", "stages": 10},
   {"name": "Wood Storage", "id": "Wood_Storage", "stages": 10},
@@ -60,7 +61,8 @@ Map<String,List> chainItems= {
   'Amber_Wishing_Stars': [
     {
       "name": "Singular Star",
-      "url": "https://static.wikia.nocookie.net/merge-gardens/images/e/e4/Singular_Star.png",
+      // "url": "https://static.wikia.nocookie.net/merge-gardens/images/e/e4/Singular_Star.png",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/4/40/Stage_1_-_Singular_Star.png/revision/latest?cb=20200721125240",
       "stage": 1
     },
     {
@@ -70,7 +72,7 @@ Map<String,List> chainItems= {
     },
     {
       "name": "Glossy Star",
-      "url": "https://static.wikia.nocookie.net/merge-gardens/images/b/b3/Glossy_Star.png",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/6/64/Stage_3_-_Glossy_Star.png/revision/latest?cb=20200721125243",
       "stage": 3
     },
     {
@@ -190,4 +192,186 @@ Map<String,List> chainItems= {
       "stage": 2
     }
   ],
+  'Aspirational_Decor':[
+    {
+      "name": "Gravel Path",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/6/63/Decor_1.png",
+      "stage": 1
+    },
+    {
+      "name": "Cobbled Path",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/a/a2/Decor_2.png",
+      "stage": 2
+    },
+    {
+      "name": "Rustic Fence",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/a/a9/Decor_3.png",
+      "stage": 3
+    },
+    {
+      "name": "Simple Night Lamp",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/e/ed/Decor_4.png",
+      "stage": 4
+    },
+    {
+      "name": "Rustic Bench",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/d/d7/Decor_5.png",
+      "stage": 5
+    },
+    {
+      "name": "Rustic Table",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/4/4c/Decor_6.png",
+      "stage": 6
+    },
+    {
+      "name": "Ornate Fence",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/b/b3/Decor_7.png",
+      "stage": 7
+    },
+    {
+      "name": "Ornate Bench",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/7/7f/Decor_8.png",
+      "stage": 8
+    },
+    {
+      "name": "Ornate Table",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/2/23/Decor_9.png",
+      "stage": 9
+    },
+    {
+      "name": "Ornate Night Lamp",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/6/62/Decor_10.png",
+      "stage": 10
+    },
+    {
+      "name": "Rustic Arched Trellis",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/f/f9/Decor_11.png",
+      "stage": 11
+    },
+    {
+      "name": "Ornate Arched Trellis",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/0/05/Decor_12.png",
+      "stage": 12
+    },
+    {
+      "name": "Ornate Gate",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/4/41/Decor_13.png",
+      "stage": 13
+    },
+    {
+      "name": "Rustic Pavilion",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/a/a9/Decor_14.png",
+      "stage": 14
+    },
+    {
+      "name": "Ornate Pavilion",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/6/6f/Decor_15.png",
+      "stage": 15
+    }
+  ],
+  'Aviaries':[
+    {
+      "name": "Wonderous Aviary",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/e/ea/Aviary_1.png",
+      "stage": 1
+    },
+    {
+      "name": "Stunning Aviary",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/0/07/Aviary_2.png",
+      "stage": 2
+    },
+    {
+      "name": "Spectacular Aviary",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/d/df/Aviary_3.png",
+      "stage": 3
+    },
+    {
+      "name": "Breathtaking Aviary",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/b/b5/Aviary_4.png",
+      "stage": 4
+    }
+  ],
+  'Baskets_and_Hampers':[
+    {
+      "name": "Dainty Brown Basket",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/d/df/Stage_1_-_Dainty_Brown_Basket.png",
+      "stage": 1
+    },
+    {
+      "name": "Dainty Green Basket",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/6/6d/Stage_1_-_Dainty_Green_Basket.png",
+      "stage": 1
+    },
+    {
+      "name": "Dainty Red Basket",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/6/65/Stage_1_-_Dainty_Red_Basket.png",
+      "stage": 1
+    },
+    {
+      "name": "Dainty Blue Basket",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/9/91/Stage_1_-_Dainty_Blue_Basket.png",
+      "stage": 1
+    },
+    {
+      "name": "Charming Brown Basket",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/8/87/Stage_2_-_Charming_Brown_Basket.png",
+      "stage": 2
+    },
+    {
+      "name": "Charming Green Basket",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/3/30/Stage_2_-_Charming_Green_Basket.png",
+      "stage": 2
+    },
+    {
+      "name": "Charming Red Basket",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/8/89/Stage_2_-_Charming_Red_Basket.png",
+      "stage": 2
+    },
+    {
+      "name": "Charming Blue Basket",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/c/c5/Stage_2_-_Charming_Blue_Basket.png",
+      "stage": 2
+    },
+    {
+      "name": "Abundant Brown Hamper",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/0/0a/Stage_3_-_Abundant_Brown_Hamper.png",
+      "stage": 3
+    },
+    {
+      "name": "Abundant Green Hamper",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/b/be/Stage_3_-_Abundant_Green_Hamper.png",
+      "stage": 3
+    },
+    {
+      "name": "Abundant Red Hamper",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/6/63/Stage_3_-_Abundant_Red_Hamper.png",
+      "stage": 3
+    },
+    {
+      "name": "Abundant Blue Hamper",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/8/86/Stage_3_-_Abundant_Blue_Hamper.png",
+      "stage": 3
+    },
+    {
+      "name": "Voluptuous Brown Hamper",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/5/52/Stage_4_-_Voluptuous_Brown_Hamper.png",
+      "stage": 4
+    },
+    {
+      "name": "Voluptuous Green Hamper",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/5/52/Stage_4_-_Voluptuous_Green_Hamper.png",
+      "stage": 4
+    },
+    {
+      "name": "Voluptuous Red Hamper",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/7/70/Stage_4_-_Voluptuous_Red_Hamper.png",
+      "stage": 4
+    },
+    {
+      "name": "Voluptuous Blue Hamper",
+      "url": "https://static.wikia.nocookie.net/merge-gardens/images/3/3f/Stage_4_-_Voluptuous_Blue_Hamper.png",
+      "stage": 4
+    }
+  ],
+  // 'Berry_Bushes':
 };
