@@ -27,9 +27,8 @@ class MergeCalculator {
     Map<int, int> breakdown = {targetLevel: targetCount};
 
     int currentLevelCount = targetCount;
-
     // Step down through each level
-    for (int level = targetLevel; level > 0; level--) {
+    for (int level = targetLevel; level > 1; level--) {
       // Logic: groups of 5 give 2, remainder (if odd) needs a merge of 3 to give 1
       int setsOfTwo = currentLevelCount ~/ 2;
       int remainder = currentLevelCount % 2;
@@ -52,6 +51,7 @@ class MergeCalculator {
     for (int i = targetLevel; i > 0; i--) {
       int neededForPrevious;
 
+      // print(i);
       if (i == 5) {
         // GOAL: Get Stage 5 from Stage 4.5 (Eggs)
         // Standard merge: 5 eggs -> 2 Stage 5
@@ -61,7 +61,7 @@ class MergeCalculator {
         // GOAL: Get those Eggs from Stage 4
         // Rule: 5 Stage 4 -> 6 Eggs
         // We need (eggsRequired / 6) sets of five Stage 4s
-        double setsOfFiveNeeded = eggsRequired / 6;
+        double setsOfFiveNeeded = eggsRequired / 12;
         neededForPrevious = (setsOfFiveNeeded.ceil() * 5);
 
       } else if (i == 45) {

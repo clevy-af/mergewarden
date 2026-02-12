@@ -1,4 +1,4 @@
-List<Map> chains= [
+List<Map<String,dynamic>> chains= [
   {"name": "Poplar Trees", "id": "Poplar_Trees", "stages": 11,"masterpiece":true},
   {"name": "Wild Flowers", "id": "Wild_Flowers", "stages": 18,"masterpiece":true},
   {"name": "Grasses", "id": "Grasses", "stages": 9,"masterpiece":true},
@@ -55,6 +55,7 @@ List<Map> chains= [
   {"name": "Aspirational Decor", "id": "Aspirational_Decor", "stages": 15},
   {"name": "Heart-Shaped Balloons", "id": "Heart-Shaped_Balloons", "stages": 2},
   {"name": "Recycled Boosters", "id": "Recycled_Boosters", "stages": 4},
+  // {"name": "Wildlife", "id": "Wildlife", "stages": 8},
 ];
 
 Map<String,List> chainItems= {

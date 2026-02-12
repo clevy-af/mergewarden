@@ -120,13 +120,13 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  int _selectedIndex = 0;
+  // int _selectedIndex = 0;
   Map<int,int> stageBreakdown={};
 
   Widget get navigationRail=>  NavigationRail(
     backgroundColor: Colors.white.withValues(alpha:0.5),
     selectedIndex: null,//_selectedIndex,
-    onDestinationSelected: (int index) => setState(() => _selectedIndex = index),
+    // onDestinationSelected: (int index) => setState(() => _selectedIndex = index),
     labelType: NavigationRailLabelType.all,
     leading: Column(
       children: [
@@ -175,7 +175,7 @@ class _DashboardState extends State<Dashboard> {
                 children: [
                   Row(
                     children: [
-                      SvgPicture.asset('mg_text.svg',width: MediaQuery.of(context).size.width*0.2,),
+                      SvgPicture.asset('mg_text.svg',width: MediaQuery.of(context).size.width*0.1,),
                       const SizedBox(width: 20),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
