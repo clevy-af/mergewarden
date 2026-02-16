@@ -23,12 +23,13 @@ class MergeCalculator {
     return totalBaseNeeded(targetLevel - 1, neededForNextLevelDown);
   }
 
-  static Map<int, int> getFullBreakdown(int targetLevel, int targetCount) {
+  static Map<int, int> getFullBreakdown(int targetLevel, int targetCount,[bool has0=false]) {
     Map<int, int> breakdown = {targetLevel: targetCount};
 
     int currentLevelCount = targetCount;
+    int lowestLevel = has0?0:1;
     // Step down through each level
-    for (int level = targetLevel; level > 1; level--) {
+    for (int level = targetLevel; level > lowestLevel; level--) {
       // Logic: groups of 5 give 2, remainder (if odd) needs a merge of 3 to give 1
       int setsOfTwo = currentLevelCount ~/ 2;
       int remainder = currentLevelCount % 2;
