@@ -253,6 +253,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                   }
                   // print('still going ahead?');
                   String? chainId=HiveProvider.appBox.get('chain');
+                  // print({'chain':chainId,'stage':stageController.text,'count':countController.text,'type':HiveProvider.appBox.get('type')});
                   setState(() {
 
                   // print(chainController.text);
@@ -277,11 +278,11 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                 );
                 },
                 style: TextButton.styleFrom(
-                  backgroundColor: cBackground,
+                  backgroundColor: cCard,
                   padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10)
                 ),
                 child: Text("Calculate!",
-                  style: TextStyle(letterSpacing: 1.5, fontSize: 12, fontWeight: FontWeight.bold,color: Colors.black),)
+                  style: TextStyle(letterSpacing: 1.5, fontSize: 12, fontWeight: FontWeight.bold,color: Colors.white),)
             ),
           ],
         ):
@@ -303,7 +304,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                     }, icon: Icon(Icons.refresh))
               ],
             ),
-            if(targetItem!.url!=null)
+            if(targetItem!.name!=null)
             Container(
               padding: const EdgeInsets.all(8),
               height: MediaQuery.of(context).size.height*0.4,
@@ -350,7 +351,6 @@ class LevelMiniCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Map? data=chainItems[chainId??0]?.firstWhere((element) => element['stage']==level,orElse: () => {'name':"Stage $level"},);
    String title=data?['name']??'Stage $level';
-   String? url=data?['url'];
     if (isWildlife) {
       if (level == 45) {
         title = "Magnificent Eggs";
@@ -370,7 +370,7 @@ class LevelMiniCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(title, style: const TextStyle(color: Colors.grey)),
-          if(url!=null)
+          if(chainId!=null&&chainId!='Wildlife')
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             height: kMinInteractiveDimension,
@@ -383,16 +383,16 @@ class LevelMiniCard extends StatelessWidget {
           if(showStage)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Text('Stage $level', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text('Stage $level', style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black)),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             margin: showStage?null:const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF9BAE96).withValues(alpha:0.3),
+              color: cCard,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
           ),
         ],
       ),

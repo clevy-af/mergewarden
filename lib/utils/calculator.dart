@@ -1,6 +1,5 @@
 class MergeCalculator {
-  /// Calculates how many [lowerLevelItems] are needed to produce [targetCount]
-  /// of the next level up.
+
   static Map<String, int> calculateRequired(int targetCount) {
     // How many sets of 2 can we get from merging 5?
     int setsOfTwo = targetCount ~/ 2;
@@ -15,14 +14,9 @@ class MergeCalculator {
     };
   }
 
-  /// Recursive function to find total base items (Level 0) needed for a target level
-  static int totalBaseNeeded(int targetLevel, int targetCount) {
-    if (targetLevel <= 0) return targetCount;
 
-    int neededForNextLevelDown = calculateRequired(targetCount)['totalNeeded']!;
-    return totalBaseNeeded(targetLevel - 1, neededForNextLevelDown);
-  }
-
+  /// Calculates how many each Level of items are needed to produce [targetLevel] x [targetCount].
+  /// [has0] includes seeds.
   static Map<int, int> getFullBreakdown(int targetLevel, int targetCount,[bool has0=false]) {
     Map<int, int> breakdown = {targetLevel: targetCount};
 
@@ -44,6 +38,7 @@ class MergeCalculator {
 
 }
 
+  /// Calculates how many each Level of Wildlife are needed to produce [targetLevel] x [targetCount].
   static Map<int, int> calculateWildlife(int targetLevel, int targetCount) {
     Map<int, int> breakdown = {targetLevel: targetCount};
     int currentNeeded = targetCount;
@@ -51,7 +46,6 @@ class MergeCalculator {
     // Loop backwards from Target to Stage 0
     for (int i = targetLevel; i > 0; i--) {
       int neededForPrevious;
-
       // print(i);
       if (i == 5) {
         // GOAL: Get Stage 5 from Stage 4.5 (Eggs)

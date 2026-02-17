@@ -196,7 +196,7 @@ class _DashboardState extends State<Dashboard> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 8),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                // crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
@@ -231,7 +231,7 @@ class _DashboardState extends State<Dashboard> {
                         ),
                       ),
                       Spacer(),
-                      Text('Merge Warden, for MergeGardens.',
+                      Text('Merge Warden, for Merge Gardens.',
                         style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.01,),
                         maxLines: 3,
                         softWrap: true,
