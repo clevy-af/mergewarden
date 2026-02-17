@@ -2,7 +2,7 @@ name: mergewarden
 description: "A MergeGardens Calculator."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.2.0
+version: 1.2.1
 
 environment:
   sdk: ^3.8.1

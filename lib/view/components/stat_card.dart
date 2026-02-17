@@ -51,7 +51,12 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(),
-                    Text('Target ${isWildlife?'Wildlife' : 'Item'} Calculator',style:  TextStyle(fontSize: MediaQuery.of(context).size.width*0.025, fontWeight: FontWeight.bold),),
+                    Semantics(
+                        label: 'Merge Gardens Calculator Header',
+                        child: Text('Target ${isWildlife?'Wildlife' : 'Item'} Calculator',
+                          style:  TextStyle(fontSize: MediaQuery.of(context).size.width*0.025,
+                              fontWeight: FontWeight.bold),),
+                    ),
                     Tooltip(
                       message: 'Enter Chain name to select and get stage details easily, add count for target items.\n The required items will be calculated and broken down per stage, visible below.',
                       preferBelow: true,
@@ -94,47 +99,50 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                         readOnly: isWildlife,
                         controller: chainController,
                       ):
-                      Autocomplete<String>(
-                        optionsBuilder: (TextEditingValue textEditingValue) {
-                          if (textEditingValue.text.isEmpty) {
-                            return const Iterable<String>.empty();
-                          }
-                          return chains.map((e) => e['name'].toString(),).where((String option) {
-                            return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
-                          });
-                        },
-                        optionsViewBuilder: (context, onSelected, options) {
-                          return Material(
-                            child: ListView.builder(
-                              itemCount: options.length,
-                              itemBuilder: (context, index) {
-                                final option = options.elementAt(index);
-                                return ListTile(
-                                  title: Text(option),
-                                  onTap: () => onSelected(option),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                        // displayStringForOption: (option) => option,
-                        onSelected: (String selection) {
-                          // print('You selected: $selection');
-                        HiveProvider.appBox.put('chain', chains.firstWhere((element) => element['name'].contains(selection),orElse: () => {'id':null},)['id']);
+                      Semantics(
+                        label: 'Merge Gardens Calculation Chain Autocomplete',
+                        child: Autocomplete<String>(
+                          optionsBuilder: (TextEditingValue textEditingValue) {
+                            if (textEditingValue.text.isEmpty) {
+                              return const Iterable<String>.empty();
+                            }
+                            return chains.map((e) => e['name'].toString(),).where((String option) {
+                              return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                            });
+                          },
+                          optionsViewBuilder: (context, onSelected, options) {
+                            return Material(
+                              child: ListView.builder(
+                                itemCount: options.length,
+                                itemBuilder: (context, index) {
+                                  final option = options.elementAt(index);
+                                  return ListTile(
+                                    title: Text(option),
+                                    onTap: () => onSelected(option),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                          // displayStringForOption: (option) => option,
+                          onSelected: (String selection) {
+                            // print('You selected: $selection');
+                          HiveProvider.appBox.put('chain', chains.firstWhere((element) => element['name'].contains(selection),orElse: () => {'id':null},)['id']);
 
-                        },
-                        fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                          // chainController=controller;
-                          return TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            decoration:  InputDecoration(
-                              labelText: 'Chain Name',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),),
-                          );
-                        },
+                          },
+                          fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                            // chainController=controller;
+                            return TextField(
+                              controller: controller,
+                              focusNode: focusNode,
+                              decoration:  InputDecoration(
+                                labelText: 'Chain Name',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),),
+                            );
+                          },
+                        ),
                       ),
                     );
                   }
@@ -182,18 +190,21 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                           ),
                         );
                       } else {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Enter stage of target item',
-                              labelText: 'Target Stage',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                                borderSide: BorderSide()
+                        return Semantics(
+                          label: 'Merge Gardens Calculation Target Stage TextField',
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Enter stage of target item',
+                                labelText: 'Target Stage',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  borderSide: BorderSide()
+                                ),
                               ),
+                              controller: stageController,
                             ),
-                            controller: stageController,
                           ),
                         );
                       }
@@ -212,15 +223,18 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Enter number of target items',
-                      labelText: 'Target Count',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15.0),
+                  child: Semantics(
+                    label: 'Merge Gardens Calculation Target Count TextField',
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Enter number of target items',
+                        labelText: 'Target Count',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
                       ),
+                      controller: countController,
                     ),
-                    controller: countController,
                   ),
                 ),
                 Positioned(
@@ -236,53 +250,56 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                 child: Text('Fields marked with * are mandatory.',style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.009),)
             ),
             const SizedBox(height: 20),
-            TextButton(
-                onPressed: () {
-                  String? targetName,chainUrl;
-                  if(stageController.text.isEmpty||countController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Filling in target details mandatory.')));
-                    return;
-                  }
+            Semantics(
+              label: 'Merge Gardens Calculation Button',
+              child: TextButton(
+                  onPressed: () {
+                    String? targetName,chainUrl;
+                    if(stageController.text.isEmpty||countController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Filling in target details mandatory.')));
+                      return;
+                    }
 
-                  int? stageCount,stageLevel;
-                  stageCount=int.tryParse(countController.text);
-                  stageLevel=int.tryParse(stageController.text);
-                  if([stageLevel,stageCount].contains(null)) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Numeric values make sense, don\'t they?')));
-                    return;
-                  }
-                  // print('still going ahead?');
-                  String? chainId=HiveProvider.appBox.get('chain');
-                  // print({'chain':chainId,'stage':stageController.text,'count':countController.text,'type':HiveProvider.appBox.get('type')});
-                  setState(() {
+                    int? stageCount,stageLevel;
+                    stageCount=int.tryParse(countController.text);
+                    stageLevel=int.tryParse(stageController.text);
+                    if([stageLevel,stageCount].contains(null)) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Numeric values make sense, don\'t they?')));
+                      return;
+                    }
+                    // print('still going ahead?');
+                    String? chainId=HiveProvider.appBox.get('chain');
+                    // print({'chain':chainId,'stage':stageController.text,'count':countController.text,'type':HiveProvider.appBox.get('type')});
+                    setState(() {
 
-                  // print(chainController.text);
-                  if(chainId!=null&&chainController.text!='Wildlife') {
-                    // chainName=chains.firstWhere((element) => element['name'].contains(chainController.text),orElse: () => {'id':null},)['id'];
+                    // print(chainController.text);
+                    if(chainId!=null&&chainController.text!='Wildlife') {
+                      // chainName=chains.firstWhere((element) => element['name'].contains(chainController.text),orElse: () => {'id':null},)['id'];
 
-                      Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==int.parse(stageController.text),orElse: () => {'name':null,'url':null},);
-                      targetName=data?['name'];
-                      chainUrl=data?['url'];
-                      // print(chainUrl);
-                  }
-                  targetItem=TargetItem(
-                      name: targetName,
-                      url: chainUrl,
-                      chain: chainController.text, count: int.tryParse(countController.text)??0,
-                      stage: int.parse(stageController.text)
+                        Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==int.parse(stageController.text),orElse: () => {'name':null,'url':null},);
+                        targetName=data?['name'];
+                        chainUrl=data?['url'];
+                        // print(chainUrl);
+                    }
+                    targetItem=TargetItem(
+                        name: targetName,
+                        url: chainUrl,
+                        chain: chainController.text, count: int.tryParse(countController.text)??0,
+                        stage: int.parse(stageController.text)
+                    );
+                  });
+                  widget.onSubmit(
+                      HiveProvider.appBox.get('type')=='wildlife'?MergeCalculator.calculateWildlife(targetItem!.stage, targetItem!.count):
+                      MergeCalculator.getFullBreakdown(targetItem!.stage, targetItem!.count,HiveProvider.appBox.get('chain0'))
                   );
-                });
-                widget.onSubmit(
-                    HiveProvider.appBox.get('type')=='wildlife'?MergeCalculator.calculateWildlife(targetItem!.stage, targetItem!.count):
-                    MergeCalculator.getFullBreakdown(targetItem!.stage, targetItem!.count,HiveProvider.appBox.get('chain0'))
-                );
-                },
-                style: TextButton.styleFrom(
-                  backgroundColor: cCard,
-                  padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10)
-                ),
-                child: Text("Calculate!",
-                  style: TextStyle(letterSpacing: 1.5, fontSize: 12, fontWeight: FontWeight.bold,color: Colors.white),)
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: cCard,
+                    padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10)
+                  ),
+                  child: Text("Calculate!",
+                    style: TextStyle(letterSpacing: 1.5, fontSize: 12, fontWeight: FontWeight.bold,color: Colors.white),)
+              ),
             ),
           ],
         ):
@@ -292,43 +309,55 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
               // mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                IconButton(
-                    tooltip: 'Reset',
-                    onPressed: () {
-                      setState(() {
-                        targetItem=null;HiveProvider.appBox.delete('chain');
-                        stageController.clear();
-                        countController.clear();
-                        widget.onSubmit({});
-                      });
-                    }, icon: Icon(Icons.refresh))
+                Semantics(
+                  label: 'Merge Gardens Calculation Reset Button',
+                  child: IconButton(
+                      tooltip: 'Reset',
+                      onPressed: () {
+                        setState(() {
+                          targetItem=null;HiveProvider.appBox.delete('chain');
+                          stageController.clear();
+                          countController.clear();
+                          widget.onSubmit({});
+                        });
+                      }, icon: Icon(Icons.refresh)),
+                )
               ],
             ),
             if(targetItem!.name!=null)
-            Container(
-              padding: const EdgeInsets.all(8),
-              height: MediaQuery.of(context).size.height*0.4,
-              width:MediaQuery.of(context).size.height*0.4,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(color: cBackground,blurRadius: 3,spreadRadius: 3)
-                ],
-                image: DecorationImage(
-                    image: AssetImage('assets/Stage_${targetItem!.stage}_-_${targetItem!.name?.replaceAll(' ', '_')}.webp'),
-                    fit: BoxFit.contain
+              Semantics(
+                label: 'Merge Gardens Calculation Target Item',
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                height: MediaQuery.of(context).size.height*0.4,
+                width:MediaQuery.of(context).size.height*0.4,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(color: cBackground,blurRadius: 3,spreadRadius: 3)
+                  ],
+                  image: DecorationImage(
+                      image: AssetImage('assets/Stage_${targetItem!.stage}_-_${targetItem!.name?.replaceAll(' ', '_')}.webp'),
+                      fit: BoxFit.contain
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 20),
 
-             Text(
-                (targetItem?.name??targetItem?.chain).toString(),
-                style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.04, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50)),
+            Semantics(
+              label: 'Merge Gardens Calculation Target Text',
+               child: Text(
+                  (targetItem?.name??targetItem?.chain).toString(),
+                  style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.04, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50)),
+                ),
+             ),
+            Semantics(
+              label: 'Merge Gardens Calculation Result',
+              child: Text(
+                "Breakdown for ${targetItem?.count} Stage ${targetItem?.stage} ${HiveProvider.appBox.get('type')=='wildlife'?'Wildlife':'Items'}",
+                style: TextStyle(letterSpacing: 1.5, fontSize:MediaQuery.of(context).size.width*0.02, fontWeight: FontWeight.bold),
               ),
-            Text(
-              "Breakdown for ${targetItem?.count} Stage ${targetItem?.stage} ${HiveProvider.appBox.get('type')=='wildlife'?'Wildlife':'Items'}",
-              style: TextStyle(letterSpacing: 1.5, fontSize:MediaQuery.of(context).size.width*0.02, fontWeight: FontWeight.bold),
             ),
             // SizedBox(height: 5,),
             // Text("PROGRESS: 0%", style: TextStyle(color: Colors.grey,fontSize: MediaQuery.of(context).size.width*0.03, fontWeight: FontWeight.bold)),
@@ -359,42 +388,45 @@ class LevelMiniCard extends StatelessWidget {
       }
     }
     var showStage = !(title.contains('Stage')||title.contains('Eggs'));
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha:0.8),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(title, style: const TextStyle(color: Colors.grey)),
-          if(chainId!=null&&chainId!='Wildlife')
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            height: kMinInteractiveDimension,
-            width:kMinInteractiveDimension,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              image: chainId!=null?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+    return Semantics(
+      label: 'Merge Gardens Calculation Stage $level Item',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha:0.8),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(title, style: const TextStyle(color: Colors.grey)),
+            if(chainId!=null&&chainId!='Wildlife')
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              height: kMinInteractiveDimension,
+              width:kMinInteractiveDimension,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                image: chainId!=null?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+              ),
             ),
-          ),
-          if(showStage)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Text('Stage $level', style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black)),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            margin: showStage?null:const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: cCard,
-              borderRadius: BorderRadius.circular(8),
+            if(showStage)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text('Stage $level', style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black)),
             ),
-            child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
-          ),
-        ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              margin: showStage?null:const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: cCard,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+            ),
+          ],
+        ),
       ),
     );
   }

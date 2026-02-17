@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -191,7 +189,23 @@ class _DashboardState extends State<Dashboard> {
                 children: [
                   Row(
                     children: [
-                      SvgPicture.asset('mg_text.svg',height: max(MediaQuery.of(context).size.width*0.1,kMinInteractiveDimension),),
+                      Text.rich(TextSpan(
+                        text: 'Merge Warden\n',
+                        children:[
+                          TextSpan(
+                            text: 'for Merge Gardens.',
+                            style: TextStyle(
+                                fontWeight: FontWeight.normal,fontSize: MediaQuery.of(context).size.width*0.01,
+
+                            ),
+                          ),
+                        ]
+                      ),
+                        style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.02,fontWeight: FontWeight.bold),
+                        maxLines: 3,
+                        textAlign: TextAlign.right,
+                        softWrap: true,
+                      ),
                       const SizedBox(width: 20),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -221,14 +235,6 @@ class _DashboardState extends State<Dashboard> {
                           }
                         ),
                       ),
-                      Spacer(),
-                      Text('Merge Warden, for Merge Gardens.',
-                        style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.01,),
-                        maxLines: 3,
-                        softWrap: true,
-                      ),
-                      const SizedBox(width: 10),
-
                     ],
                   ),
                   const SizedBox(height: 30),
