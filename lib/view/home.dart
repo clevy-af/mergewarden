@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -124,25 +126,6 @@ class _DashboardState extends State<Dashboard> {
   // int _selectedIndex = 0;
   Map<int,int> stageBreakdown={};
 
-  Widget get navigationRail=>  NavigationRail(
-    backgroundColor: Colors.white.withValues(alpha:0.5),
-    selectedIndex: null,//_selectedIndex,
-    // onDestinationSelected: (int index) => setState(() => _selectedIndex = index),
-    labelType: NavigationRailLabelType.all,
-    leading: Container(
-      margin: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-          image: DecorationImage(image: AssetImage('assets/mg_logo.jpeg'))
-      ),
-      height: 80,width: 80,
-    ),
-    destinations: const [
-      // NavigationRailDestination(icon: Icon(Icons.park), label: Text('Fruit Trees')),
-      // NavigationRailDestination(icon: Icon(Icons.egg), label: Text('Dragons')),
-    ],
-  );
-
   Widget get sidebar=> Container(
     color: cCard,
     padding:  const EdgeInsets.all(8),
@@ -183,8 +166,16 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: cBackground,
-      drawer: isDesktop?null:navigationRail,
-      appBar: isDesktop?null: AppBar(leading: IconButton(onPressed: () {} , icon:Icon( Icons.menu)),),
+      drawer: isDesktop?null:sidebar,
+      appBar: isDesktop?null: AppBar(
+        backgroundColor: cCard,
+        leading: Builder(
+        builder: (context) {
+          return IconButton(onPressed: () {
+            Scaffold.of(context).openDrawer();
+          } , icon:Icon( Icons.menu));
+        }
+      ),),
       body: Row(
         children: [
           // Sidebar
@@ -200,7 +191,7 @@ class _DashboardState extends State<Dashboard> {
                 children: [
                   Row(
                     children: [
-                      SvgPicture.asset('mg_text.svg',height: MediaQuery.of(context).size.height*0.1,),
+                      SvgPicture.asset('mg_text.svg',height: max(MediaQuery.of(context).size.width*0.1,kMinInteractiveDimension),),
                       const SizedBox(width: 20),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
