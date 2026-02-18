@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <base href="$FLUTTER_BASE_HREF">
+    <base href="$FLUTTER_BASE_HREF">
     <meta name="google-site-verification" content="mVnAAeJa0JHtTWMloUNvmLvbCG56bDzBs9YoqqrUJmg" />
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -69,6 +68,27 @@
         </ul>
     </section>
 </div>
-  <script src="flutter_bootstrap.js" async></script>
+  <script src="flutter_bootstrap.js" async>
+
+  window.addEventListener('load', function(ev) {
+    // Download main.dart.js
+    _flutter.loader.load({
+      serviceWorker: {
+        serviceWorkerVersion: serviceWorkerVersion,
+      },
+      onEntrypointLoaded: function(engineInitializer) {
+        engineInitializer.initializeEngine().then(function(appRunner) {
+          appRunner.runApp();
+
+          // FORCE VIEWPORT OVERRIDE AFTER RUNNING
+          var viewport = document.querySelector('meta[name="viewport"]');
+          if (viewport) {
+            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=5.0');
+          }
+        });
+      }
+    });
+  });
+  </script>
 </body>
 </html>

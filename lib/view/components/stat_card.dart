@@ -58,95 +58,104 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                               fontWeight: FontWeight.bold),),
                     ),
                     Tooltip(
-                      message: 'Enter Chain name to select and get stage details easily, add count for target items.\n The required items will be calculated and broken down per stage, visible below.',
+                      message: 'How to Use',
+                      // message: 'Enter Chain name to select and get stage details easily, add count for target items.\n The required items will be calculated and broken down per stage, visible below.',
                       preferBelow: true,
                       triggerMode: TooltipTriggerMode.tap,
                       child: IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.info_outline),
+                          onPressed: showExplainerDialog,
+                          icon: Icon(Icons.question_mark_outlined,color: cCard,),
                         // tooltip: 'Info',
                       ),
                     ),],
                 );
               }
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child:ValueListenableBuilder(
-                  valueListenable: HiveProvider.appBox.listenable(keys: ['type','chain']),
-                  // key: ValueKey(null),
-                  builder: (context,data,_) {
-                    bool isWildlife=data.get('type')=='wildlife';
+            ValueListenableBuilder(
+                valueListenable: HiveProvider.appBox.listenable(keys: ['type','chain']),
+                // key: ValueKey(null),
+                builder: (context,data,_) {
+                  bool isWildlife=data.get('type')=='wildlife';
 
-                    if(isWildlife){
-                      chainController = TextEditingController()..text='Wildlife';
-                      data.put('chain',chainController.text);
+                  if(isWildlife){
+                    chainController = TextEditingController()..text='Wildlife';
+                    data.put('chain',chainController.text);
 
-                    }
-                    else {
-                      chainController.clear();
-                    }
-                    return Container(
-                      key: ValueKey(data.get('type')),
-                      child: isWildlife?TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter ${isWildlife?'Wildlife' : 'Chain'} Name',
-                          labelText: '${isWildlife?'Wildlife' : 'Chain'} Name',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15.0),
+                  }
+                  else {
+                    chainController.clear();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+
+                          key: ValueKey(data.get('type')),
+                          child: isWildlife?TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Enter ${isWildlife?'Wildlife' : 'Chain'} Name',
+                              labelText: '${isWildlife?'Wildlife' : 'Chain'} Name',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                            ),
+                            readOnly: isWildlife,
+                            controller: chainController,
+                          ):
+                          Semantics(
+                            label: 'Merge Gardens Calculation Chain Autocomplete',
+                            child: Autocomplete<String>(
+                              optionsBuilder: (TextEditingValue textEditingValue) {
+                                if (textEditingValue.text.isEmpty) {
+                                  return const Iterable<String>.empty();
+                                }
+                                return chains.map((e) => e['name'].toString(),).where((String option) {
+                                  return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                                });
+                              },
+                              optionsViewBuilder: (context, onSelected, options) {
+                                return Material(
+                                  child: ListView.builder(
+                                    itemCount: options.length,
+                                    itemBuilder: (context, index) {
+                                      final option = options.elementAt(index);
+                                      return ListTile(
+                                        title: Text(option),
+                                        onTap: () => onSelected(option),
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                              // displayStringForOption: (option) => option,
+                              onSelected: (String selection) {
+                                // print('You selected: $selection');
+                              HiveProvider.appBox.put('chain', chains.firstWhere((element) => element['name'].contains(selection),orElse: () => {'id':null},)['id']);
+
+                              },
+                              fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                                // chainController=controller;
+                                return TextField(
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  decoration:  InputDecoration(
+                                    labelText: 'Chain Name',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),),
+                                );
+                              },
+                            ),
                           ),
                         ),
-                        readOnly: isWildlife,
-                        controller: chainController,
-                      ):
-                      Semantics(
-                        label: 'Merge Gardens Calculation Chain Autocomplete',
-                        child: Autocomplete<String>(
-                          optionsBuilder: (TextEditingValue textEditingValue) {
-                            if (textEditingValue.text.isEmpty) {
-                              return const Iterable<String>.empty();
-                            }
-                            return chains.map((e) => e['name'].toString(),).where((String option) {
-                              return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
-                            });
-                          },
-                          optionsViewBuilder: (context, onSelected, options) {
-                            return Material(
-                              child: ListView.builder(
-                                itemCount: options.length,
-                                itemBuilder: (context, index) {
-                                  final option = options.elementAt(index);
-                                  return ListTile(
-                                    title: Text(option),
-                                    onTap: () => onSelected(option),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          // displayStringForOption: (option) => option,
-                          onSelected: (String selection) {
-                            // print('You selected: $selection');
-                          HiveProvider.appBox.put('chain', chains.firstWhere((element) => element['name'].contains(selection),orElse: () => {'id':null},)['id']);
-
-                          },
-                          fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                            // chainController=controller;
-                            return TextField(
-                              controller: controller,
-                              focusNode: focusNode,
-                              decoration:  InputDecoration(
-                                labelText: 'Chain Name',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  }
-              ),
+                        Text('Chains Available with Images: A-B',style: hintStyle,),
+                      ],
+                    ),
+                  );
+                }
             ),
 
             Stack(
@@ -247,7 +256,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
             Container(
               alignment: Alignment.centerLeft,
                 padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Text('Fields marked with * are mandatory.',style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.009),)
+                child: Text('Fields marked with * are mandatory.',style: hintStyle,)
             ),
             const SizedBox(height: 20),
             Semantics(
@@ -365,6 +374,71 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
           ],
         ),
       ),
+    );
+  }
+
+  void showExplainerDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('How to use Target Item Calculator'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('• Make sure you have selected the correct tab above the form: Items / Wildlife.'),
+                const Text('• In the form-'),
+                const Text('1. Select your chain: e.g., Oak Trees, Tulips, etc. (Optional)'),
+                const Text('2. Enter the Stage Level you want to reach.'),
+                const Text('3. Enter how many of those items you need.'),
+                const Divider(height: 30),
+                const Text('Example Calculation:', style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+
+                // Example Table
+                Table(
+                  border: TableBorder.all(color: Colors.grey.shade300),
+                  children: const [
+                    TableRow(children: [
+                      Padding(padding: EdgeInsets.all(8), child: Text('Input', style: TextStyle(fontWeight: FontWeight.bold))),
+                      Padding(padding: EdgeInsets.all(8), child: Text('Value', style: TextStyle(fontWeight: FontWeight.bold))),
+                    ]),
+                    TableRow(children: [
+                      Padding(padding: EdgeInsets.all(8), child: Text('Chain')),
+                      Padding(padding: EdgeInsets.all(8), child: Text('Oak Trees')),
+                    ]),
+                    TableRow(children: [
+                      Padding(padding: EdgeInsets.all(8), child: Text('Target Stage')),
+                      Padding(padding: EdgeInsets.all(8), child: Text('4')),
+                    ]),
+                    TableRow(children: [
+                      Padding(padding: EdgeInsets.all(8), child: Text('Quantity')),
+                      Padding(padding: EdgeInsets.all(8), child: Text('2')),
+                    ]),
+                  ],
+                ),
+
+                const SizedBox(height: 15),
+                const Text('• View Result: All required items will be calculated and broken down per stage, shown below the form.'),
+                const SizedBox(height: 15),
+
+                const Text(
+                      'NB: Calculation is optimal, without extras. 5-merges till possible, then 3-merge as needed.',
+                  style: hintStyle,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Got it!'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

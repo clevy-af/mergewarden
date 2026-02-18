@@ -345,5 +345,31 @@ Map<String,List> chainItems= {
     //   "stage": 4
     // }
   ],
-  // 'Berry_Bushes':
+  'Berries':[
+    {"name": "Cranberry", "stage": 1},
+    {"name": "Blackberry", "stage": 2},
+    {"name": "Strawberry", "stage": 3},
+    {"name": "Blueberry", "stage": 4},
+    {"name": "Raspberry", "stage": 5},
+    {"name": "Cloudberry", "stage": 6},
+    {"name": "Gooseberry", "stage": 7},
+    {"name": "White Currant", "stage": 8},
+    {"name": "Physalis", "stage": 9}
+  ],
+  'Berry_Bushes':[
+    {"name": "Sprouting Berry Bush", "stage": 1},
+    {"name": "Growing Berry Bush", "stage": 2},
+    {"name": "Maturing Berry Bush", "stage": 3},
+    {"name": "Cranberry Bush", "stage": 4},
+    {"name": "Blackberry Bush", "stage": 5},
+    {"name": "Strawberry Bush", "stage": 6},
+    {"name": "Blueberry Bush", "stage": 7},
+    {"name": "Raspberry Bush", "stage": 8},
+    {"name": "Cloudberry Bush", "stage": 9},
+    {"name": "Gooseberry Bush", "stage": 10},
+    {"name": "White Currant Bush", "stage": 11},
+    {"name": "Physalis Bush", "stage": 12},
+    {"name": "Fanciful Labyrinth", "stage": 13}
+  ],
+
 };
