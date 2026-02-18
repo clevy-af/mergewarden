@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/hive_provider.dart';

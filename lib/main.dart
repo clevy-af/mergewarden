@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/view/home.dart';
@@ -7,7 +7,7 @@ import 'package:mergewarden/view/home.dart';
 void main() async{
 
     WidgetsFlutterBinding.ensureInitialized();
-
+    await Hive.initFlutter();
     HiveProvider.appBox=await Hive.openBox('app');
     await HiveProvider.appBox.put('type', 'items');
 
