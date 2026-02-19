@@ -2,8 +2,9 @@ class ChainMeta {
   final String name;
   final String id;
   final int stages;
-  final bool masterpiece;
-  ChainMeta({required this.name,required this.id,required this.stages,this.masterpiece=false, });
+  final int? masterpiece;
+
+  ChainMeta({required this.name,required this.id,required this.stages,this.masterpiece, });
   Map<String, dynamic> toJson() => {
     "name": name,
     "id": id,
