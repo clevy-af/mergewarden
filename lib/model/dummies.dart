@@ -45,7 +45,7 @@ List<Map<String,dynamic>> chains= [
   {"name": "Aqua Trunks", "id": "Aqua_Trunks", "stages": 2},
   {"name": "Dutch Trunks", "id": "Dutch_Trunks", "stages": 2},
   {"name": "Floral Trunks", "id": "Floral_Trunks", "stages": 2},
-  {"name": "Tradesman's Trunks", "id": "Tradesman%27s_Trunks", "stages": 2},
+  {"name": "Tradesman's Trunks", "id": "Tradesman's_Trunks", "stages": 2},
   {"name": "Timber Trunk", "id": "Timber_Trunk", "stages": 2},
   {"name": "Precious Gems", "id": "Precious_Gems", "stages": 3},
   {"name": "Aviaries", "id": "Aviaries", "stages": 4},
@@ -676,6 +676,156 @@ Map<String,List> chainItems= {
   'Secret_Wells':[
     {"name": "Hidden Spring", "stage": 1},
     {"name": "Secluded Reservoir", "stage": 2}
+  ],
+  'Timber':[
+    {"name": "Timber Log", "stage": 1},
+    {"name": "Timber Cuts", "stage": 2},
+    {"name": "Timber Pile", "stage": 3},
+    {"name": "Bundle of Timber", "stage": 4},
+    {"name": "Lenghts of Timber", "stage": 5},
+    {"name": "Stack of Timber", "stage": 6},
+    {"name": "Sturdy Timber Pile", "stage": 7},
+    {"name": "Plentiful Timber Pile", "stage": 8},
+    {"name": "Industrial Log Pile", "stage": 9}
+  ],
+  'Timber_Trunk':[
+    {"name": "Handsome Timber Trunk", "stage": 1},
+    {"name": "Exquisite Timber Trunk", "stage": 2}
+  ],
+  'Topiaries':[
+    {"name": "Duckling Topiary", "stage": 1},
+    {"name": "Bunny Topiary", "stage": 2},
+    {"name": "Squirrel Topiary", "stage": 3},
+    {"name": "Fox Topiary", "stage": 4},
+    {"name": "Deer Topiary", "stage": 5},
+    {"name": "Panda Topiary", "stage": 6},
+    {"name": "Elephant Topiary", "stage": 7},
+    {"name": "Royal Peacock Topiary", "stage": 8}
+  ],
+  "Tradesman's_Trunks":[
+    {"name": "Sturdy Tradesman's Trunk", "stage": 1},
+    {"name": "Solid Tradesman's Trunk", "stage": 2}
+  ],
+  'Treasure_Chests':[
+    {"name": "Small Chest", "stage": 1},
+    {"name": "Comely Chest", "stage": 2},
+    {"name": "Elegant Chest", "stage": 3},
+    {"name": "Handsome Chest", "stage": 4},
+    {"name": "Charming Chest", "stage": 5},
+    {"name": "Delightful Chest", "stage": 6},
+    {"name": "Bountiful Chest", "stage": 7}
+  ],
+  'Tulips':[
+    {"name": "Tulip Bulb", "stage": 0},
+    {"name": "Yellow Tulip", "stage": 1},
+    {"name": "Orange Tulips", "stage": 2},
+    {"name": "Red Tulips", "stage": 3},
+    {"name": "White Tulips", "stage": 4},
+    {"name": "Tulip Bouquet", "stage": 5},
+    {"name": "Punnet of Tulips", "stage": 6},
+    {"name": "Barrel of Tulips", "stage": 7},
+    {"name": "Barrow of Tulips", "stage": 8},
+    {"name": "Wreath of Tulips", "stage": 9},
+    {"name": "Dutch Windmill", "stage": 10}
+  ],
+  'Vegetable_Patches':[
+    {"name": "Vegetable Nursery", "stage": 1},
+    {"name": "Radish Patch", "stage": 2},
+    {"name": "Carrot Patch", "stage": 3},
+    {"name": "Eggplant Patch", "stage": 4},
+    {"name": "Chili Patch", "stage": 5},
+    {"name": "Prizewinning Pumpkin Patch", "stage": 6}
+  ],
+  'Vegetables':[
+    {"name": "Radish", "stage": 1},
+    {"name": "Carrot", "stage": 2},
+    {"name": "Eggplant", "stage": 3},
+    {"name": "Chili", "stage": 4}
+  ],
+  'Vines':[
+    {"name": "Seedling Vine", "stage": 0},
+    {"name": "Sprouting Vine", "stage": 1},
+    {"name": "Growing Vine", "stage": 2},
+    {"name": "Vine Trellis", "stage": 3},
+    {"name": "Vine Portico", "stage": 4},
+    {"name": "Vine Overhang", "stage": 5},
+    {"name": "Vine Lattice", "stage": 6},
+    {"name": "Vine Arbor", "stage": 7},
+    {"name": "Vine Gazebo", "stage": 8},
+    {"name": "Vine Summerhouse", "stage": 9},
+    {"name": "Provincial Vineyard", "stage": 10}
+  ],
+  'Water_Wheels':[
+    {"name": "Rustic Wheel", "stage": 1},
+    {"name": "Quaint Mill", "stage": 2}
+  ],
+  'Wild_Flowers':[
+    {"name": "Wild Flower Seed", "stage": 0},
+    {"name": "Sprout", "stage": 1},
+    {"name": "Dandelion", "stage": 2},
+    {"name": "Buttercup", "stage": 3},
+    {"name": "Daisy", "stage": 4},
+    {"name": "Forget-Me-Not", "stage": 5},
+    {"name": "Poppy", "stage": 6},
+    {"name": "Hosta", "stage": 7},
+    {"name": "Foxglove", "stage": 8},
+    {"name": "Azalea", "stage": 9},
+    {"name": "Peony", "stage": 10},
+    {"name": "Hardy Hibiscus", "stage": 11},
+    {"name": "Rhododendron", "stage": 12},
+    {"name": "Hydrangea", "stage": 13},
+    {"name": "Lustrous Flower Bed", "stage": 14},
+    {"name": "Stunning Flower Bed", "stage": 15},
+    {"name": "Exquisite Flower Bed", "stage": 16},
+    {"name": "Magnificent Flower Bed", "stage": 17},
+    {"name": "Glass House", "stage": 18}
+  ],
+  'Wildlife_Homes':[
+    {"name": "Fine Bird House", "stage": 1},
+    {"name": "Elegant Bird House", "stage": 2},
+    {"name": "Exquisite Bird House", "stage": 3},
+    {"name": "Delightful Home", "stage": 4},
+    {"name": "Marvelous Home", "stage": 5},
+    {"name": "Lavish Home", "stage": 6},
+    {"name": "Magnificent Home", "stage": 7},
+    {"name": "Divine Sanctuary", "stage": 8}
+  ],
+  'Wood_Storage':[
+    {"name": "Wood Shelter", "stage": 1},
+    {"name": "Wood Stash", "stage": 2},
+    {"name": "Wood Shack", "stage": 3},
+    {"name": "Wood Lean-to", "stage": 4},
+    {"name": "Wood Shed", "stage": 5},
+    {"name": "Wood Hut", "stage": 6},
+    {"name": "Wood Cabin", "stage": 7},
+    {"name": "Timber Cottage", "stage": 8}
+  ],
+  'Yard_Games':[
+    {"name": "Soccer Ball", "stage": 1},
+    {"name": "Connect Four", "stage": 2},
+    {"name": "Croquet", "stage": 3},
+    {"name": "Ring Toss", "stage": 4},
+    {"name": "Chess", "stage": 5},
+    {"name": "Lawn Match Cards", "stage": 6},
+    {"name": "Darts", "stage": 7},
+    {"name": "Tetherball", "stage": 8},
+    {"name": "Giant Jenga", "stage": 9},
+    {"name": "Bowling", "stage": 10},
+    {"name": "Cornhole", "stage": 11},
+    {"name": "Treehouse", "stage": 12}
+  ],
+  'Zen_Gardens':[
+    {"name": "Zen Stones", "stage": 0},
+    {"name": "Soothing Garden", "stage": 1},
+    {"name": "Gentle Garden", "stage": 2},
+    {"name": "Restful Garden", "stage": 3},
+    {"name": "Sedate Garden", "stage": 4},
+    {"name": "Peaceful Garden", "stage": 5},
+    {"name": "Stoic Garden", "stage": 6},
+    {"name": "Tranquil Garden", "stage": 7},
+    {"name": "Quiescent Garden", "stage": 8},
+    {"name": "Serene Garden", "stage": 9},
+    {"name": "Enlightened Sanctuary", "stage": 10}
   ],
 
 };

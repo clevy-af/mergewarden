@@ -151,7 +151,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                             ),
                           ),
                         ),
-                        Text('Chains Available with Images: A-N',style: hintStyle,),
+                        Text('All Chains Available with Images (except Recycled Boosters)',style: hintStyle,),
                       ],
                     ),
                   );
@@ -338,13 +338,15 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                 label: 'Merge Gardens Calculation Target Item',
               child: Container(
                 padding: const EdgeInsets.all(8),
+                // margin: EdgeInsets.all(8),
                 height: MediaQuery.of(context).size.height*0.4,
                 width:MediaQuery.of(context).size.height*0.4,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(color: cBackground,blurRadius: 3,spreadRadius: 3)
-                  ],
+                  color: cCard,
+                  // boxShadow: [
+                  //   BoxShadow(color: cCard,blurRadius: 3,spreadRadius: 3)
+                  // ],
                   image: DecorationImage(
                       image: AssetImage('assets/Stage_${targetItem!.stage}_-_${targetItem!.name?.replaceAll(' ', '_')}.webp'),
                       fit: BoxFit.contain
