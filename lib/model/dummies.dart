@@ -460,5 +460,69 @@ Map<String,List> chainItems= {
     {"name": "Dragonfruit", "stage": 6},
     {"name": "Durian", "stage": 7}
   ],
-
+  'Garden_Gnomes':[
+    {"name": "Garden Gnome", "stage": 1},
+    {"name": "Brisk Gnome", "stage": 2},
+    {"name": "Gardening Gnome", "stage": 3},
+    {"name": "Foraging Gnome", "stage": 4},
+    {"name": "Relaxing Gnome", "stage": 5},
+    {"name": "Fisher Gnome", "stage": 6},
+    {"name": "Surprised Gnome", "stage": 7},
+    {"name": "Adventurous Gnome", "stage": 8},
+    {"name": "Startled Gnome", "stage": 9},
+    {"name": "Befriending Fellows", "stage": 10},
+    {"name": "Kindred Spirits", "stage": 11},
+    {"name": "Retired Adventurers", "stage": 12},
+    {"name": "Ancient Friends", "stage": 13}
+  ],
+  'Garden_Statues':[
+    {"name": "Sundial Statue", "stage": 1},
+    {"name": "Dove Statue", "stage": 2},
+    {"name": "Pooch Statue", "stage": 3},
+    {"name": "Lion Statue", "stage": 4},
+    {"name": "Pegasus Statue", "stage": 5}
+  ],
+  'Gardening_Tools':[
+    {"name": "Gardening Glove", "stage": 1},
+    {"name": "Hand Rake", "stage": 2},
+    {"name": "Trowel", "stage": 3},
+    {"name": "Shears", "stage": 4},
+    {"name": "Leaf Rake", "stage": 5},
+    {"name": "Shovel", "stage": 6},
+    {"name": "Wheelbarrow", "stage": 7},
+    {"name": "Hand Saw", "stage": 8},
+    {"name": "Power Drill", "stage": 9},
+    {"name": "Toolbox", "stage": 10},
+    {"name": "Miter Saw", "stage": 11},
+    {"name": "Scroll Bender", "stage": 12},
+    {"name": "Welder", "stage": 13},
+    {"name": "Rolling Mill", "stage": 14},
+    {"name": "Forge", "stage": 15},
+    {"name": "Lathe", "stage": 16},
+    {"name": "Table Saw", "stage": 17},
+    {"name": "Ironworker", "stage": 18},
+    {"name": "Toolshed", "stage": 19},
+    {"name": "Mastercraft Workshop", "stage": 20}
+  ],
+  'Grasses':[
+    {"name": "Mossy Pebbles", "stage": 1},
+    {"name": "Grassy Tuft", "stage": 2},
+    {"name": "Grass Patch", "stage": 3},
+    {"name": "Blooming Grass", "stage": 4},
+    {"name": "Wild Grasses", "stage": 5},
+    {"name": "Magnificent Grasses", "stage": 6},
+    {"name": "Great Grasses", "stage": 7},
+    {"name": "Grassy Spectacle", "stage": 8},
+    {"name": "Mediterranean Patio", "stage": 9}
+  ],
+  'Heart-Shaped_Balloons':[
+    {"name": "Life Balloon", "stage": 1},
+    {"name": "Balloon Cluster", "stage": 2}
+  ],
+  'Honey':[
+    {"name": "Honeycomb", "stage": 1},
+    {"name": "Honey Jar", "stage": 2},
+    {"name": "Honey Cache", "stage": 3},
+    {"name": "Honey Stand", "stage": 4}
+  ],
 };
