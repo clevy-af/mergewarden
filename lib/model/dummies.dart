@@ -570,5 +570,65 @@ Map<String,List> chainItems= {
     {"name": "Refined Orange Nectar", "stage": 7},
     {"name": "Rainbow Nectar", "stage": 8},
     {"name": "Flawless Nectar", "stage": 9}
-  ]
+  ],
+  'Oak_Trees':[
+    {"name": "Acorn", "stage": 0},
+    {"name": "Oak Sapling", "stage": 1},
+    {"name": "Growing Oak", "stage": 2},
+    {"name": "Young Oak", "stage": 3},
+    {"name": "Handsome Oak", "stage": 4},
+    {"name": "Sturdy Oak", "stage": 5},
+    {"name": "Strong Oak", "stage": 6},
+    {"name": "Great Oak", "stage": 7},
+    {"name": "Elder Oak", "stage": 8},
+    {"name": "Ancient Oak", "stage": 9},
+    {"name": "Whomping Oak", "stage": 10}
+  ],
+  'Ore_Veins':[
+    {"name": "Mysterious Vein", "stage": 1},
+    {"name": "Gorgeous Vein", "stage": 2}
+  ],
+  'Ornamental_Vases':[
+    {"name": "Earthenware Vase", "stage": 1},
+    {"name": "Terracotta Vase", "stage": 2},
+    {"name": "Artisan Vase", "stage": 3},
+    {"name": "Tuscan Vase", "stage": 4},
+    {"name": "Imari Vase", "stage": 5},
+    {"name": "Delft Vase", "stage": 6},
+    {"name": "Parisian Vase", "stage": 7},
+    {"name": "Murano Vase", "stage": 8},
+    {"name": "Faberge Vase", "stage": 9},
+    {"name": "Renaissance Vase", "stage": 10},
+    {"name": "Artisanal Ceramic Oven", "stage": 11}
+  ],
+  'Ponds':[
+    {"name": "Puddle", "stage": 1},
+    {"name": "Quagmire", "stage": 2},
+    {"name": "Water Hole", "stage": 3},
+    {"name": "Shimmering Pond", "stage": 4},
+    {"name": "Lively Pond", "stage": 5},
+    {"name": "Flowing Pond", "stage": 6},
+    {"name": "Blooming Pond", "stage": 7},
+    {"name": "Delightful Pond", "stage": 8},
+    {"name": "Ancient Aqueduct", "stage": 9}
+  ],
+  'Poplar_Trees':[
+    {"name": "Poplar Tree Leaf", "stage": 0},
+    {"name": "Sprouting Poplar", "stage": 1},
+    {"name": "Growing Poplar", "stage": 2},
+    {"name": "Young Poplar", "stage": 3},
+    {"name": "Adult Poplar", "stage": 4},
+    {"name": "Mature Poplar", "stage": 5},
+    {"name": "Distinguished Poplar", "stage": 6},
+    {"name": "Majestic Poplar", "stage": 7},
+    {"name": "Old World Poplar", "stage": 8},
+    {"name": "Poplar Ruins", "stage": 9},
+    {"name": "Poplar Columnade", "stage": 10},
+    {"name": "Appian Way", "stage": 11}
+  ],
+  'Precious_Gems':[
+    {"name": "Glimmering Gem", "stage": 1},
+    {"name": "Immaculate Gem", "stage": 2},
+    {"name": "Flawless Gem", "stage": 3}
+  ],
 };
