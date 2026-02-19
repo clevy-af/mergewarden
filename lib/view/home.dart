@@ -214,7 +214,10 @@ class _DashboardState extends State<Dashboard> {
                             return ActionChip(
                               tooltip: 'Items Calculator',
                               side: data.get('type')=='items'?BorderSide(color: Colors.green):null,
-                                onPressed: () async => await  HiveProvider.appBox.put('type', 'items'),
+                                onPressed: () async {
+                                  await  HiveProvider.appBox.put('type', 'items');
+                                  await  HiveProvider.appBox.put('chain', null);
+                                },
                                 label: Text('Items')
                             );
                           }

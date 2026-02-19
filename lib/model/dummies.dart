@@ -34,7 +34,7 @@ List<Map<String,dynamic>> chains= [
   {"name": "Amber Wishing Stars", "id": "Amber_Wishing_Stars", "stages": 6},
   {"name": "Honey", "id": "Honey", "stages": 4},
   {"name": "Mossy Timber", "id": "Mossy_Timber", "stages": 5},
-  {"name": "Fruit", "id": "Fruits", "stages": 7},
+  {"name": "Fruits", "id": "Fruits", "stages": 7},
   {"name": "Vegetables", "id": "Vegetables", "stages": 4},
   {"name": "Berries", "id": "Berries", "stages": 9},
   {"name": "Garden Statues", "id": "Garden_Statues", "stages": 5},
@@ -370,6 +370,95 @@ Map<String,List> chainItems= {
     {"name": "White Currant Bush", "stage": 11},
     {"name": "Physalis Bush", "stage": 12},
     {"name": "Fanciful Labyrinth", "stage": 13}
+  ],
+'Coins':[
+  {"name": "Gold Coin", "stage": 1},
+  {"name": "Solid Coins", "stage": 2},
+  {"name": "Pile of Coins", "stage": 3},
+  {"name": "Stash of Coins", "stage": 4},
+  {"name": "Heap of Coins", "stage": 5},
+  {"name": "Gold Bars", "stage": 6},
+  {"name": "Mountain of Gold", "stage": 7},
+  {"name": "Gold Collection", "stage": 8},
+  {"name": "Temple of Gold", "stage": 9}
+],
+  'Coin_Storage':[
+    {"name": "Coin Cache", "stage": 1},
+    {"name": "Coin Hideout", "stage": 2},
+    {"name": "Coin Stash", "stage": 3},
+    {"name": "Coin Storehouse", "stage": 4},
+    {"name": "Coin Repository", "stage": 5},
+    {"name": "Coin Vault", "stage": 6},
+    {"name": "Coin Treasury", "stage": 7},
+    {"name": "Garden Bank", "stage": 8}
+  ],
+  'Dutch_Trunks':[
+    {"name": "Elegant Dutch Trunk", "stage": 1},
+    {"name": "Superb Dutch Trunk", "stage": 2}
+  ],
+  'Exotic_Flora':[
+    {"name": "Curious Seeds", "stage": 0},
+    {"name": "Flamingo Flower", "stage": 1},
+    {"name": "Plumeria", "stage": 2},
+    {"name": "Angel Wing Begonia", "stage": 3},
+    {"name": "Pink Ginger", "stage": 4},
+    {"name": "Bird of Paradise", "stage": 5},
+    {"name": "Passion Flower", "stage": 6},
+    {"name": "Protea", "stage": 7},
+    {"name": "Pitcher Plant", "stage": 8},
+    {"name": "Rafflesia", "stage": 9},
+    {"name": "Titan Arum", "stage": 10},
+    {"name": "Botanical Arbour", "stage": 11}
+  ],
+'Faberge_Egg':[
+  {
+    "name": "Faberge Egg Shard",
+    "stage": 1
+  },
+  {
+    "name": "Faberge Egg",
+    "stage": 2
+  }
+],
+  'Floral_Trunks':[
+    {
+      "name": "Delicate Floral Trunk",
+      "stage": 1
+    },
+    {
+      "name": "Stunning Floral Trunk",
+      "stage": 2
+    }
+  ],
+  'Fountains':[
+    {"name": "Peaceful Fountain", "stage": 1},
+    {"name": "Grand Fountain", "stage": 2},
+    {"name": "Fish Sculpture Fountain", "stage": 3},
+    {"name": "Mermaid Sculpture Fountain", "stage": 4},
+    {"name": "Unidolphasus Sculpture Fountain", "stage": 5}
+  ],
+  'Fruit_Trees':[
+    {"name": "Fruit Tree Seed", "stage": 0},
+    {"name": "Fruit Tree Sprout", "stage": 1},
+    {"name": "Seedling Fruit Tree", "stage": 2},
+    {"name": "Budding Fruit Tree", "stage": 3},
+    {"name": "Apple Tree", "stage": 4},
+    {"name": "Lemon Tree", "stage": 5},
+    {"name": "Cherry Tree", "stage": 6},
+    {"name": "Banana Tree", "stage": 7},
+    {"name": "Mango Tree", "stage": 8},
+    {"name": "Dragonfruit Tree", "stage": 9},
+    {"name": "Durian Tree", "stage": 10},
+    {"name": "Mysterious Mangrove", "stage": 11}
+  ],
+  'Fruits':[
+    {"name": "Apple", "stage": 1},
+    {"name": "Lemon", "stage": 2},
+    {"name": "Cherry", "stage": 3},
+    {"name": "Banana", "stage": 4},
+    {"name": "Mango", "stage": 5},
+    {"name": "Dragonfruit", "stage": 6},
+    {"name": "Durian", "stage": 7}
   ],
 
 };

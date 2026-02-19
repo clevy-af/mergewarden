@@ -77,7 +77,10 @@
         serviceWorkerVersion: serviceWorkerVersion,
       },
       onEntrypointLoaded: function(engineInitializer) {
-        engineInitializer.initializeEngine().then(function(appRunner) {
+      const config = {
+      useWasm: true, // Force Wasm
+    };
+    const appRunner = await engineInitializer.initializeEngine(config).then(function(appRunner) {
           appRunner.runApp();
 
           // FORCE VIEWPORT OVERRIDE AFTER RUNNING

@@ -151,7 +151,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                             ),
                           ),
                         ),
-                        Text('Chains Available with Images: A-B',style: hintStyle,),
+                        Text('Chains Available with Images: A-F',style: hintStyle,),
                       ],
                     ),
                   );
