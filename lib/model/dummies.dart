@@ -631,4 +631,51 @@ Map<String,List> chainItems= {
     {"name": "Immaculate Gem", "stage": 2},
     {"name": "Flawless Gem", "stage": 3}
   ],
+  // 'Recycled_Boosters':[
+  //   {"name": "Booster Scraps", "stage": 1},
+  //   {"name": "Booster Shards", "stage": 2},
+  //   {"name": "Booster Box", "stage": 3},
+  //   {"name": "Booster Crate", "stage": 4}
+  // ],
+  'Rocks':[
+    {"name": "Strange Slab", "stage": 1},
+    {"name": "Unusual Boulder", "stage": 2},
+    {"name": "Peculiar Mass", "stage": 3},
+    {"name": "Curious Formation", "stage": 4},
+    {"name": "Celtic Hand", "stage": 5},
+    {"name": "Primal Obelisk", "stage": 6},
+    {"name": "Druid Structure", "stage": 7},
+    {"name": "Ancient Stone Circle", "stage": 8}
+  ],
+  'Roman_Ruins':[
+    {"name": "Historic Fragments", "stage": 1},
+    {"name": "Unearthed Stonework", "stage": 2},
+    {"name": "Preserved Columns", "stage": 3},
+    {"name": "Restored Columns", "stage": 4},
+    {"name": "Theatrical Columns", "stage": 5},
+    {"name": "Forum Balustrade", "stage": 6},
+    {"name": "Aqueduct Support", "stage": 7},
+    {"name": "Grand Portal", "stage": 8},
+    {"name": "Nymphaeum", "stage": 9}
+  ],
+  'Rope':[
+    {"name": "Scrap of Bark", "stage": 1},
+    {"name": "Bark Rope", "stage": 2},
+    {"name": "Rope Coil", "stage": 3},
+    {"name": "Scaffolding", "stage": 4},
+    {"name": "Bamboo Nursery", "stage": 5}
+  ],
+  'Rosebushes':[
+    {"name": "Dainty Roses", "stage": 1},
+    {"name": "Rose Thicket", "stage": 2},
+    {"name": "Rose Hedge", "stage": 3},
+    {"name": "Rose Sculpture", "stage": 4},
+    {"name": "Rose Trellis", "stage": 5},
+    {"name": "Rose Veranda", "stage": 6}
+  ],
+  'Secret_Wells':[
+    {"name": "Hidden Spring", "stage": 1},
+    {"name": "Secluded Reservoir", "stage": 2}
+  ],
+
 };
