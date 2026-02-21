@@ -631,12 +631,12 @@ Map<String,List> chainItems= {
     {"name": "Immaculate Gem", "stage": 2},
     {"name": "Flawless Gem", "stage": 3}
   ],
-  // 'Recycled_Boosters':[
-  //   {"name": "Booster Scraps", "stage": 1},
-  //   {"name": "Booster Shards", "stage": 2},
-  //   {"name": "Booster Box", "stage": 3},
-  //   {"name": "Booster Crate", "stage": 4}
-  // ],
+  'Recycled_Boosters':[
+    {"name": "Booster Scraps", "stage": 1},
+    {"name": "Booster Shards", "stage": 2},
+    {"name": "Booster Box", "stage": 3},
+    {"name": "Booster Crate", "stage": 4}
+  ],
   'Rocks':[
     {"name": "Strange Slab", "stage": 1},
     {"name": "Unusual Boulder", "stage": 2},
