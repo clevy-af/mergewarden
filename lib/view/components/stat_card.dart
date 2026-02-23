@@ -328,6 +328,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
           targetItem=null;HiveProvider.appBox.delete('chain');
           stageController.clear();
           countController.clear();
+          potionController.clear();
           widget.onSubmit([]);
         });
       },
