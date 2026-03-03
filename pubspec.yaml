@@ -2,7 +2,7 @@ name: mergewarden
 description: "A MergeGardens Calculator."
 publish_to: 'none'
 
-version: 1.4.0
+version: 1.5.1
 
 environment:
   sdk: ^3.8.1

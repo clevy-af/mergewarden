@@ -6,7 +6,9 @@ import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/model/target_item.dart';
 import 'package:mergewarden/utils/calculator.dart';
 import 'package:mergewarden/utils/colors.dart';
+import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
+import 'package:mergewarden/view/goal_screen.dart';
 
 class CentralStatsCard extends StatefulWidget {
   const CentralStatsCard({super.key, required this.onSubmit,});
@@ -22,6 +24,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
   TextEditingController countController=TextEditingController();
   TextEditingController stageController=TextEditingController();
   TextEditingController potionController=TextEditingController();
+  bool merge5Only=true;
 
   @override
   void dispose() {
@@ -31,6 +34,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
     potionController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return CardBox(
@@ -48,7 +52,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                   Semantics(
                       label: 'Merge Gardens Calculator Header',
                       child: Text('Target ${isWildlife?'Wildlife' : 'Item'} Calculator',
-                        style:  TextStyle(fontSize: MediaQuery.of(context).size.width*0.025,
+                        style:  TextStyle(fontSize:context.isDesktop?30:20,
                             fontWeight: FontWeight.bold),),
                   ),
                   Tooltip(
@@ -61,7 +65,8 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                         icon: Icon(Icons.question_mark_outlined,color: cCard,),
                       // tooltip: 'Info',
                     ),
-                  ),],
+                  ),
+                ],
               );
             }
           ),
@@ -107,6 +112,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                       optionsViewBuilder: (context, onSelected, options) {
                         return Material(
                           child: ListView.builder(
+                            shrinkWrap: true,
                             itemCount: options.length,
                             itemBuilder: (context, index) {
                               final option = options.elementAt(index);
@@ -187,7 +193,8 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                         label: 'Merge Gardens Calculation Target Stage TextField',
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: TextField(
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               hintText: 'Enter stage of target item',
                               labelText: 'Target Stage',
@@ -218,7 +225,8 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                 padding: const EdgeInsets.all(8.0),
                 child: Semantics(
                   label: 'Merge Gardens Calculation Target Count TextField',
-                  child: TextField(
+                  child:TextFormField(
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       hintText: 'Enter number of target items',
                       labelText: 'Target Count',
@@ -267,6 +275,32 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
               padding: EdgeInsets.symmetric(horizontal: 8),
               child: Text('Fields marked with * are mandatory.',style: hintStyle,)
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                ValueListenableBuilder(
+                    valueListenable:  HiveProvider.appBox.listenable(keys: ['type']),
+                    builder:(context,data,_) {
+                      bool isWildlife=data.get('type')=='wildlife';
+                    return Semantics(
+                      value: 'Checkbox for Merge 5 Only calculation',
+                      child: Checkbox(
+                          value: isWildlife?true:merge5Only,
+                          activeColor: cCard,
+                          onChanged: isWildlife?null:(value) {
+                            setState(() {
+                              merge5Only=value??false;
+                            });
+                          },
+                      ),
+                    );
+                  }
+                ),
+                Text('Merge 5 Only')
+              ],
+            ),
+          ),
           const SizedBox(height: 20),
           Semantics(
             label: 'Merge Gardens Calculation Button',
@@ -308,7 +342,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                 });
                 widget.onSubmit(
                     HiveProvider.appBox.get('type')=='wildlife'?MergeCalculator.calculateWildlife(targetItem!.stage, targetItem!.count):
-                    MergeCalculator.getFullBreakdown(targetItem!.stage, targetItem!.count,int.tryParse(potionController.text)??0,HiveProvider.appBox.get('chain0'))
+                    MergeCalculator.getFullBreakdown(targetItem!.stage, targetItem!.count,int.tryParse(potionController.text)??0,HiveProvider.appBox.get('chain0'),merge5Only)
                 );
                 },
                 style: TextButton.styleFrom(
@@ -354,6 +388,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                 const Text('2. Enter target level you want to reach.'),
                 const Text('3. Enter how many of those items you need.'),
                 const Text('4. Enter how many potions you have available. (Optional)'),
+                const Text('5. Select whether to calculate merges by 5 only. (If you intend to repeat the target, leave it checked.)'),
                 const Divider(height: 30),
                 const Text('Example Calculation:', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
@@ -382,6 +417,10 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                       Padding(padding: EdgeInsets.all(8), child: Text('Potion Quantity')),
                       Padding(padding: EdgeInsets.all(8), child: Text('1')),
                     ]),
+                    TableRow(children: [
+                      Padding(padding: EdgeInsets.all(8), child: Text('Merge 5 Only')),
+                      Padding(padding: EdgeInsets.all(8), child: Text('True')),
+                    ]),
                   ],
                 ),
 
@@ -390,7 +429,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                 const SizedBox(height: 15),
 
                 const Text(
-                      'NB: Calculation is optimal, without extras. 5-merges till possible, then 3-merge as needed. Potions are used starting from highest stage, once per merge(5 or 3).',
+                      'NB: If Merge by 5 is unchecked, calculation is optimal, without extras; 5-merges till possible, then 3-merge as needed. For merge by 5, if count is odd, it will be rounded up to accommodate 5-merges only. Potions are used starting from highest stage, once per merge(5 or 3).',
                   style: hintStyle,
                 ),
               ],
@@ -414,17 +453,16 @@ class CardBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width:max(MediaQuery.of(context).size.width*0.6,450),
-        padding: const EdgeInsets.all(30),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(32),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.05), blurRadius: 20)],
-        ),
-        child: child,
+    return Container(
+      width:max(MediaQuery.of(context).size.width*0.6,450),
+      padding: const EdgeInsets.only(bottom: 15,left: 15,right: 15,top: 10),
+      // alignment: Alignment.topCenter,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.05), blurRadius: 20)],
       ),
+      child: child,
     );
   }
 }
@@ -457,53 +495,65 @@ class TargetPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          // mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.end,
+        Stack(
           children: [
-            Semantics(
-              label: 'Merge Gardens Calculation Reset Button',
-              child: IconButton(
-                  tooltip: 'Reset',
-                  onPressed: onReset, icon: Icon(Icons.refresh)),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  children: [
+                    if(targetItem!.name!=null)
+
+                    Semantics(
+                      label: 'Merge Gardens Calculation Target Item',
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        // margin: EdgeInsets.all(8),
+                        height: MediaQuery.of(context).size.height*0.4,
+                        width:MediaQuery.of(context).size.height*0.4,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: cCard,
+                          // boxShadow: [
+                          //   BoxShadow(color: cCard,blurRadius: 3,spreadRadius: 3)
+                          // ],
+                          image: DecorationImage(
+                              image: AssetImage('assets/Stage_${targetItem!.stage}_-_${targetItem!.name?.replaceAll(' ', '_')}.webp'),
+                              fit: BoxFit.contain
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    Semantics(
+                      label: 'Merge Gardens Calculation Target Text',
+                      child: Text(
+                        (targetItem?.name??targetItem?.chain).toString(),
+                        style: TextStyle(fontSize: context.isDesktop?40:30, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Semantics(
+                label: 'Merge Gardens Calculation Reset Button',
+                child: IconButton(
+                    tooltip: 'Reset',
+                    onPressed: onReset, icon: Icon(Icons.refresh)),
+              ),
             )
           ],
         ),
-        if(targetItem!.name!=null)
-          Semantics(
-            label: 'Merge Gardens Calculation Target Item',
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              // margin: EdgeInsets.all(8),
-              height: MediaQuery.of(context).size.height*0.4,
-              width:MediaQuery.of(context).size.height*0.4,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: cCard,
-                // boxShadow: [
-                //   BoxShadow(color: cCard,blurRadius: 3,spreadRadius: 3)
-                // ],
-                image: DecorationImage(
-                    image: AssetImage('assets/Stage_${targetItem!.stage}_-_${targetItem!.name?.replaceAll(' ', '_')}.webp'),
-                    fit: BoxFit.contain
-                ),
-              ),
-            ),
-          ),
-        const SizedBox(height: 20),
 
-        Semantics(
-          label: 'Merge Gardens Calculation Target Text',
-          child: Text(
-            (targetItem?.name??targetItem?.chain).toString(),
-            style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.04, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50)),
-          ),
-        ),
+
         Semantics(
           label: 'Merge Gardens Calculation Result',
           child: Text(
             "Breakdown for ${targetItem?.count} Stage ${targetItem?.stage} ${HiveProvider.appBox.get('type')=='wildlife'?'Wildlife':'Items'}",
-            style: TextStyle(letterSpacing: 1.5, fontSize:MediaQuery.of(context).size.width*0.02, fontWeight: FontWeight.bold),
+            style: TextStyle(letterSpacing: 1.5, fontSize:context.isDesktop?20:15, fontWeight: FontWeight.bold),
           ),
         ),
         if(completed!=null)
@@ -525,7 +575,7 @@ class LevelCard extends StatelessWidget {
   final int potions;
   final bool isWildlife;
   final String? chainId;
-  const LevelCard({super.key, required this.level, this.chainId, this.count=0, this.isWildlife=false, required this.potions});
+  const LevelCard({super.key, required this.level, this.chainId, this.count=0, this.isWildlife=false, this.potions=0});
 
   @override
   Widget build(BuildContext context) {
@@ -555,7 +605,7 @@ class LevelCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(title, style: showStage?const TextStyle(color: Colors.grey):stageStyle),
+                Text('Stage $level', style: showStage?const TextStyle(color: Colors.grey):stageStyle),
                 if(chainId!=null&&chainId!='Wildlife')
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -569,7 +619,7 @@ class LevelCard extends StatelessWidget {
                 if(showStage)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(title, style: stageStyle),
+                  child: FittedBox(child: Text(title, style: stageStyle,maxLines: 1,)),
                 ),
                 Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
@@ -590,13 +640,13 @@ class LevelCard extends StatelessWidget {
                 alignment: Alignment.bottomRight,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 12,),
                     height: kMinInteractiveDimension,
                     alignment: Alignment.bottomCenter,
                     width:kMinInteractiveDimension,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      image:DecorationImage(image: AssetImage('assets/potion.webp'),),
+                      image:DecorationImage(image: AssetImage('assets/Stage_4_-_Potent_Concoction.webp'),fit: BoxFit.cover),
                     ),
                   ),
                   Container(
@@ -623,12 +673,13 @@ class InventoryCard extends StatelessWidget {
   final int count;
   final bool isWildlife;
   final String? chainId;
-  const InventoryCard({super.key, required this.level, this.chainId, this.count=0, this.isWildlife=false});
+  final int potions;
+  const InventoryCard({super.key, required this.level, this.chainId, this.count=0,  this.potions=0,this.isWildlife=false});
 
   @override
   Widget build(BuildContext context) {
     Map? data=chainItems[chainId??0]?.firstWhere((element) => element['stage']==level,orElse: () => {'name':"Stage $level"},);
-   String title=data?['name']??'Stage $level';
+    String title=data?['name']??'Stage $level';
     if (isWildlife) {
       if (level == 45) {
         title = "Magnificent Eggs";
@@ -637,70 +688,278 @@ class InventoryCard extends StatelessWidget {
       }
     }
     var showStage = !(title.contains('Stage')||title.contains('Eggs'));
+    var stageStyle= TextStyle(fontWeight: FontWeight.bold,color: Colors.black);
+    const double cardHeight = kMinInteractiveDimension*1.6;
     return Semantics(
-      label: 'Merge Gardens Calculation Stage $level Item',
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha:0.8),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Text(title, style: const TextStyle(color: Colors.grey)),
-            if(chainId!=null&&chainId!='Wildlife')
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              height: kMinInteractiveDimension,
-              width:kMinInteractiveDimension,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                image: chainId!=null?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
-              ),
-            ),
-            if(showStage)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text('Stage $level: 30%', style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black)),
-            ),
-            Divider(color: cCard,thickness: 1,),
-            Row(
-               mainAxisAlignment: MainAxisAlignment.center,
+      label: 'Merge Gardens Goal: Stage $level Item',
+      child: LayoutBuilder(
+        builder: (context,c) {
+          bool isDesktop=c.maxWidth>600;
+          // print(c.maxWidth);
+          Widget child;
+          if(isDesktop) {
+            child= Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                  margin: showStage?null:const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: cBackground,
-                    borderRadius: BorderRadius.circular(8),
+                CountView(height: cardHeight,count: 35,),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ProgressCircle(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                            child: Stack(
+                              alignment: Alignment.bottomCenter,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                  height: cardHeight,
+                                  width:cardHeight,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    image: chainId!=null&&chainId!='Wildlife'?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: cCard,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(title, style: showStage?const TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold):stageStyle),
+                        ],
+                      ),
+                      PotionView(cardHeight: cardHeight, showStage: showStage, potions: potions),
+
+                    ],
+                              ),
                   ),
-                  child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
                 ),
-                SizedBox(
-                  width: 25,
-                  child: Transform.rotate(
-                      angle:-pi/3,
-                      child: Divider(color: Colors.black,thickness: 3,indent: 1,endIndent: 1,)
+                Container(
+                  width: kMinInteractiveDimension,
+                  margin: EdgeInsets.all(8),
+                  child: Column(
+                    // mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(child: CounterButton(iconData: Icons.remove)),
+
+                      const SizedBox(height: 8),
+                      Expanded(child: CounterButton(iconData: Icons.add)),
+                    ],
                   ),
                 ),
 
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                  margin: showStage?null:const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: cCard,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
-                ),
               ],
-            ),
+            );
+          }
+          else {
+            child= Row(
+              children: [
+                CountView(height: cardHeight,count: 35,),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(title,
+                          style: showStage?const TextStyle(color: Colors.black,fontSize:20,fontWeight: FontWeight.bold)
+                              :stageStyle,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                              child: Stack(
+                                alignment: Alignment.bottomCenter,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                    height: cardHeight,
+                                    width:cardHeight,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      image: chainId!=null&&chainId!='Wildlife'?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: cCard,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            PotionView(cardHeight: cardHeight-10, showStage: showStage, potions: potions),
 
-          ],
+                            ],
+                        ),
+
+                        Flexible(child: LinearProgressIndicator(value: 0.7,color: cCard,)),
+
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  width: kMinInteractiveDimension,
+                  margin: EdgeInsets.all(8),
+                  child: Column(
+                    // mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(child: CounterButton(iconData: Icons.remove)),
+
+                      const SizedBox(height: 8),
+                      Expanded(child: CounterButton(iconData: Icons.add)),
+                    ],
+                  ),
+                ),
+
+              ],
+            );
+          }
+
+          return Container(
+            // padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha:0.8),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            alignment: Alignment.center,
+            height: isDesktop?100:200,
+            child: child,
+          );
+        }
+      ),
+    );
+  }
+
+}
+class CountView extends StatelessWidget {
+  const CountView({super.key, required this.count, required this.height});
+  final int count;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // height: height,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+      // margin: const EdgeInsets.symmetric(horizontal: 8),//showStage?null:
+      decoration: BoxDecoration(
+        color: Colors.black54.withAlpha(50),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15),
+          bottomLeft: Radius.circular(15),
         ),
       ),
+      child: FittedBox(child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 20))),
+    );
+  }
+}
+
+
+class PotionView extends StatelessWidget {
+  const PotionView({
+    super.key,
+    required this.cardHeight,
+    required this.showStage,
+    required this.potions,
+  });
+
+  final double cardHeight;
+  final bool showStage;
+  final int potions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 8,vertical: 5),
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            height: cardHeight,
+            alignment: Alignment.bottomCenter,
+            width:cardHeight,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              image:DecorationImage(image: AssetImage('assets/Stage_4_-_Potent_Concoction_old.webp'),),
+            ),
+          ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              margin: showStage?null:const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: cCard,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(potions.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+            ),
+          Positioned(
+            right:0,
+            top:0,
+            child: GestureDetector(
+              onTap: () {
+
+              },
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: cBackground,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.add,color: Colors.white,),
+              ),
+            ),
+          ),
+
+
+        ],
+      ),
+    );
+  }
+}
+
+class ProgressCircle extends StatelessWidget {
+  const ProgressCircle({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          height: kMinInteractiveDimension,
+          width: kMinInteractiveDimension,
+          margin: const EdgeInsets.all(8.0),
+          child: CircularProgressIndicator(
+            color: cCard,
+            value: 0.4,
+            backgroundColor: cBackground,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text('30%',),
+        )
+      ],
     );
   }
 }

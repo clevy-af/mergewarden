@@ -55,12 +55,71 @@ List<Map<String,dynamic>> chains= [
   {"name": "Aspirational Decor", "id": "Aspirational_Decor", "stages": 15},
   {"name": "Heart-Shaped Balloons", "id": "Heart-Shaped_Balloons", "stages": 2},
   {"name": "Recycled Boosters", "id": "Recycled_Boosters", "stages": 4},
+  {"name": "Uncle Elwood's Experiment", "id": "Uncle_Elwood's_Experiment", "stages": 4},
   // {"name": "Wildlife", "id": "Wildlife", "stages": 8},
 ];
 
 const String imageUrl='https://store-images.s-microsoft.com/image/apps.41185.14321666486326182.fa278455-44db-4ead-94ab-964c9c1f1290.ab4dc92b-e9f7-4a07-93f7-60053e3f7868?h=253';
 
-
+List<String> wildlifeList = [
+  "Ameraucana Chicken",
+  "Bald Eagle",
+  "Barn Owl",
+  "Bumblebee",
+  "Chaffinch",
+  "Cicada",
+  "Cockatiel",
+  "Crowned Hairstreak",
+  "Dove",
+  "Dracula Parrot",
+  "Eastern Bluebird",
+  "Falcon",
+  "Feather-horned Beetle",
+  "Flame Bowerbird",
+  "Flamingo",
+  "Flying Lemur",
+  "Flying Squirrel",
+  "Gliding Lizard",
+  "Green Darner",
+  "Heron",
+  "Hog-Nosed Bat",
+  "Homing Pigeon",
+  "Honey Bee",
+  "Hoopoe",
+  "Hummingbird",
+  "Hummingbird Hawk-moth",
+  "Kingfisher",
+  "Ladybug",
+  "Long Eared Owl",
+  "Lovebird",
+  "Luna Moth",
+  "Magpie",
+  "Mandarin Duck",
+  "Mantis",
+  "Monarch Butterfly",
+  "Peacock",
+  "Pelican",
+  "Pheasant",
+  "Puffin",
+  "Rainbow Leaf Beetle",
+  "Raven",
+  "Robin",
+  "Rosy Maple",
+  "Seagull",
+  "Secretary Bird",
+  "Snowy Owl",
+  "Sugar Glider",
+  "Swan",
+  "Toucan",
+  "White Bat",
+  "Woodpecker",
+  // Note: The following items appear on the Wiki's wildlife deadend/category pages
+  "Blue Ghost Firefly",
+  "Japanese Firefly",
+  "Garden Gnome",
+  "Mystery Bird",
+  "Mystery Mammal"
+];
 Map<String,List> chainItems= {
   'Amber_Wishing_Stars': [
     {
@@ -727,6 +786,12 @@ Map<String,List> chainItems= {
     {"name": "Barrow of Tulips", "stage": 8},
     {"name": "Wreath of Tulips", "stage": 9},
     {"name": "Dutch Windmill", "stage": 10}
+  ],
+  "Uncle_Elwood's_Experiment":[
+    {"name": "Peculiar Potion", "stage": 1},
+    {"name": "Mysterious Infusion", "stage": 2},
+    {"name": "Strange Brew", "stage": 3},
+    {"name": "Potent Concoction", "stage": 4}
   ],
   'Vegetable_Patches':[
     {"name": "Vegetable Nursery", "stage": 1},
