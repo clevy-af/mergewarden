@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:intl/intl.dart';
 import 'package:mergewarden/model/dummies.dart';
+import 'package:mergewarden/model/goal_data.dart';
 import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/model/target_item.dart';
 import 'package:mergewarden/utils/calculator.dart';
@@ -11,8 +13,7 @@ import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/view/goal_screen.dart';
 
 class CentralStatsCard extends StatefulWidget {
-  const CentralStatsCard({super.key, required this.onSubmit,});
-  final Function(List<Breakup>) onSubmit;
+  const CentralStatsCard({super.key, });
 
   @override
   State<CentralStatsCard> createState() => _CentralStatsCardState();
@@ -111,8 +112,11 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                       },
                       optionsViewBuilder: (context, onSelected, options) {
                         return Material(
+                          color: cLightBackground,
+                          surfaceTintColor: cCreme,
                           child: ListView.builder(
                             shrinkWrap: true,
+                            itemExtent: 50,
                             itemCount: options.length,
                             itemBuilder: (context, index) {
                               final option = options.elementAt(index);
@@ -167,6 +171,8 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                         margin: EdgeInsets.all(8),
                         child: DropdownButton<int>(
                           isExpanded: true,
+                          dropdownColor: cLightBackground,
+                          focusColor: cCreme,
                           value: int.tryParse(stageController.text),
                           underline: SizedBox(),
                           onChanged: ( newValue) {
@@ -321,29 +327,33 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                   }
                   // print('still going ahead?');
                   String? chainId=HiveProvider.appBox.get('chain');
+                  bool isWildlife=HiveProvider.appBox.get('type')=='wildlife';
                   // print({'chain':chainId,'stage':stageController.text,'count':countController.text,'type':HiveProvider.appBox.get('type')});
                   setState(() {
 
                   // print(chainController.text);
+                  var stageNumber = int.parse(stageController.text);
                   if(chainId!=null&&chainController.text!='Wildlife') {
                     // chainName=chains.firstWhere((element) => element['name'].contains(chainController.text),orElse: () => {'id':null},)['id'];
 
-                      Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==int.parse(stageController.text),orElse: () => {'name':null,'url':null},);
+                      Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==stageNumber,orElse: () => {'name':null,'url':null},);
                       targetName=data?['name'];
                       chainUrl=data?['url'];
                       // print(chainUrl);
                   }
                   targetItem=TargetItem(
-                      name: targetName,
+                    isWildlife:isWildlife ,
+                    has0: HiveProvider.appBox.get('chain0'),
+                      merge5: merge5Only,
+                      stageName: targetName??'Stage $stageNumber Wildlife',
                       url: chainUrl,
-                      chain: chainController.text, count: int.tryParse(countController.text)??0,
-                      stage: int.parse(stageController.text)
+                      chainId: chainId, count: int.tryParse(countController.text)??0,
+                      stage: stageNumber
                   );
                 });
-                widget.onSubmit(
-                    HiveProvider.appBox.get('type')=='wildlife'?MergeCalculator.calculateWildlife(targetItem!.stage, targetItem!.count):
-                    MergeCalculator.getFullBreakdown(targetItem!.stage, targetItem!.count,int.tryParse(potionController.text)??0,HiveProvider.appBox.get('chain0'),merge5Only)
-                );
+                  HiveProvider().putBreakDown(isWildlife?MergeCalculator.calculateWildlife(targetItem!.stage, targetItem!.count):
+                  MergeCalculator.getFullBreakdown(targetItem!.stage, targetItem!.count,int.tryParse(potionController.text)??0,HiveProvider.appBox.get('chain0'),merge5Only)
+                  );
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: cCard,
@@ -363,9 +373,24 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
           stageController.clear();
           countController.clear();
           potionController.clear();
-          widget.onSubmit([]);
+          HiveProvider.appBox.delete('breakdown');
         });
       },
+        onGoalSet: () {
+          List<Inventory> inventories=[];
+          for(int i=0;i<HiveProvider.appBox.get('breakdown').length;i++)
+            {
+              inventories.add(Inventory.fromJson(HiveProvider.appBox.get('breakdown')[i]));
+            }
+          HiveProvider().putGoal(
+              GoalData(
+                potions: int.tryParse(potionController.text)??0,
+                createdAt: DateTime.now().millisecondsSinceEpoch,
+                  targetItem: targetItem!,
+                  inventory: inventories
+              )
+          );
+        },
       ),
     );
   }
@@ -486,66 +511,74 @@ class LineIndicator extends StatelessWidget {
 
 
 class TargetPage extends StatelessWidget {
-  const TargetPage({super.key,  this.targetItem, required this.onReset, this.completed});
+  const TargetPage({super.key,  this.targetItem, required this.onReset, this.completed, required this.onGoalSet});
   final TargetItem? targetItem;
   final double? completed;
   final VoidCallback onReset;
+  final VoidCallback onGoalSet;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Stack(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  children: [
-                    if(targetItem!.name!=null)
+            Tooltip(
+              message: 'Add To GoalS',
+              child: TextButton(
 
-                    Semantics(
-                      label: 'Merge Gardens Calculation Target Item',
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        // margin: EdgeInsets.all(8),
-                        height: MediaQuery.of(context).size.height*0.4,
-                        width:MediaQuery.of(context).size.height*0.4,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: cCard,
-                          // boxShadow: [
-                          //   BoxShadow(color: cCard,blurRadius: 3,spreadRadius: 3)
-                          // ],
-                          image: DecorationImage(
-                              image: AssetImage('assets/Stage_${targetItem!.stage}_-_${targetItem!.name?.replaceAll(' ', '_')}.webp'),
-                              fit: BoxFit.contain
-                          ),
-                        ),
+                onPressed: onGoalSet,
+                child: Text('Add As Goal'),
+              ),
+            ),
+            SizedBox(width: 8,),
+            Semantics(
+              label: 'Merge Gardens Calculation Reset Button',
+              child: IconButton(
+                  tooltip: 'Reset',
+                  onPressed: onReset, icon: Icon(Icons.refresh)),
+            ),
+          ],
+        ),
+
+        SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              if(targetItem!.stageName!=null)
+
+                Semantics(
+                  label: 'Merge Gardens Calculation Target Item',
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    // margin: EdgeInsets.all(8),
+                    height: MediaQuery.of(context).size.height*0.4,
+                    width:MediaQuery.of(context).size.height*0.4,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: cCard,
+                      // boxShadow: [
+                      //   BoxShadow(color: cCard,blurRadius: 3,spreadRadius: 3)
+                      // ],
+                      image: DecorationImage(
+                          image: AssetImage('assets/${targetItem?.chainId!=null&&targetItem?.chainId!='Wildlife'?'Stage_${targetItem?.stage}_-_${targetItem?.stageName?.replaceAll(' ', '_')}':'wildlife'}.webp'),
+                          fit: BoxFit.contain
                       ),
                     ),
-                    const SizedBox(height: 20),
+                  ),
+                ),
+              const SizedBox(height: 20),
 
-                    Semantics(
-                      label: 'Merge Gardens Calculation Target Text',
-                      child: Text(
-                        (targetItem?.name??targetItem?.chain).toString(),
-                        style: TextStyle(fontSize: context.isDesktop?40:30, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50)),
-                      ),
-                    ),
-                  ],
+              Semantics(
+                label: 'Merge Gardens Calculation Target Text',
+                child: Text(
+                  (targetItem?.stageName??targetItem?.chainId).toString(),
+                  style: TextStyle(fontSize: context.isDesktop?40:30, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50)),
                 ),
               ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Semantics(
-                label: 'Merge Gardens Calculation Reset Button',
-                child: IconButton(
-                    tooltip: 'Reset',
-                    onPressed: onReset, icon: Icon(Icons.refresh)),
-              ),
-            )
-          ],
+            ],
+          ),
         ),
 
 
@@ -590,6 +623,8 @@ class LevelCard extends StatelessWidget {
     }
     var showStage = !(title.contains('Stage')||title.contains('Eggs'));
     var stageStyle= TextStyle(fontWeight: FontWeight.bold,color: Colors.black);
+    final formatter = NumberFormat.decimalPattern();
+    final formattedNumber = formatter.format(count);
     return Semantics(
       label: 'Merge Gardens Calculation Stage $level Item',
       child: Stack(
@@ -628,7 +663,7 @@ class LevelCard extends StatelessWidget {
                         color: cCard,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+                      child: Text(formattedNumber.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
                     ),
               ],
             ),
@@ -669,16 +704,23 @@ class LevelCard extends StatelessWidget {
 }
 
 class InventoryCard extends StatelessWidget {
-  final int level;
-  final int count;
+
   final bool isWildlife;
+  final bool showCounter;
   final String? chainId;
-  final int potions;
-  const InventoryCard({super.key, required this.level, this.chainId, this.count=0,  this.potions=0,this.isWildlife=false});
+  final Inventory inventory;
+  final Function(int) onCounter;
+  final Function() onPotion;
+  const InventoryCard({super.key,
+    required this.inventory, required this.chainId, this.isWildlife=false,
+    required this.onCounter, required this.onPotion, this.showCounter=true,
+  });
 
   @override
   Widget build(BuildContext context) {
-    Map? data=chainItems[chainId??0]?.firstWhere((element) => element['stage']==level,orElse: () => {'name':"Stage $level"},);
+    int level=inventory.stage;
+    // print(chainItems[chainId]);
+    Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==level,orElse: () => {'name':"Stage $level"},);
     String title=data?['name']??'Stage $level';
     if (isWildlife) {
       if (level == 45) {
@@ -697,17 +739,45 @@ class InventoryCard extends StatelessWidget {
           bool isDesktop=c.maxWidth>600;
           // print(c.maxWidth);
           Widget child;
+          var counterColumn = showCounter?Container(
+            width: kMinInteractiveDimension,
+            margin: EdgeInsets.all(8),
+            child: Column(
+              // mainAxisSize: MainAxisSize.min,
+              children: [
+                if(inventory.have>0)
+                Expanded(child: CounterButton(
+                    iconData: Icons.remove,
+                    onTap: () => onCounter(-1)
+                )
+                ),
+
+                const SizedBox(height: 8),
+                if(inventory.have<inventory.count)
+                Expanded(child:
+                CounterButton(iconData: Icons.add,
+                    onTap: () => onCounter(1)
+                )),
+              ],
+            ),
+          ):SizedBox(width: kMinInteractiveDimension,);
+          Widget potionView=inventory.potions>0?PotionView(
+            cardHeight: cardHeight,
+            showCounter: inventory.havePotions<inventory.potions,
+            potions: inventory.havePotions,
+            onPotion: onPotion,
+          ):SizedBox();
           if(isDesktop) {
             child= Row(
               children: [
-                CountView(height: cardHeight,count: 35,),
+                CountView(height: cardHeight,count: inventory.count,),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ProgressCircle(),
+                      ProgressCircle(progress:inventory.count==0?100:inventory.have/ inventory.count*100,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -722,7 +792,7 @@ class InventoryCard extends StatelessWidget {
                                   width:cardHeight,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(15),
-                                    image: chainId!=null&&chainId!='Wildlife'?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+                                    image: DecorationImage(image: AssetImage('assets/${chainId!='Wildlife'?'Stage_${level}_-_${title.replaceAll(' ', '_')}':'wildlife'}.webp'),),
                                   ),
                                 ),
                                 Container(
@@ -731,7 +801,10 @@ class InventoryCard extends StatelessWidget {
                                     color: cCard,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+                                  child: Text(inventory.have.toString(),
+                                      style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
+                                    key: ValueKey(inventory.have),
+                                  ),
                                 ),
                               ],
                             ),
@@ -739,25 +812,12 @@ class InventoryCard extends StatelessWidget {
                           Text(title, style: showStage?const TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold):stageStyle),
                         ],
                       ),
-                      PotionView(cardHeight: cardHeight, showStage: showStage, potions: potions),
-
+                      potionView,
                     ],
                               ),
                   ),
                 ),
-                Container(
-                  width: kMinInteractiveDimension,
-                  margin: EdgeInsets.all(8),
-                  child: Column(
-                    // mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(child: CounterButton(iconData: Icons.remove)),
-
-                      const SizedBox(height: 8),
-                      Expanded(child: CounterButton(iconData: Icons.add)),
-                    ],
-                  ),
-                ),
+                counterColumn,
 
               ],
             );
@@ -783,13 +843,14 @@ class InventoryCard extends StatelessWidget {
                               child: Stack(
                                 alignment: Alignment.bottomCenter,
                                 children: [
+                                  if(chainId!=null)
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                     height: cardHeight,
                                     width:cardHeight,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(15),
-                                      image: chainId!=null&&chainId!='Wildlife'?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+                                      image: chainId!='Wildlife'?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
                                     ),
                                   ),
                                   Container(
@@ -798,13 +859,12 @@ class InventoryCard extends StatelessWidget {
                                       color: cCard,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Text(count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+                                    child: Text(inventory.count.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
                                   ),
                                 ],
                               ),
                             ),
-                            PotionView(cardHeight: cardHeight-10, showStage: showStage, potions: potions),
-
+                            potionView
                             ],
                         ),
 
@@ -814,19 +874,7 @@ class InventoryCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  width: kMinInteractiveDimension,
-                  margin: EdgeInsets.all(8),
-                  child: Column(
-                    // mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(child: CounterButton(iconData: Icons.remove)),
-
-                      const SizedBox(height: 8),
-                      Expanded(child: CounterButton(iconData: Icons.add)),
-                    ],
-                  ),
-                ),
+               counterColumn,
 
               ],
             );
@@ -877,13 +925,14 @@ class PotionView extends StatelessWidget {
   const PotionView({
     super.key,
     required this.cardHeight,
-    required this.showStage,
-    required this.potions,
+    required this.showCounter,
+    required this.potions, required this.onPotion,
   });
 
   final double cardHeight;
-  final bool showStage;
+  final bool showCounter;
   final int potions;
+  final VoidCallback onPotion;
 
   @override
   Widget build(BuildContext context) {
@@ -904,27 +953,42 @@ class PotionView extends StatelessWidget {
           ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              margin: showStage?null:const EdgeInsets.symmetric(vertical: 8),
+              // margin: showStage?null:const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                 color: cCard,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(potions.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
             ),
+          if(showCounter)
           Positioned(
             right:0,
+            left: 0,
             top:0,
-            child: GestureDetector(
-              onTap: () {
-
-              },
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: cBackground,
-                  borderRadius: BorderRadius.circular(8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: onPotion ,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: cBackground,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.remove,color: Colors.white,),
+                  ),
                 ),
-                child: Icon(Icons.add,color: Colors.white,),
-              ),
+                GestureDetector(
+                  onTap: onPotion ,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: cBackground,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.add,color: Colors.white,),
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -937,8 +1001,9 @@ class PotionView extends StatelessWidget {
 
 class ProgressCircle extends StatelessWidget {
   const ProgressCircle({
-    super.key,
+    super.key, required this.progress,
   });
+  final double progress;
 
   @override
   Widget build(BuildContext context) {
@@ -946,18 +1011,18 @@ class ProgressCircle extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         Container(
-          height: kMinInteractiveDimension,
-          width: kMinInteractiveDimension,
+          height: kMinInteractiveDimension+8,
+          width: kMinInteractiveDimension+8,
           margin: const EdgeInsets.all(8.0),
           child: CircularProgressIndicator(
             color: cCard,
-            value: 0.4,
+            value: progress/100,
             backgroundColor: cBackground,
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text('30%',),
+          child: Text('${progress.percent}%',),
         )
       ],
     );

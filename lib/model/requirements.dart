@@ -1,27 +1,46 @@
-class Requirements {
-  final int count;
-  final int merge5s;
-  final int merge3s;
-
-  Requirements({required this.merge5s, required this.merge3s,
-    required this.count,
-  });
-  Map<String, dynamic> toJson() => {
-    "count": count,
-    "merge5s": merge5s,
-    "merge3s": merge3s,
-  };
-  factory Requirements.fromJson(Map<String, dynamic> json) => Requirements(
-    count: json["count"],
-    merge5s: json["merge5s"],
-    merge3s: json["merge3s"],
-  );
-}
-
 
 class Breakup {
   final int stage;
   final int count;
-  final int potionsUsed;
-  Breakup( {required this.stage, required this.count, required this.potionsUsed});
+  final int potions;
+  Breakup( {required this.stage, this.count=0, this.potions=0});
+  Map<String, dynamic> toJson() => {
+    "stage": stage,
+    "count": count,
+    "potions": potions,
+  };
+  factory Breakup.fromJson(Map json) => Breakup(
+    stage: json["stage"]??0,
+    count: json["count"]??0,
+    potions: json["potions"]??0,
+  );
+  @override
+  String toString() => toJson().toString();
+}
+
+class Inventory extends Breakup {
+  final int have;
+  final int havePotions;
+
+
+  Inventory( {required super.stage, required super.count,this.havePotions=0,  required super.potions, this.have=0,});
+
+  factory Inventory.fromJson(Map json) => Inventory(
+    stage: json["stage"]??0,
+    count: json["count"]??0,
+    potions: json["potions"]??0,
+    havePotions: json["havePotions"]??0,
+    have: json["have"]??0,
+  );
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'have':have,
+    'havePotions':havePotions,
+    ...super.toJson()
+  };
+
+
+  @override
+  String toString() => toJson().toString();
 }

@@ -1,9 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:mergewarden/model/dummies.dart';
-import 'package:mergewarden/model/requirements.dart';
-import 'package:mergewarden/model/target_item.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
@@ -20,7 +17,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   int _selectedIndex = 1;
-  List<Breakup> stageBreakdown=[];
+  // List<Breakup> stageBreakdown=[];
   // List<Breakup> stageBreakdown=[
   //   Breakup(stage: 5, count: 2, potionsUsed: 0),
   //   Breakup(stage: 4, count: 5, potionsUsed: 0),
@@ -49,23 +46,23 @@ class _DashboardState extends State<Dashboard> {
           ),
           height: 80,width: 80,
         ),
-        TextButton(
-          onPressed: () => web.window.open('https://futureplaygames.zendesk.com/hc/en-us/categories/360002343379-Merge-Gardens'),
-          child: Text('Futureplay',style: TextStyle(color: Colors.white),),
-        ),
-        TextButton(
-          onPressed: () => web.window.open('https://mergegardens.com/'),
-          child: Text('Website',style: TextStyle(color: Colors.white),),
-        ),
-        TextButton(
-          onPressed: () => web.window.open('https://merge-gardens.fandom.com/wiki/Merge_Gardens_Wiki'),
-          child: Text('Wiki',style: TextStyle(color: Colors.white),),
-        ),
-        TextButton(
-          onPressed: () => web.window.open('https://store.mergegardens.com/en/'),
-          child: Text('Web Store',style: TextStyle(color: Colors.white),),
-        ),
 
+        LinkButton(
+          link: 'https://futureplaygames.zendesk.com/hc/en-us/categories/360002343379-Merge-Gardens',
+          text: 'Futureplay',
+        ),
+        LinkButton(
+          link: 'https://mergegardens.com/',
+          text: 'Website',
+        ),
+        LinkButton(
+          link: 'https://merge-gardens.fandom.com/wiki/Merge_Gardens_Wiki',
+          text: 'Wiki',
+        ),
+        LinkButton(
+          link: 'https://store.mergegardens.com/en/',
+          text: 'Web Store',
+        ),
         Container(
           padding: const EdgeInsets.all(8.0),
           width: 88,
@@ -75,6 +72,7 @@ class _DashboardState extends State<Dashboard> {
     ),
   ),
   labelType: NavigationRailLabelType.all,
+  indicatorColor: cCreme,
   destinations: [
     NavigationRailDestination(
         icon: Icon(Icons.calculate),
@@ -87,9 +85,13 @@ class _DashboardState extends State<Dashboard> {
 
   ],
   selectedIndex: _selectedIndex,
-    onDestinationSelected: (value) => setState(() {
+    onDestinationSelected: (value) {
+      setState(() {
       _selectedIndex=value;
-    }),
+    });
+      HiveProvider.appBox.delete('breakdown');
+
+    },
   );
 
 
@@ -120,120 +122,140 @@ class _DashboardState extends State<Dashboard> {
           // Sidebar
           if(context.isDesktop) navigationRail,
 
-            Container(
-              height: MediaQuery.of(context).size.height,
-              width:MediaQuery.of(context).size.width*0.9 ,
-              padding:  EdgeInsets.symmetric(horizontal: context.isDesktop?MediaQuery.of(context).size.width*0.1:0),
+            Expanded(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                // width:MediaQuery.of(context).size.width*0.9 ,
+                padding:  EdgeInsets.symmetric(horizontal: context.isDesktop?MediaQuery.of(context).size.width*0.05:0),
 
-              child:[
-                CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child:  Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          if(context.isDesktop)  TextLogo(),
-                          if(context.isDesktop) const SizedBox(width: 20),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ValueListenableBuilder(
-                                valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
-                                builder: (context,data,_) {
-                                  return ActionChip(
-                                      tooltip: 'Items Calculator',
-                                      side: data.get('type')=='items'?BorderSide(color: cCard,width: 2):null,
+                child:[
+                  CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child:  Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            if(context.isDesktop)  TextLogo(),
+                            if(context.isDesktop) const SizedBox(width: 20),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ValueListenableBuilder(
+                                  valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
+                                  builder: (context,data,_) {
+                                    return ActionChip(
+                                        tooltip: 'Items Calculator',
+                                        side: data.get('type')=='items'?BorderSide(color: cCard,width: 2):null,
+                                        onPressed: () async {
+                                          await  HiveProvider.appBox.put('type', 'items');
+                                          await  HiveProvider.appBox.put('chain', null);
+                                          HiveProvider.appBox.delete('breakdown');
+
+                                        },
+                                        label: Text('Items')
+                                    );
+                                  }
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child:ValueListenableBuilder(
+                                  valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
+                                  builder: (context,data,_) {
+                                    return ActionChip(
+                                      tooltip: 'Wildlife Calculator',
+                                      label: Text('Wildlife'),
+                                      side: data.get('type')=='wildlife'?BorderSide(color: cCard,width: 2):null,
                                       onPressed: () async {
-                                        await  HiveProvider.appBox.put('type', 'items');
-                                        await  HiveProvider.appBox.put('chain', null);
+                                        await  HiveProvider.appBox.put('type', 'wildlife');
+                                        HiveProvider.appBox.delete('breakdown');
                                       },
-                                      label: Text('Items')
-                                  );
-                                }
+                                    );
+                                  }
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child:ValueListenableBuilder(
-                                valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
-                                builder: (context,data,_) {
-                                  return ActionChip(
-                                    tooltip: 'Wildlife Calculator',
-                                    label: Text('Wildlife'),
-                                    side: data.get('type')=='wildlife'?BorderSide(color: cCard,width: 2):null,
-                                    onPressed: () async => await  HiveProvider.appBox.put('type', 'wildlife'),
-                                  );
-                                }
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  SliverPadding(
-                    padding: EdgeInsetsGeometry.symmetric(vertical: 5),
-                  ),
-                  // Central Progress Card
-                  SliverToBoxAdapter(
-
-                    child:  Padding(
-                      padding: EdgeInsets.symmetric(horizontal:context.isDesktop?MediaQuery.of(context).size.width*0.15:18),
-                      child: CentralStatsCard(
-                        onSubmit: (p0) {
-                          setState(() {
-                            stageBreakdown=p0;
-                            // print(p0);
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                  SliverPadding(
+                    SliverPadding(
                       padding: EdgeInsetsGeometry.symmetric(vertical: 5),
-                  ),
+                    ),
+                    // Central Progress Card
+                    SliverToBoxAdapter(
 
-                                    // Levels Grid
-                  SliverToBoxAdapter(child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: const Text("REQUIRED ITEMS BY LEVEL", style: TextStyle(fontWeight: FontWeight.bold)),
-                  )),
-                  SliverToBoxAdapter(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: stageBreakdown.isNotEmpty?
-                                        GridView.builder(
-                                          shrinkWrap: true,
-                                          physics: const NeverScrollableScrollPhysics(),
-                                          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                                            maxCrossAxisExtent: 180,
-                                            mainAxisExtent: 180,
-                                            crossAxisSpacing: 20,
-                                            mainAxisSpacing: 20,
+                      child:  Padding(
+                        padding: EdgeInsets.symmetric(horizontal:context.isDesktop?MediaQuery.of(context).size.width*0.15:18),
+                        child: CentralStatsCard(),
+                      ),
+                    ),
+                    SliverPadding(
+                        padding: EdgeInsetsGeometry.symmetric(vertical: 5),
+                    ),
+
+                                      // Levels Grid
+                    SliverToBoxAdapter(child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: const Text("REQUIRED ITEMS BY LEVEL", style: TextStyle(fontWeight: FontWeight.bold)),
+                    )),
+                    SliverToBoxAdapter(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child:
+                                          ValueListenableBuilder(
+                                            valueListenable: HiveProvider.appBox.listenable(keys: ['breakdown','chain','type']),
+                                            builder: (context, value, child) {
+                                              final List data=value.get('breakdown')??[];
+                                              if(data.isEmpty) return  Text('Fill out your target details to get started');
+                                              return GridView.builder(
+                                                shrinkWrap: true,
+                                                physics: const NeverScrollableScrollPhysics(),
+                                                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                                                  maxCrossAxisExtent: 180,
+                                                  mainAxisExtent: 180,
+                                                  crossAxisSpacing: 20,
+                                                  mainAxisSpacing: 20,
+                                                ),
+                                                itemCount: data.length,
+                                                itemBuilder: (context, index) =>  LevelCard(
+                                                    level: data.elementAt(index)['stage'],
+                                                    potions: data.elementAt(index)['potions'],
+                                                  count: data.elementAt(index)['count'],
+                                                  chainId: value.get('chain'),
+                                                  isWildlife: value.get('type')=='wildlife',
+                                                ),
+                                              );
+                                            }
                                           ),
-                                          itemCount: stageBreakdown.length,
-                                          itemBuilder: (context, index) =>  LevelCard(
-                                              level: stageBreakdown.elementAt(index).stage,
-                                              potions: stageBreakdown.elementAt(index).potionsUsed,
-                                            count: stageBreakdown.elementAt(index).count,
-                                            chainId: HiveProvider.appBox.get('chain'),
-                                            isWildlife: HiveProvider.appBox.get('type')=='wildlife',
-                                          ),
-                                        )
-                                        : Text('Fill out your target details to get started'),
+                                        ),
                                       ),
-                                    ),
-                ],
-              ),
-                TargetGoalScreen(
-                  stageBreakdown: {6:6,5: 2, 4: 5, 3: 13, 2: 33, 1: 83, 0: 208},
-                  targetItem: TargetItem(count: 2, stage: 4,
-                      name: chainItems[chains.first['id']]?.firstWhere((element) => element['stage']==4,)['name'],
-                      chain: chains.first['id']),
+                  ],
                 ),
-              ][_selectedIndex],
+                  TargetGoalScreen(),
+                ][_selectedIndex],
+              ),
             ),
         ],
       ),
+    );
+  }
+}
+
+class LinkButton extends StatelessWidget {
+  const LinkButton({
+    super.key, required this.link, required this.text,
+  });
+  final String link;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: TextButton.styleFrom(
+        overlayColor: cCreme
+      ),
+      onPressed: () => web.window.open(link),
+      child: Text(text,style: TextStyle(color: Colors.white),),
     );
   }
 }

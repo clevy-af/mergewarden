@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:mergewarden/model/requirements.dart';
+import 'package:mergewarden/utils/extension.dart';
 
 class MergeCalculator {
 
@@ -18,38 +19,9 @@ class MergeCalculator {
     };
   }
 
-
-  /// Calculates how many each Level of items are needed to produce [targetLevel] x [targetCount].
-  /// [has0] includes seed stage.
-//   static Map<int, int> getFullBreakdown(int targetLevel, int targetCount,[int potions=0,bool has0=false]) {
-//     Map<int, int> breakdown = {targetLevel: targetCount};
-//
-//     int currentLevelCount = targetCount;
-//     int lowestLevel = has0?0:1;
-//     // Step down through each level
-//     for (int level = targetLevel; level > lowestLevel; level--) {
-//       // Logic: groups of 5 give 2, remainder (if odd) needs a merge of 3 to give 1
-//       int setsOfTwo = currentLevelCount ~/ 2;
-//       int remainder = currentLevelCount % 2;
-//
-//       int merges= setsOfTwo+remainder;
-//
-//       int neededForLevelBelow = (setsOfTwo * 5) + (remainder * 3);
-//
-//       for(int i=0;i<merges&&potions>1;i++){
-//         neededForLevelBelow--;
-//         potions--;
-//       }
-//       breakdown[level - 1] = neededForLevelBelow;
-//       currentLevelCount = neededForLevelBelow;
-//     }
-//
-//     return breakdown;
-//
-// }
   static List<Breakup> getFullBreakdown(int targetLevel, int targetCount,[int potions=0,bool has0=false,bool merge5Only=true]) {
     List<Breakup> breakdown = [
-      Breakup(stage: targetLevel, count: targetCount, potionsUsed: 0)
+      Breakup(stage: targetLevel, count: targetCount, potions: 0)
     ];
 
     int currentLevelCount = targetCount;
@@ -63,7 +35,7 @@ class MergeCalculator {
 
       int merges= setsOfTwo+remainder;
 
-      int neededForLevelBelow = (setsOfTwo * 5) + (merge5Only?(remainder>0?5: 0):(remainder % 2 * 3));
+      int neededForLevelBelow = (setsOfTwo * 5) + remainder.remainingCount(merge5Only);
       // int i=0;
        var minusValue = min(merges, potionsLeft);
      if(potionsLeft>0) {
@@ -72,7 +44,7 @@ class MergeCalculator {
       potionsLeft=potionsLeft-minusValue;
      }
       // breakdown[level - 1] = neededForLevelBelow;
-      breakdown.add(Breakup(stage: level-1, count: neededForLevelBelow, potionsUsed: minusValue));
+      breakdown.add(Breakup(stage: level-1, count: neededForLevelBelow, potions: minusValue));
       currentLevelCount = neededForLevelBelow;
     }
 
@@ -81,9 +53,9 @@ class MergeCalculator {
 }
 
   /// Calculates how many each Level of Wildlife are needed to produce [targetLevel] x [targetCount].
-  static List<Breakup> calculateWildlife(int targetLevel, int targetCount,) {
+  static List<Breakup> calculateWildlife(int targetLevel, int targetCount,[bool merge5Only=true]) {
     List<Breakup> breakdown = [
-      Breakup(stage: targetLevel, count: targetCount, potionsUsed: 0)
+      Breakup(stage: targetLevel, count: targetCount, potions: 0)
     ];
     int currentNeeded = targetCount;
 
@@ -94,10 +66,10 @@ class MergeCalculator {
       if (i == 5) {
         // GOAL: Get Stage 5 from Stage 4.5 (Eggs)
         // Standard merge: 5 eggs -> 2 Stage 5
-        int eggsRequired = (currentNeeded ~/ 2 * 5) + (currentNeeded % 2 >0?5:0);
+        int eggsRequired = (currentNeeded ~/ 2 * 5) +currentNeeded.remainingCount(merge5Only);
 
         // breakdown[45] = eggsRequired; // Store as "Stage 4.5"
-        breakdown.add(Breakup(stage: 45, count: eggsRequired, potionsUsed: 0));
+        breakdown.add(Breakup(stage: 45, count: eggsRequired, potions: 0));
 
         // GOAL: Get those Eggs from Stage 4
         // Rule: 5 Stage 4 -> 6 Eggs
@@ -111,13 +83,13 @@ class MergeCalculator {
         continue;
       } else {
         // Standard 5-for-2 logic for all other stages
-        neededForPrevious = (currentNeeded ~/ 2 * 5) + (currentNeeded % 2 >0?5:0);
+        neededForPrevious = (currentNeeded ~/ 2 * 5) + currentNeeded.remainingCount(merge5Only);
       }
 
       // If we are at Stage 5, the "previous" is Stage 4
       int actualLevelKey = (i == 5) ? 4 : i - 1;
       // breakdown[actualLevelKey] = neededForPrevious;
-      breakdown.add(Breakup(stage: actualLevelKey, count: neededForPrevious, potionsUsed: 0));
+      breakdown.add(Breakup(stage: actualLevelKey, count: neededForPrevious, potions: 0));
 
       currentNeeded = neededForPrevious;
     }
