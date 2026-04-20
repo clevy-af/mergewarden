@@ -6,6 +6,7 @@ import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
 import 'package:mergewarden/view/goal_screen.dart';
+import 'package:mergewarden/view/whats_new.dart';
 import 'package:web/web.dart' as web;
 
 class Dashboard extends StatefulWidget {
@@ -16,15 +17,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  int _selectedIndex = 1;
-  // List<Breakup> stageBreakdown=[];
-  // List<Breakup> stageBreakdown=[
-  //   Breakup(stage: 5, count: 2, potionsUsed: 0),
-  //   Breakup(stage: 4, count: 5, potionsUsed: 0),
-  //   Breakup(stage: 3, count: 13, potionsUsed: 0),
-  //   Breakup(stage: 2, count: 33, potionsUsed: 0),
-  //   Breakup(stage: 0, count: 208, potionsUsed: 0),
-  // ];
+  int _selectedIndex = 0;
 
   Widget get navigationRail => NavigationRail(
     backgroundColor: cCard,
@@ -42,7 +35,7 @@ class _DashboardState extends State<Dashboard> {
           margin: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              image: DecorationImage(image: AssetImage('assets/mg_logo.jpeg'))
+              image: DecorationImage(image: AssetImage('assets/logo.webp'))
           ),
           height: 80,width: 80,
         ),
@@ -78,9 +71,13 @@ class _DashboardState extends State<Dashboard> {
         icon: Icon(Icons.calculate),
       label: Text('Calculator',style: TextStyle(color: Colors.white),),
     ),
-    NavigationRailDestination(
-        icon: Icon(Icons.track_changes),
-      label: Text('Goals',style: TextStyle(color: Colors.white),),
+    // NavigationRailDestination(
+    //     icon: Icon(Icons.merge),
+    //   label: Text('Merger',style: TextStyle(color: Colors.white),),
+    // ),
+NavigationRailDestination(
+        icon: Icon(Icons.new_releases_outlined),
+      label: Text('What\'s New',style: TextStyle(color: Colors.white),),
     ),
 
   ],
@@ -144,7 +141,110 @@ class _DashboardState extends State<Dashboard> {
                                   valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
                                   builder: (context,data,_) {
                                     return ActionChip(
-                                        tooltip: 'Items Calculator',
+                                        tooltip: 'Basic Item Calculator',
+                                        side: data.get('type')=='items'?BorderSide(color: cCard,width: 2):null,
+                                        onPressed: () async {
+                                          await  HiveProvider.appBox.put('type', 'items');
+                                          await  HiveProvider.appBox.put('chain', null);
+                                          HiveProvider.appBox.delete('breakdown');
+
+                                        },
+                                        label: Text('Items')
+                                    );
+                                  }
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child:ValueListenableBuilder(
+                                  valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
+                                  builder: (context,data,_) {
+                                    return ActionChip(
+                                      tooltip: 'Basic Wildlife Calculator',
+                                      label: Text('Wildlife'),
+                                      side: data.get('type')=='wildlife'?BorderSide(color: cCard,width: 2):null,
+                                      onPressed: () async {
+                                        await  HiveProvider.appBox.put('type', 'wildlife');
+                                        HiveProvider.appBox.delete('breakdown');
+                                      },
+                                    );
+                                  }
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: EdgeInsetsGeometry.symmetric(vertical: 5),
+                    ),
+                    // Central Progress Card
+                    SliverToBoxAdapter(
+
+                      child:  Padding(
+                        padding: EdgeInsets.symmetric(horizontal:context.isDesktop?MediaQuery.of(context).size.width*0.15:18),
+                        child: CentralStatsCard(),
+                      ),
+                    ),
+                    SliverPadding(
+                        padding: EdgeInsetsGeometry.symmetric(vertical: 5),
+                    ),
+
+                                      // Levels Grid
+                    SliverToBoxAdapter(child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: const Text("REQUIRED ITEMS BY LEVEL", style: TextStyle(fontWeight: FontWeight.bold)),
+                    )),
+                    SliverToBoxAdapter(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child:
+                                          ValueListenableBuilder(
+                                            valueListenable: HiveProvider.appBox.listenable(keys: ['breakdown','chain','type']),
+                                            builder: (context, value, child) {
+                                              final List data=value.get('breakdown')??[];
+                                              if(data.isEmpty) return  Text('Fill out your target details to get started');
+                                              return GridView.builder(
+                                                shrinkWrap: true,
+                                                physics: const NeverScrollableScrollPhysics(),
+                                                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                                                  maxCrossAxisExtent: 180,
+                                                  mainAxisExtent: 180,
+                                                  crossAxisSpacing: 20,
+                                                  mainAxisSpacing: 20,
+                                                ),
+                                                itemCount: data.length,
+                                                itemBuilder: (context, index) =>  LevelCard(
+                                                    level: data.elementAt(index)['stage'],
+                                                    potions: data.elementAt(index)['potions'],
+                                                  count: data.elementAt(index)['count'],
+                                                  chainId: value.get('chain'),
+                                                  isWildlife: value.get('type')=='wildlife',
+                                                ),
+                                              );
+                                            }
+                                          ),
+                                        ),
+                                      ),
+                  ],
+                ),
+                  ChangelogPage(),
+                  CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child:  Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            if(context.isDesktop)  TextLogo(),
+                            if(context.isDesktop) const SizedBox(width: 20),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ValueListenableBuilder(
+                                  valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
+                                  builder: (context,data,_) {
+                                    return ActionChip(
+                                        tooltip: 'Merger Calculator',
                                         side: data.get('type')=='items'?BorderSide(color: cCard,width: 2):null,
                                         onPressed: () async {
                                           await  HiveProvider.appBox.put('type', 'items');
@@ -231,6 +331,7 @@ class _DashboardState extends State<Dashboard> {
                                       ),
                   ],
                 ),
+                  // TargetGoalScreen(),
                   TargetGoalScreen(),
                 ][_selectedIndex],
               ),

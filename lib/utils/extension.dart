@@ -4,7 +4,7 @@ extension ContExt on BuildContext{
   bool get isDesktop=>MediaQuery.of(this).size.width>700;
 
 }
-extension DoubleExt on double{
+extension DoubleExt on num{
   String get percent=>toString().endsWith("0")?toString():toStringAsFixed(2);
 }
 
