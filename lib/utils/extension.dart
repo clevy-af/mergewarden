@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mergewarden/utils/constants.dart';
 
 extension ContExt on BuildContext{
-  bool get isDesktop=>MediaQuery.of(this).size.width>700;
+  bool get isDesktop{
+    return MediaQuery.of(this).size.width>kDesktopBreak;
+  }
 
 }
 extension DoubleExt on num{

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mergewarden/utils/colors.dart';
 
 class ChangelogPage extends StatelessWidget {
   const ChangelogPage({super.key});
@@ -13,7 +12,7 @@ class ChangelogPage extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cCreme,
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
         // Dashed border look
         border: Border.all(
@@ -63,7 +62,7 @@ class ChangelogPage extends StatelessWidget {
       child: ListView(
         children: [
 
-          _buildComingSoon(brief: 'Wildlife images and more!',icon: Icons.timer, title: 'In the Workshop'),
+          _buildComingSoon(brief: 'Wildlife images and inventory support!',icon: Icons.timer, title: 'In the Workshop'),
           const SizedBox(height: 20),
           const Text("What's New in the Shed",
               style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
@@ -124,7 +123,7 @@ class ChangelogPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -146,7 +145,7 @@ class ChangelogPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),

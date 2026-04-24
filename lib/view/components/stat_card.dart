@@ -523,15 +523,15 @@ class TargetPage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Tooltip(
-              message: 'Add To GoalS',
-              child: TextButton(
-
-                onPressed: onGoalSet,
-                child: Text('Add As Goal'),
-              ),
-            ),
-            SizedBox(width: 8,),
+            // Tooltip(
+            //   message: 'Add To GoalS',
+            //   child: TextButton(
+            //
+            //     onPressed: onGoalSet,
+            //     child: Text('Add As Goal'),
+            //   ),
+            // ),
+            // SizedBox(width: 8,),
             Semantics(
               label: 'Merge Gardens Calculation Reset Button',
               child: IconButton(
