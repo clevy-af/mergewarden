@@ -56,6 +56,7 @@ List<Map<String,dynamic>> chains= [
   {"name": "Heart-Shaped Balloons", "id": "Heart-Shaped_Balloons", "stages": 2},
   {"name": "Recycled Boosters", "id": "Recycled_Boosters", "stages": 4},
   {"name": "Uncle Elwood's Experiment", "id": "Uncle_Elwood's_Experiment", "stages": 4},
+  {"name": "Time Skip", "id": "Time_Skip", "stages": 4},
   // {"name": "Wildlife", "id": "Wildlife", "stages": 8},
 ];
 
@@ -793,6 +794,12 @@ Map<String,List> chainItems= {
     {"name": "Strange Brew", "stage": 3},
     {"name": "Potent Concoction", "stage": 4}
   ],
+  "Time_Skip":[
+    {"name": "Small Time Skip", "stage": 1},
+    {"name": "Medium Time Skip", "stage": 2},
+    {"name": "Big Time Skip", "stage": 3},
+    {"name": "Cuckoo Time Skip", "stage": 4},
+  ],
   'Vegetable_Patches':[
     {"name": "Vegetable Nursery", "stage": 1},
     {"name": "Radish Patch", "stage": 2},
@@ -894,3 +901,16 @@ Map<String,List> chainItems= {
   ],
 
 };
+
+List<Map> wildlifeChain= [
+    {"name": "Eggs", "stage": 0},
+    {"name": "Stage 1", "stage": 1},
+    {"name": "Stage 2", "stage": 2},
+    {"name": "Stage 3", "stage": 3},
+    {"name": "Stage 4", "stage": 4},
+    {"name": "Magnificent Eggs", "stage": 45},
+    {"name": "Stage 5", "stage": 5},
+    {"name": "Stage 6", "stage": 6},
+    {"name": "Stage 7", "stage": 7},
+    {"name": "Stage 8", "stage": 8},
+  ];

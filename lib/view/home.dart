@@ -1,12 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:mergewarden/model/goal_data.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/view/components/goal_card.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
-import 'package:mergewarden/view/goal_screen.dart';
 import 'package:mergewarden/view/whats_new.dart';
 import 'package:web/web.dart' as web;
 
@@ -16,86 +16,6 @@ class Dashboard extends StatefulWidget {
   @override
   State<Dashboard> createState() => _DashboardState();
 }
-
-class NavigationLine extends StatelessWidget {
-  const NavigationLine({super.key, required this.index, required this.onChanged});
-  final int index;
-  final Function(int) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return NavigationRail(
-      backgroundColor: cCard,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            if(!context.isDesktop)Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                CloseButton(color: Colors.black,)
-              ],
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  image: DecorationImage(image: AssetImage('assets/logo.webp'))
-              ),
-              height: 80,width: 80,
-            ),
-
-            LinkButton(
-              link: 'https://futureplaygames.zendesk.com/hc/en-us/categories/360002343379-Merge-Gardens',
-              text: 'Futureplay',
-            ),
-            LinkButton(
-              link: 'https://mergegardens.com/',
-              text: 'Website',
-            ),
-            LinkButton(
-              link: 'https://merge-gardens.fandom.com/wiki/Merge_Gardens_Wiki',
-              text: 'Wiki',
-            ),
-            LinkButton(
-              link: 'https://store.mergegardens.com/en/',
-              text: 'Web Store',
-            ),
-            Container(
-              padding: const EdgeInsets.all(8.0),
-              width: 88,
-              child: Divider(color: Colors.white,thickness: 1,endIndent: 5,indent: 5,),
-            ),
-          ],
-        ),
-      ),
-      labelType: NavigationRailLabelType.all,
-      indicatorColor: cCreme,
-      destinations: [
-        NavigationRailDestination(
-          icon: Icon(Icons.calculate),
-          label: Text('Calculator',style: TextStyle(color: Colors.white),),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.checklist_outlined),
-          label: Text('Goals',style: TextStyle(color: Colors.white),),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.new_releases_outlined),
-          label: Text('What\'s New',style: TextStyle(color: Colors.white),),
-        ),
-
-      ],
-      selectedIndex: index,
-      onDestinationSelected: (value) {
-     onChanged(value);
-        HiveProvider.appBox.delete('breakdown');
-        if(Scaffold.of(context).isDrawerOpen) Scaffold.of(context).closeDrawer();
-      },
-    );
-  }
-}
-
 
 class _DashboardState extends State<Dashboard> {
   int _selectedIndex = 0;
@@ -109,7 +29,11 @@ class _DashboardState extends State<Dashboard> {
   }),
   );
 
-
+  @override
+  void initState() {
+    if(HiveProvider.goals.keys.isNotEmpty) HiveProvider.appBox.put('goalIndex', HiveProvider.goals.keys.first);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -253,10 +177,7 @@ class _DashboardState extends State<Dashboard> {
                       // Central Progress Card
                       SliverToBoxAdapter(
 
-                        child:  Padding(
-                          padding: EdgeInsets.symmetric(horizontal:context.isDesktop?MediaQuery.of(context).size.width*0.15:18),
-                          child:CentralGoalCard()
-                        ),
+                        child:  Center(child: CentralGoalCard()),
                       ),
                       SliverPadding(
                         padding: EdgeInsetsGeometry.symmetric(vertical: 5),
@@ -272,27 +193,42 @@ class _DashboardState extends State<Dashboard> {
                           padding: const EdgeInsets.all(8.0),
                           child:
                           ValueListenableBuilder(
-                              valueListenable: HiveProvider.appBox.listenable(keys: ['breakdown','chain','type']),
+                              valueListenable: HiveProvider.appBox.listenable(keys: ['goalIndex']),
                               builder: (context, value, child) {
-                                final List data=value.get('breakdown')??[];
-                                if(data.isEmpty) return  Text('Fill out your target details to get started');
-                                return GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                                    maxCrossAxisExtent: 180,
-                                    mainAxisExtent: 180,
-                                    crossAxisSpacing: 20,
-                                    mainAxisSpacing: 20,
-                                  ),
-                                  itemCount: data.length,
-                                  itemBuilder: (context, index) =>  LevelCard(
-                                    level: data.elementAt(index)['stage'],
-                                    potions: data.elementAt(index)['potions'],
-                                    count: data.elementAt(index)['count'],
-                                    chainId: value.get('chain'),
-                                    isWildlife: value.get('type')=='wildlife',
-                                  ),
+                                int? index=value.get('goalIndex');
+
+                                if(index==null||HiveProvider.goals.isEmpty||!HiveProvider.goals.keys.contains(index)) return  Text('Fill out your target details to get started');
+                                return ValueListenableBuilder(
+                                  key: ValueKey(index),
+                                  valueListenable: HiveProvider.goals.listenable(keys: [index]),
+                                  builder: (context, goalData, child) {
+                                    // print(goalData.toMap());
+
+                                    var json = goalData.get(index);
+                                    if(json==null) return Text('Nothing to show');
+                                    final goalValue=GoalData.fromJson(json);
+                                    // print(goalValue.inventory);
+                                    return GridView.builder(
+                                      key: ObjectKey(goalValue.inventory),
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                                        maxCrossAxisExtent: 180,
+                                        mainAxisExtent: 180,
+                                        crossAxisSpacing: 20,
+                                        mainAxisSpacing: 20,
+                                      ),
+                                      itemCount: goalValue.inventory.length,
+                                      itemBuilder: (context, index) =>  LevelCard(
+                                        key: ValueKey(goalValue.inventory[index]),
+                                        level: goalValue.inventory[index].stage,
+                                        potions: goalValue.inventory[index].potions,
+                                        count: goalValue.inventory[index].count,
+                                        chainId: goalValue.targetItem.chainId,
+                                        isWildlife: goalValue.targetItem.isWildlife,
+                                      ),
+                                    );
+                                  }
                                 );
                               }
                           ),
@@ -301,13 +237,93 @@ class _DashboardState extends State<Dashboard> {
                     ],
                   ),
                   ChangelogPage(),
-                  // TargetGoalScreen(),
-                  TargetGoalScreen(),
                 ][_selectedIndex],
               ),
             ),
         ],
       ),
+    );
+  }
+}
+
+class NavigationLine extends StatelessWidget {
+  const NavigationLine({super.key, required this.index, required this.onChanged});
+  final int index;
+  final Function(int) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return NavigationRail(
+      backgroundColor: cCard,
+      leading: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            if(!context.isDesktop)Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CloseButton(color: Colors.black,)
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  image: DecorationImage(image: AssetImage('assets/logo.webp'))
+              ),
+              height: 60,width: 60,
+            ),
+
+            LinkButton(
+              link: 'https://futureplaygames.zendesk.com/hc/en-us/categories/360002343379-Merge-Gardens',
+              text: 'Futureplay',
+            ),
+            LinkButton(
+              link: 'https://mergegardens.com/',
+              text: 'Website',
+            ),
+            LinkButton(
+              link: 'https://merge-gardens.fandom.com/wiki/Merge_Gardens_Wiki',
+              text: 'Wiki',
+            ),
+            LinkButton(
+              link: 'https://store.mergegardens.com/en/',
+              text: 'Web Store',
+            ),
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              width: 88,
+              child: Divider(color: Colors.white,thickness: 1,endIndent: 5,indent: 5,),
+            ),
+          ],
+        ),
+      ),
+      labelType: NavigationRailLabelType.all,
+      indicatorColor: cCreme,
+      destinations: [
+        NavigationRailDestination(
+          icon: Icon(Icons.calculate),
+          label: Text('Calculator',style: TextStyle(color: Colors.white),),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.checklist_outlined),
+          label: Text('Goals',style: TextStyle(color: Colors.white),),
+        ),
+        // NavigationRailDestination(
+        //   icon: Icon(Icons.new_releases_outlined),
+        //   label: Text('What\'s New',style: TextStyle(color: Colors.white),),
+        // ),
+
+      ],
+      trailing:  TextButton(onPressed: () => showAdaptiveDialog(context: context, builder: (context) => ChangelogPage(),),
+          child: Text('Changelog',style: TextStyle(color: cCreme),)),
+      selectedIndex: index,
+      trailingAtBottom: true,
+      onDestinationSelected: (value) {
+        onChanged(value);
+        HiveProvider.appBox.delete('breakdown');
+        if(Scaffold.of(context).isDrawerOpen) Scaffold.of(context).closeDrawer();
+      },
     );
   }
 }

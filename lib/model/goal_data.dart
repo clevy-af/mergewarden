@@ -5,7 +5,7 @@ class GoalData {
   final TargetItem targetItem;
   final int potions;
   final int createdAt;
-  final List<Inventory> inventory;
+  List<Inventory> inventory;
 
   GoalData( {required this.targetItem, required this.inventory,this.potions=0,required this.createdAt});
   factory GoalData.fromJson(Map json) => GoalData(
@@ -26,6 +26,15 @@ class GoalData {
       progress+=(inventory[i].have/inventory[i].count)*100;
     }
     return progress/inventory.length;
+}
+
+Map<int,int> inventoryMap(){
+    Map<int ,int> data={};
+    final x=inventory.map((e) => {e.stage:e.count},);
+    for (var element in x) {
+      data.putIfAbsent(element.keys.first,()=>element.values.first);
+    }
+    return data;
 }
 
 }

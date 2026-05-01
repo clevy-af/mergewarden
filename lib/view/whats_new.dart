@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mergewarden/utils/colors.dart';
 
 class ChangelogPage extends StatelessWidget {
   const ChangelogPage({super.key});
@@ -56,50 +57,66 @@ class ChangelogPage extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 600), // Perfect for Web
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: ListView(
-        children: [
-
-          _buildComingSoon(brief: 'Wildlife images and inventory support!',icon: Icons.timer, title: 'In the Workshop'),
-          const SizedBox(height: 20),
-          const Text("What's New in the Shed",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
-          const SizedBox(height: 20),
-          // _buildLogEntry(
-          //   date: "April 2026",
-          //   version: "v2.1.0",
-          //   title: "The Potential Plan Update",
-          //   description: "We've added a new master calculator to see how far your current inventory can grow!",
-          //   icon: Icons.auto_awesome,
-          //   color: Colors.orangeAccent,
-          // ),
-          _buildLogEntry(
-            date: "Apr 2026",
-            version: "v1.5.2",
-            title: "Pest Control",
-            description: "Tongue-eating Louse caused Stage number to be replaced by stage name; found it, squished it. ",
-            icon: Icons.bug_report_outlined,
-            color: Colors.redAccent,
-          ),
-          _buildLogEntry(
-            date: "March 2026",
-            version: "v1.2.0",
-            title: "Potions & Whimsy",
-            description: "All chain items aesthetics captured. Potion addition to calculations, along with option to decide whether to include merge3 or not.",
-            icon: Icons.phone_iphone,
-            color: Colors.lightBlueAccent,
-          ),
-          _buildLogEntry(
-            date: "Feb 2026",
-            version: "v1.0.0",
-            title: "Let's Calculate",
-            description: "Initial launch of assitant platform for MG. Merge calculator tailored for MG rocked the show. Happy merging!",
-            icon: Icons.local_florist,
-            color: Colors.greenAccent,
-          ),
+    return Scaffold(
+      backgroundColor: cBackground,
+      appBar: AppBar(
+        backgroundColor: cCard,
+        automaticallyImplyLeading: false,
+        animateColor: true,
+        actions: [
+          CloseButton(
+            color: Colors.white,
+          )
         ],
+      ),
+      body: Center(
+        child: Container(
+          constraints:  BoxConstraints(maxWidth: 600), // Perfect for Web
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+
+              _buildComingSoon(brief: 'Wildlife images and inventory support!',icon: Icons.timer, title: 'In the Workshop'),
+              const SizedBox(height: 20),
+              const Text("What's New in the Shed",
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
+              const SizedBox(height: 20),
+              // _buildLogEntry(
+              //   date: "April 2026",
+              //   version: "v2.1.0",
+              //   title: "The Potential Plan Update",
+              //   description: "We've added a new master calculator to see how far your current inventory can grow!",
+              //   icon: Icons.auto_awesome,
+              //   color: Colors.orangeAccent,
+              // ),
+              _buildLogEntry(
+                date: "Apr 2026",
+                version: "v1.5.2",
+                title: "Pest Control",
+                description: "Tongue-eating Louse caused Stage number to be replaced by stage name; found it, squished it. ",
+                icon: Icons.bug_report_outlined,
+                color: Colors.redAccent,
+              ),
+              _buildLogEntry(
+                date: "March 2026",
+                version: "v1.2.0",
+                title: "Potions & Whimsy",
+                description: "All chain items aesthetics captured. Potion addition to calculations, along with option to decide whether to include merge3 or not.",
+                icon: Icons.phone_iphone,
+                color: Colors.lightBlueAccent,
+              ),
+              _buildLogEntry(
+                date: "Feb 2026",
+                version: "v1.0.0",
+                title: "Let's Calculate",
+                description: "Initial launch of assitant platform for MG. Merge calculator tailored for MG rocked the show. Happy merging!",
+                icon: Icons.local_florist,
+                color: Colors.greenAccent,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -123,10 +140,10 @@ class ChangelogPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.2),
+                  color: color.withValues(alpha: 0.7),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: color, size: 20),
+                child: Icon(icon, color: Colors.white, size: 20),
               ),
               Container(
                 width: 2,

@@ -21,7 +21,7 @@ class MergeCalculator {
 
   static List<Breakup> getFullBreakdown(int targetLevel, int targetCount,[int potions=0,bool has0=false,bool merge5Only=true]) {
     List<Breakup> breakdown = [
-      Breakup(stage: targetLevel, count: targetCount, potions: 0, mergeBy3: merge5Only?-1:0, mergeBy5: 0,)
+      Breakup(stage: targetLevel, count: targetCount, potions: 0,)
     ];
 
     int currentLevelCount = targetCount;
@@ -36,8 +36,6 @@ class MergeCalculator {
       int merges= setsOfTwo+remainder;
 
       int neededForLevelBelow = (setsOfTwo * 5) + remainder.remainingCount(merge5Only);
-      int surplus = merge5Only&&remainder>0?5-remainder:0;
-      // int i=0;
        var minusValue = min(merges, potionsLeft);
      if(potionsLeft>0) {
        neededForLevelBelow = neededForLevelBelow - minusValue;
@@ -46,11 +44,8 @@ class MergeCalculator {
      }
       // breakdown[level - 1] = neededForLevelBelow;
       breakdown.add(Breakup(
-          stage: level-1, count: neededForLevelBelow, potions: minusValue,
-        mergeBy3: (merge5Only?-1:1)*remainder,
-        mergeBy5: setsOfTwo,
-        surplus: surplus
-      )
+          stage: level-1, count: neededForLevelBelow,
+        potions: minusValue,)
       );
       currentLevelCount = neededForLevelBelow;
     }
@@ -62,7 +57,7 @@ class MergeCalculator {
   /// Calculates how many each Level of Wildlife are needed to produce [targetLevel] x [targetCount].
   static List<Breakup> calculateWildlife(int targetLevel, int targetCount,[bool merge5Only=true]) {
     List<Breakup> breakdown = [
-      Breakup(stage: targetLevel, count: targetCount, potions: 0, mergeBy5: 0, mergeBy3: 0,surplus: targetCount.isOdd?1:0)
+      Breakup(stage: targetLevel, count: targetCount, potions: 0)
     ];
     int currentNeeded = targetCount;
 
@@ -80,7 +75,7 @@ class MergeCalculator {
 
         // breakdown[45] = eggsRequired; // Store as "Stage 4.5"
 
-        breakdown.add(Breakup(stage: 45, count: eggsRequired, potions: 0, mergeBy3: merge5Only?-1:currentNeeded%2, mergeBy5: merge5Only?setsBy5:-1,surplus: merge5Only?eggsRequired%5:0));
+        breakdown.add(Breakup(stage: 45, count: eggsRequired, potions: 0));
         // GOAL: Get those Eggs from Stage 4
         // Rule: 5 Stage 4 -> 6 Eggs
         // We need (eggsRequired / 6) sets of five Stage 4s
@@ -102,14 +97,13 @@ class MergeCalculator {
       // If we are at Stage 5, the "previous" is Stage 4
       int actualLevelKey = (i == 5) ? 4 : i - 1;
       // breakdown[actualLevelKey] = neededForPrevious;
-      breakdown.add(Breakup(stage: actualLevelKey, count: neededForPrevious, potions: 0, mergeBy3: merge5Only?-1:currentNeeded%2, mergeBy5: merge5Only?setsBy5:-1,));
+      breakdown.add(Breakup(stage: actualLevelKey, count: neededForPrevious, potions: 0,));
 
       currentNeeded = neededForPrevious;
     }
 
     return breakdown;
   }
-
 
   Map<int, int> calculateGlobalMaxReach(Map<int, int> physicalInventory) {
     // 1. Create a working copy of the inventory

@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
-import 'package:mergewarden/model/dummies.dart';
+import 'package:mergewarden/model/json.dart';
 import 'package:mergewarden/model/goal_data.dart';
 import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/model/target_item.dart';
@@ -177,11 +177,11 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                           onChanged: ( newValue) {
                             setState(() { stageController.text = (newValue??0) .toString(); });
                           },
-                          items: chainId=='Wildlife'?List.generate(8, (index) => DropdownMenuItem<int>(
-                            value: index+1,
+                          items:chainId=='Wildlife'?List.generate(wildlifeChain.length, (index) => DropdownMenuItem<int>(
+                            value: wildlifeChain[index]['stage'] ,
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text('Stage ${index+1}'),
+                              child:Text( wildlifeChain[index]['name'] ),
                             ),
                           )
                           ): List.generate(stages.length, (index) => DropdownMenuItem<int>(
@@ -287,13 +287,13 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                 ValueListenableBuilder(
                     valueListenable:  HiveProvider.appBox.listenable(keys: ['type']),
                     builder:(context,data,_) {
-                      bool isWildlife=data.get('type')=='wildlife';
+                      // bool isWildlife=data.get('type')=='wildlife';
                     return Semantics(
                       value: 'Checkbox for Merge 5 Only calculation',
                       child: Checkbox(
-                          value: isWildlife?true:merge5Only,
+                          value: merge5Only,
                           activeColor: cCard,
-                          onChanged: isWildlife?null:(value) {
+                          onChanged:(value) {
                             setState(() {
                               merge5Only=value??false;
                             });
@@ -350,7 +350,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                       stage: stageNumber
                   );
                 });
-                  HiveProvider().putBreakDown(isWildlife?MergeCalculator.calculateWildlife(targetItem!.stage, targetItem!.count):
+                  HiveProvider().putBreakDown(isWildlife?MergeCalculator.calculateWildlife(targetItem!.stage, targetItem!.count,merge5Only):
                   MergeCalculator.getFullBreakdown(targetItem!.stage, targetItem!.count,int.tryParse(potionController.text)??0,HiveProvider.appBox.get('chain0'),merge5Only)
                   );
                 },
@@ -368,7 +368,8 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
         targetItem: targetItem,
           onReset: () {
         setState(() {
-          targetItem=null;HiveProvider.appBox.delete('chain');
+          targetItem=null;
+          HiveProvider.appBox.delete('chain');
           stageController.clear();
           countController.clear();
           potionController.clear();
@@ -523,15 +524,15 @@ class TargetPage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            // Tooltip(
-            //   message: 'Add To GoalS',
-            //   child: TextButton(
-            //
-            //     onPressed: onGoalSet,
-            //     child: Text('Add As Goal'),
-            //   ),
-            // ),
-            // SizedBox(width: 8,),
+            Tooltip(
+              message: 'Add To GoalS',
+              child: TextButton(
+
+                onPressed: onGoalSet,
+                child: Text('Add As Goal'),
+              ),
+            ),
+            SizedBox(width: 8,),
             Semantics(
               label: 'Merge Gardens Calculation Reset Button',
               child: IconButton(
@@ -541,43 +542,7 @@ class TargetPage extends StatelessWidget {
           ],
         ),
 
-        SizedBox(
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-
-            children: [
-              if(targetItem!.chainId!=null)
-
-                Semantics(
-                  label: 'Merge Gardens Calculation Target Item',
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    // margin: EdgeInsets.all(8),
-                    height: MediaQuery.of(context).size.height*0.4,
-                    width:MediaQuery.of(context).size.height*0.4,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: cCard,
-                      image: DecorationImage(
-                          image: AssetImage('assets/${targetItem?.chainId!=null&&targetItem?.chainId!='Wildlife'?'Stage_${targetItem?.stage}_-_${targetItem?.stageName?.replaceAll(' ', '_')}':'wildlife'}.webp'),
-                          fit: BoxFit.contain
-                      ),
-                    ),
-                  ),
-                ),
-              const SizedBox(height: 20),
-
-              Semantics(
-                label: 'Merge Gardens Calculation Target Text',
-                child: Text(
-                  (targetItem?.stageName??targetItem?.chainId).toString(),
-                  style: TextStyle(fontSize: context.isDesktop?40:30, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50)),
-                ),
-              ),
-            ],
-          ),
-        ),
-
+        TargetItemView(targetItem: targetItem),
 
         Semantics(
           label: 'Merge Gardens Calculation Result',
@@ -594,6 +559,55 @@ class TargetPage extends StatelessWidget {
         Text("PROGRESS: 0%", style: TextStyle(color: Colors.grey,fontSize: MediaQuery.of(context).size.width*0.03, fontWeight: FontWeight.bold)),
 
       ],
+    );
+  }
+}
+
+class TargetItemView extends StatelessWidget {
+  const TargetItemView({
+    super.key,
+    required this.targetItem,
+  });
+
+  final TargetItem? targetItem;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+
+        children: [
+          if(targetItem!.chainId!=null)
+
+            Semantics(
+              label: 'Merge Gardens Target Item',
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                // margin: EdgeInsets.all(8),
+                height: MediaQuery.of(context).size.height*0.4,
+                width:MediaQuery.of(context).size.height*0.4,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: cCard,
+                  image: DecorationImage(
+                      image: AssetImage('assets/${targetItem?.chainId!=null&&targetItem?.chainId!='Wildlife'?'Stage_${targetItem?.stage}_-_${targetItem?.stageName?.replaceAll(' ', '_')}':'wildlife'}.webp'),
+                      fit: BoxFit.contain
+                  ),
+                ),
+              ),
+            ),
+          const SizedBox(height: 20),
+
+          Semantics(
+            label: 'Merge Gardens Target Text',
+            child: Text(
+              (targetItem?.stageName??targetItem?.chainId).toString(),
+              style: TextStyle(fontSize: context.isDesktop?40:30, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
