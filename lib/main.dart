@@ -10,6 +10,8 @@ void main() async{
     await Hive.initFlutter();
     HiveProvider.appBox=await Hive.openBox('app');
     HiveProvider.goals=await Hive.openBox('goals');
+    HiveProvider.form=await Hive.openBox('adjustForm');
+    await HiveProvider.form.clear();
     await HiveProvider.appBox.put('type', 'items');
 
     runApp(const MyApp());

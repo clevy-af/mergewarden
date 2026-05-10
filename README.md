@@ -1,6 +1,6 @@
 # Merge Warden
 
-A helpful assistance tool for Gardeners at MergeGardens.
+A helpful assistance tool for Gardeners of MergeGardens.
 
 ## Features
 - Item Calculator

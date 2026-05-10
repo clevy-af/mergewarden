@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 const Color cBackground= Color(0xFF9BAE96);
+const Color cFillBackground= Color(0xffF1F5EC);
 const Color cCard= Color(0xFF5E7356);
 const Color cBrown= Color(0xff4B3621);
 const Color cCreme= Color(0xffCCC7A3);
+const Color cRed= Color(0xFFB35A44);
 final Color cLightBackground= Colors.white.withValues(alpha: 0.98);
 
 const TextStyle hintStyle=TextStyle(fontStyle: FontStyle.italic, color: Colors.blueGrey);

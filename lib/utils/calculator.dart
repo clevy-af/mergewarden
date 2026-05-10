@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:mergewarden/model/json.dart';
 import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/utils/extension.dart';
 
@@ -54,50 +55,121 @@ class MergeCalculator {
 
 }
 
+  static List<Breakup> getFullBreakdownAdjusted(
+      int targetLevel,
+      int targetCount, {
+        Map<int, int> inventory = const {},
+        int potions = 0,
+        bool has0 = false,
+        bool merge5Only = true,
+      }) {
+    List<Breakup> breakdown = [];
+    int currentNeededAtThisLevel = targetCount;
+    int lowestLevel = has0 ? 0 : 1;
+    int potionsLeft = potions;
+
+    // Step down from Target to Bottom
+    for (int level = targetLevel; level >= lowestLevel; level--) {
+      // 1. Get inventory for this specific level
+      int owned = inventory[level] ?? 0;
+
+      // 2. IMPORTANT: Subtract inventory from what we need
+      // This 'netNeed' is what we actually have to build/merge
+      int netNeed = (currentNeededAtThisLevel - owned).clamp(0, currentNeededAtThisLevel).toInt();
+
+      // 3. Add to our report
+      breakdown.add(Breakup(
+        stage: level,
+        count: netNeed, // This shows the user exactly what's left to do
+        potions: 0,
+      ));
+
+      // 4. Calculate requirements for the level BELOW
+      if (level > lowestLevel) {
+        int neededForLevelBelow;
+
+        if (merge5Only) {
+          // Strictly 5-for-2
+          neededForLevelBelow = (netNeed / 2).ceil() * 5;
+        } else {
+          // Hybrid 5-for-2 and 3-for-1
+          int setsOfTwo = netNeed ~/ 2;
+          int remainder = netNeed % 2;
+          neededForLevelBelow = (setsOfTwo * 5) + (remainder * 3);
+        }
+
+        // 5. Apply Potion Logic to the requirement we just calculated
+        int merges = (netNeed / 2).ceil();
+        int potionsToUse = min(merges, potionsLeft);
+
+        if (potionsToUse > 0) {
+          neededForLevelBelow = (neededForLevelBelow - potionsToUse).clamp(0, double.infinity).toInt();
+          potionsLeft -= potionsToUse;
+        }
+
+        // Set the requirement for the next iteration
+        currentNeededAtThisLevel = neededForLevelBelow;
+      }
+    }
+
+    return breakdown;
+  }
   /// Calculates how many each Level of Wildlife are needed to produce [targetLevel] x [targetCount].
   static List<Breakup> calculateWildlife(int targetLevel, int targetCount,[bool merge5Only=true]) {
     List<Breakup> breakdown = [
       Breakup(stage: targetLevel, count: targetCount, potions: 0)
     ];
+    List<int> stageHierarchy = [8, 7, 6, 5, 45, 4, 3, 2, 1, 0];
+    int startIndex = stageHierarchy.indexOf(targetLevel);
+    if (startIndex == -1) return [];
     int currentNeeded = targetCount;
+    // print(currentNeeded);
 
-    // Loop backwards from Target to Stage 0
-    for (int i = targetLevel; i > 0; i--) {
+    // Iterate through the hierarchy list instead of a number range
+    for (int i = startIndex; i < stageHierarchy.length - 1; i++) {
       int neededForPrevious,setsBy5,setsBy3;
-      // print(i);
-      if (i == 5) {
-        // GOAL: Get Stage 5 from Stage 4.5 (Eggs)
-        // Standard merge: 5 eggs -> 2 Stage 5
+      int currentStage = stageHierarchy[i];
+      int nextStage = stageHierarchy[i + 1];
 
-         setsBy5=currentNeeded ~/ 2;
-         setsBy3=currentNeeded% 2;
-        int eggsRequired = ( setsBy5* 5) +setsBy3.remainingCount( merge5Only);
+      if (currentStage == 5 && nextStage == 45) {
+        // Logic for Stage 5 -> Eggs (Stage 45)
+         setsBy5 = currentNeeded ~/ 2;
+         setsBy3 = currentNeeded % 2;
+        neededForPrevious = (setsBy5 * 5) + setsBy3.remainingCount(merge5Only);
 
-        // breakdown[45] = eggsRequired; // Store as "Stage 4.5"
+      } else if (currentStage == 45 && nextStage == 4) {
+        // NEW RULE: 5 Stage 4 -> 12 Eggs | 3 Stage 4 -> 6 Eggs
 
-        breakdown.add(Breakup(stage: 45, count: eggsRequired, potions: 0));
-        // GOAL: Get those Eggs from Stage 4
-        // Rule: 5 Stage 4 -> 6 Eggs
-        // We need (eggsRequired / 6) sets of five Stage 4s
-        double setsOfFiveNeeded = eggsRequired / 6;
-        int setsOf3Needed = eggsRequired %6;
-        neededForPrevious = (setsOfFiveNeeded.floor())* 5+(setsOf3Needed.remainingCount(merge5Only));
+        if (merge5Only) {
+          // Strictly 5-merges (sets of 12)
+          int setsOfTwelve = (currentNeeded / 12).ceil();
+          neededForPrevious = setsOfTwelve * 5;
+        } else {
+          // Hybrid logic: Prioritize 12s, then 6s
+          int setsOfTwelve = currentNeeded ~/ 12; // Whole sets of 5-merges
+          int remainder = currentNeeded % 12;
 
-      } else if (i == 45) {
-        // This is just a placeholder to skip the loop logic
-        // since we handled 4.5 inside the i==5 block
-        continue;
+          int additionalItems = 0;
+          if (remainder > 0) {
+            if (remainder <= 6) {
+              // A single 3-merge (6 eggs) is more efficient than a 5-merge
+              additionalItems = 3;
+            } else {
+              // Remainder is 7-11; a 5-merge (12 eggs) is required
+              additionalItems = 5;
+            }
+          }
+
+          neededForPrevious = (setsOfTwelve * 5) + additionalItems;
+        }
       } else {
-        // Standard 5-for-2 logic for all other stages
-         setsBy5=currentNeeded ~/ 2;
-         setsBy3=currentNeeded% 2;
-        neededForPrevious = ( setsBy5* 5) +setsBy3.remainingCount( merge5Only);
+        // Standard 5-for-2 logic
+        int setsBy5 = currentNeeded ~/ 2;
+        int setsBy3 = currentNeeded % 2;
+        neededForPrevious = (setsBy5 * 5) + setsBy3.remainingCount(merge5Only);
       }
 
-      // If we are at Stage 5, the "previous" is Stage 4
-      int actualLevelKey = (i == 5) ? 4 : i - 1;
-      // breakdown[actualLevelKey] = neededForPrevious;
-      breakdown.add(Breakup(stage: actualLevelKey, count: neededForPrevious, potions: 0,));
+      breakdown.add(Breakup(stage: nextStage, count: neededForPrevious, potions: 0,));
 
       currentNeeded = neededForPrevious;
     }
@@ -141,5 +213,74 @@ class MergeCalculator {
     // Remove levels with 0 items for a clean output
     currentStatus.removeWhere((key, value) => value == 0);
     return currentStatus;
+  }
+  static Map<int, int> calculateMaxReachStat(
+      Map<int, int> physicalInventory, {
+        bool merge5Only = true,
+      }) {
+    // 1. Working copy to store our "Ghost" results
+    Map<int, int> ghostInventory = Map.from(physicalInventory);
+
+    if (ghostInventory.isEmpty) return {};
+
+    // 2. Determine the range
+    int minLevel = ghostInventory.keys.reduce((a, b) => a < b ? a : b);
+    int maxLevel = ghostInventory.keys.reduce((a, b) => a > b ? a : b);
+
+    // 3. Sweep Upward
+    // We use a separate variable for 'carriedPotential' so we don't
+    // overwrite the physical items in the current stage.
+    int carriedPotential = 0;
+
+    for (int lvl = minLevel; lvl <= maxLevel || carriedPotential > 0; lvl++) {
+      // Current physical items + what came from merges below
+      int totalAvailableAtLevel = (ghostInventory[lvl] ?? 0) + carriedPotential;
+
+      int producedNextLevel = 0;
+
+      // Calculate production for the next stage
+      if (totalAvailableAtLevel >= 5) {
+        int setsOfFive = totalAvailableAtLevel ~/ 5;
+        producedNextLevel = setsOfFive * 2;
+      }
+
+      if (!merge5Only) {
+        // In hybrid mode, calculate how many extra items come from remaining 3-merges
+        int remainderAfterFive = totalAvailableAtLevel % 5;
+        if (remainderAfterFive >= 3) {
+          producedNextLevel += 1;
+        }
+      }
+
+      // UPDATE: We store the "Ghost" total at this level
+      // (Physical + Merged Upwards)
+      if (totalAvailableAtLevel > 0) {
+        ghostInventory[lvl] = totalAvailableAtLevel;
+      }
+
+      // Carry the production forward to the next loop iteration
+      carriedPotential = producedNextLevel;
+
+      // Update maxLevel if we've pushed into new stages
+      if (carriedPotential > 0 && lvl >= maxLevel) {
+        maxLevel = lvl + 1;
+      }
+    }
+
+    return ghostInventory;
+  }
+
+  static String stageName(String? chainId,int stage){
+    Map? data=chainItems[chainId??0]?.firstWhere((element) => element['stage']==stage,orElse: () => {'name':"Stage $stage"},);
+    String title=data?['name']??'Stage $stage';
+    // print(isWildlife);
+    if (chainId=='Wildlife') {
+      if (stage == 45) {
+        title = "Magnificent Eggs";
+      } else  if(stage==0){
+        title = "Eggs";
+      }
+    }
+  return title;
   }
 }

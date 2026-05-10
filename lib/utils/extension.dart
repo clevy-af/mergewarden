@@ -3,8 +3,10 @@ import 'package:mergewarden/utils/constants.dart';
 
 extension ContExt on BuildContext{
   bool get isDesktop{
-    return MediaQuery.of(this).size.width>kDesktopBreak;
+    return screenSize.width>kDesktopBreak;
   }
+
+  Size get screenSize=>MediaQuery.of(this).size;
 
 }
 extension DoubleExt on num{

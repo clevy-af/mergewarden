@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:mergewarden/model/json.dart';
+import 'package:intl/intl.dart';
 import 'package:mergewarden/model/goal_data.dart';
+import 'package:mergewarden/model/json.dart';
 import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/model/target_item.dart';
-import 'package:mergewarden/utils/calculator.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
-import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
-import 'package:mergewarden/view/home.dart';
+import 'package:mergewarden/view/confetti.dart';
+import 'package:mergewarden/view/inventory_form.dart';
 
 class CentralGoalCard extends StatefulWidget {
-  const CentralGoalCard({super.key, });
+  const CentralGoalCard({super.key, required this.goalData, required this.onDelete, required this.onReset, required this.onUpdate, });
+  final GoalData? goalData;
+  final VoidCallback onDelete;
+  final VoidCallback onReset;
+  final bool Function(Map<int,int>) onUpdate;
+
 
   @override
   State<CentralGoalCard> createState() => _CentralGoalCardState();
@@ -24,8 +28,12 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
   TextEditingController chainController = TextEditingController();
   TextEditingController countController=TextEditingController();
   TextEditingController stageController=TextEditingController();
-  int currentIndex=0;
 
+  @override
+  void initState() {
+    targetItem=widget.goalData?.targetItem;
+    super.initState();
+  }
   @override
   void dispose() {
     chainController.dispose();
@@ -34,267 +42,356 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: HiveProvider.goals.listenable(),
-        builder: (context, value, child) {
-          GoalData? goal;
-          if(value.keys.contains(currentIndex)) {
-            goal=GoalData.fromJson(value.get(currentIndex));
-          }
-          targetItem=goal?.targetItem;
-          // print(goal.inventory.map((e)=>e.stage));
-          return LayoutBuilder(
+  void showExplainerDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('How to use Goals'),
+          actionsPadding: EdgeInsets.only(bottom: 10,right: 10),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('You reached here after calculating a target stage breakdown, to track/sync your inventory with the breakdown.'),
+                const Divider(height: 20),
+                const Text('• In the top card, you can see your target details -'),
+                const Text('\t- Target Stage Item image and name, along with count.'),
+                const Text('\t- Progress of completing this goal. If this shows 100%, it means you have enough to merge up to target, if you haven\'t already.'),
+                const Text('\t- Update Inventory: Add/subtract your inventory items to adjust your progress. The value in form as well as `have` reflect your inventory count for the respective stage.'),
+                const Text('\t- Reset: Start over, like turning a new leaf.'),
+                const Text('\t- Delete: If you are done, you can remove this from goals to stop tracking it.'),
+                const Divider(height: 20),
+                const Text('• In the list below, you will find:'),
+                const Text('\t- Stage Item image and name.'),
+                const Text('\t- Needed: number of items you need to reach the target and have: what you have currently.'),
+                const Text('\t- Potion: number of potions used. Note that this count is not included in needed/have.'),
+                const Text('\t- Progress Circle: your progress in collecting items of this stage, shows checkmark if done (needed=have).'),
+                const SizedBox(height: 10),
 
-              builder: (context,c) {
-
-
-                Widget child2= goal==null?SizedBox():Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsetsGeometry.all(15),
-                      child:  Text('Add items you have to include in calculation.',style: hintStyle.copyWith(fontStyle: FontStyle.normal),),
-                    ),
-                    Stack(
-                      alignment: Alignment.centerLeft,
-                      children: [
-                        Builder(
-
-                            builder: (context,) {
-                              String? chainId=targetItem?.chainId;
-                              List stages=chainItems[chainId]??[];
-                              // print(chainId);
-                              if(chainId!=null&&stages.isNotEmpty||chainId=='Wildlife') {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                      border: Border.all(color: Color(0xFF000000),width: 0.6)
-                                  ),
-                                  margin: EdgeInsets.all(8),
-                                  child: DropdownButton<int>(
-                                    isExpanded: true,
-                                    dropdownColor: cLightBackground,
-                                    focusColor: cCreme,
-                                    value: int.tryParse(stageController.text),
-                                    underline: SizedBox(),
-                                    onChanged: ( newValue) {
-                                      setState(() { stageController.text = (newValue??0) .toString(); });
-                                    },
-                                    items: chainId=='Wildlife'?List.generate(wildlifeChain.indexWhere((e)=> e['stage']==targetItem!.stage)+1, (index) => DropdownMenuItem<int>(
-                                      value: wildlifeChain[index]['stage'] ,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                        child: Text(wildlifeChain[index]['name']),
-                                      ),
-                                    )
-                                    ): List.generate(stages.indexWhere((e)=> e['stage']==targetItem!.stage)+1, (index) => DropdownMenuItem<int>(
-                                      value: stages.elementAt(index)['stage'],
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                        child: Text('Stage ${stages.elementAt(index)['stage']}: ${stages.elementAt(index)['name']}'),
-                                      ),
-                                    ),),
-                                  ),
-                                );
-                              } else {
-                                return Semantics(
-                                  label: 'Merge Gardens Calculation Target Stage TextField',
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: TextFormField(
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        hintText: 'Enter stage of target item',
-                                        labelText: 'Target Stage',
-                                        border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(15.0),
-                                            borderSide: BorderSide()
-                                        ),
-                                      ),
-                                      controller: stageController,
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
-                        ),
-                        Positioned(
-                            top: 0,
-                            left: 5,
-                            child: Text('*')
-                        )
-                      ],
-                    ),
-
-                    Stack(
-                      alignment: Alignment.centerLeft,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Semantics(
-                            label: 'Merge Gardens Calculation Target Count TextField',
-                            child:TextFormField(
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                hintText: 'Enter number of target items',
-                                labelText: 'Target Count',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
-                              ),
-                              controller: countController,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                            top: 0,
-                            left: 5,
-                            child: Text('*')
-                        )
-                      ],
-                    ),
-                    Container(
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Text('All fields are mandatory.',style: hintStyle,)
-                    ),
-                    const SizedBox(height: 20),
-                    Semantics(
-                      label: 'Merge Gardens Calculation Button',
-                      child: TextButton(
-                          onPressed: ()  {
-                            if(stageController.text.isEmpty||countController.text.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Filling in item details mandatory.')));
-                              return;
-                            }
-
-                            int? stageCount,stageLevel;
-                            stageCount=int.tryParse(countController.text);
-                            stageLevel=int.tryParse(stageController.text);
-                            if([stageLevel,stageCount].contains(null)) {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Numeric values make sense, don\'t they?')));
-                              return;
-                            }
-                            inventoryItem={stageLevel!:stageCount!};
-
-                            List<Breakup> list=goal!.targetItem.isWildlife?MergeCalculator.calculateWildlife(inventoryItem.keys.first, inventoryItem.values.first,targetItem?.merge5??false):
-                            MergeCalculator.getFullBreakdown(inventoryItem.keys.first,inventoryItem.values.first,0,goal.targetItem.has0);
-
-                            for (var e in list) {
-                             // print (e.stage);
-                              Inventory x =goal.inventory.firstWhere((element) => element.stage==e.stage,);
-                              if(x.count>e.count) {
-                                x.count-=e.count;
-                              }
-                              else {
-                                x.count=0;
-                              }
-                            }
-                            HiveProvider.goals.put(currentIndex, goal.toJson());
-
-                          },
-                          style: TextButton.styleFrom(
-                              backgroundColor: cCard,
-                              padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10)
-                          ),
-                          child: Text("Submit",
-                            style: TextStyle(letterSpacing: 1.5, fontSize: 12, fontWeight: FontWeight.bold,color: Colors.white),)
-                      ),
-                    ),
-                  ],
-                );
-                Widget child1= Column(
-                  children: [
-
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Track Your Goal',
-                          style:  TextStyle(fontSize:context.isDesktop?30:20,
-                              fontWeight: FontWeight.bold),),
-                        SizedBox(width: 10,),
-                        IconButton(
-                          tooltip: 'Delete goal',
-                          onPressed: () {
-                          HiveProvider.goals.delete(currentIndex);
-                        } , icon: Icon(Icons.delete_outline),color: Colors.red,)
-                      ],
-                    ),
-
-
-                    if(targetItem!=null)
-                      SizedBox(height: 20,),
-                    if(targetItem!=null)
-                      TargetItemView(targetItem: targetItem),
-
-                  ],
-                );
-                Widget child;
-                if(c.maxWidth>400) {
-
-                  child=Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [Flexible(child: child1), Flexible(child: child2)],
-                  );
-                } else {
-                  child = Column(
-                    children: [child1, child2],
-                  );
-                }
-                return Column(
-                  children: [
-                    const SizedBox(height: 10),
-
-                    Row(
-                      children: [
-                        if(context.isDesktop)TextLogo(),
-                        if(context.isDesktop) SizedBox(width: 10,),
-                        SizedBox(
-                          width: c.maxWidth*0.81,
-                          height: kMinInteractiveDimension,
-                          child: ListView.separated(
-                            shrinkWrap: true,
-                            separatorBuilder: (context, index) => SizedBox(width: 8,),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: value.keys.length,
-                            itemBuilder: (context, index) => ActionChip(
-                                tooltip: 'Goal Item ${index+1}',
-                                side:value.keys.elementAt(index)==currentIndex? BorderSide(color: cCard,width: 2):null,
-                                onPressed: ()  {
-                                  // final value=  (HiveProvider.goals.getAt(index));
-                                  // // print(value);
-                                  // goalNotifier.value=GoalData.fromJson(value );
-                                  setState(() {
-                                  currentIndex=value.keys.elementAt(index);
-
-                                  });
-
-                                   HiveProvider.appBox.put('goalIndex', currentIndex);
-                                },
-                                label: Text(value.getAt(index)['targetItem']['name']??'Item  ${index+1}')
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    if(value.isEmpty||value.get(currentIndex)==null) CardBox(
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: MediaQuery.of(context).size.height*0.4,
-                            child: Text('Add a Goal to Get Started...')
-                        )
-                    )
-                else
-                    CardBox(child: child),
-                  ],
-                );
-
-              }
-          );
-        }
+                const Text(
+                  'NB: You cannot change merge5Only or potion count preference here.',
+                  style: hintStyle,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Got it!'),
+            ),
+          ],
+        );
+      },
     );
   }
+
+
+  @override
+  Widget build(BuildContext context) {
+    // print(widget.goalData?.targetItem.chainId);
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+
+
+        if([widget.goalData,targetItem].contains(null)) CardBox(
+            child: Container(
+                alignment: Alignment.center,
+                height: MediaQuery.of(context).size.height*0.4,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        buildTooltip(),
+
+                      ],
+                    ),
+                    Spacer(),
+                    Text('Create a Calculation to Get Started...'),
+                    Spacer(),
+
+                  ],
+                )
+            )
+        )
+        else
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF5E7356),
+              borderRadius: BorderRadius.circular(32),
+            ),
+            child: Row(
+              children: [
+                // Image Placeholder
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(15),
+                    // side: BorderSide(color: cCreme,width: 2)
+                  ),
+                  color:Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB( 8,16,8,8),
+                    child: TargetItemView(
+                      targetItem: targetItem,
+                      width: context.screenSize.width*0.14,
+                      height: context.screenSize.height*0.2,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Row(
+                        children: [
+                          _buildBadge("CURRENT GOAL"),
+                          Spacer(),
+                          buildTooltip(),
+                        ],
+                      ),
+                      Builder(
+                          builder: (context) {
+                            var indexWhere = chains.indexWhere((element) => element['id']==targetItem?.chainId,);
+                            if(!indexWhere.isNegative&&chains[indexWhere]['masterpiece']!=null&&chains[indexWhere]['stages']==targetItem?.stage) {
+                              return Text("# Masterpiece ${chains[indexWhere]['masterpiece']}", style:const TextStyle(color: Colors.white, fontSize: 10));
+                            }
+                            return SizedBox();
+                          }
+                      ),
+                      const SizedBox(height: 10),
+                      Text("${targetItem?.count} Stage ${targetItem?.stage} Items", style: TextStyle(fontSize:context.isDesktop?30:20,color: Colors.white70)),
+                      const SizedBox(height: 10),
+                      Text(targetItem?.chainId=='Wildlife'?'Of Wildlife':"Of ${chains.firstWhere((element) => element['id']==targetItem?.chainId,)['name']} Chain", style:const TextStyle(color: Colors.white, fontSize: 10)),
+                      const SizedBox(height: 15),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: LinearProgressIndicator(
+                          value: (widget.goalData?.progress??0)/100,
+                          color: Colors.white,
+                          backgroundColor: Colors.white70,
+                          borderRadius: BorderRadiusGeometry.circular(15),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 25),
+                        child: Text("Progress: ${widget.goalData?.progress.clamp(0, 100).toStringAsFixed(2)} %", style: const TextStyle(fontSize: 18, color: Colors.white,)),
+                      ),
+                      // const SizedBox(height: 30),
+                      Wrap(
+                        runSpacing: 10,
+                        spacing: 10,
+                        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          if(widget.goalData!.progress!=100)
+                            Tooltip(
+                              message: 'Tap to Update Inventory of Goal',
+                              child: TextButton.icon(
+
+                                style: TextButton.styleFrom(backgroundColor: cBackground,padding: EdgeInsets.symmetric(vertical: 20,horizontal: 15)),
+                                label: Text("Update Inventory",style: TextStyle(color: Colors.white),),
+                                icon:  Icon(Icons.inventory_2_outlined,color: Colors.white,),
+                                onPressed: () {
+                                  showAdaptiveDialog(
+                                    barrierDismissible: true,
+                                    context: context,
+                                    builder: (context) => InventoryPopup(
+                                      chainID: targetItem!.chainId!,
+                                      targetStage: targetItem!.stage,
+                                      onUpdate: (p0) {
+                                      final result=widget.onUpdate(p0);
+                                        Navigator.of(context).pop();
+                                        // print(result);
+                                        if(result==true) showCompletionDialog(context);
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          Tooltip(
+                            message: 'Tap to Reset Goal',
+                            child: TextButton.icon(
+                              style: TextButton.styleFrom(backgroundColor: cBackground,padding: EdgeInsets.symmetric(vertical: 20,horizontal: 15)),
+                              label: Text("Reset",style: TextStyle(color: Colors.white),),
+                              icon:  Icon(Icons.replay,color: Colors.white,),
+                              onPressed: widget.onReset,
+                            ),
+                          ),
+                          Tooltip(
+                            message: 'Tap to Delete Goal',
+                            child: TextButton.icon(
+                              style: TextButton.styleFrom(backgroundColor: cRed,padding: EdgeInsets.symmetric(vertical: 20,horizontal: 15)),
+                              label: Text("Delete",style: TextStyle(color: Colors.white),),
+                              icon:  Icon(Icons.delete_outline,color: Colors.white,),
+                              onPressed:widget.onDelete ,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Tooltip buildTooltip() {
+    return Tooltip(
+                                message: 'How to Use',
+                                // message: 'Enter Chain name to select and get stage details easily, add count for target items.\n The required items will be calculated and broken down per stage, visible below.',
+                                preferBelow: true,
+                                triggerMode: TooltipTriggerMode.tap,
+                                child: IconButton(
+                                  onPressed: showExplainerDialog,
+                                  icon: Icon(Icons.question_mark_outlined,color: Colors.white,),
+                                  // tooltip: 'Info',
+                                ),
+                              );
+  }
+
+  Widget _buildBadge(String text) {
+    return Container(
+      padding: const EdgeInsets.all(8,),
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: cCreme),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 10)),
+    );
+  }
+}
+class GoalLevelCard extends StatelessWidget {
+  final Inventory inventory;
+  final String? chainId;
+  const GoalLevelCard({super.key, required this.inventory, this.chainId});
+
+  @override
+  Widget build(BuildContext context) {
+    int level=inventory.stage;
+    int count=inventory.count;
+    int have=inventory.have;
+    // print(chainId);
+    Map? data=chainItems[chainId??0]?.firstWhere((element) => element['stage']==level,orElse: () => {'name':"Stage $level"},);
+    String title=data?['name']??'Stage $level';
+    var isWildlife = chainId=='Wildlife';
+    if (isWildlife) {
+      if (level == 45) {
+        title = "Magnificent Eggs";
+      } else  if(level==0){
+        title = "Eggs";
+      }
+    }
+
+    double progress=count==0?100:have/count*100;
+    return Semantics(
+      label: 'Merge Gardens Calculation Stage $level Item',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha:0.8),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Spacer(),
+            if(chainId!=null&&chainId!='Wildlife')
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                height: context.screenSize.height*0.15,
+                width: context.screenSize.height*0.15,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  image: chainId!=null?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+                ),
+              ),
+            SizedBox(width: 15,),
+            _stat(isWildlife?'':'Stage $level', title),
+            Spacer(
+              flex: 2,
+            ),
+            _buildRequirementStats(),
+            SizedBox(width: 15,),
+            if(inventory.potions>0)
+              Padding(
+                padding: EdgeInsetsGeometry.all(5),
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12,),
+                      height: kMinInteractiveDimension,
+                      alignment: Alignment.bottomCenter,
+                      width:kMinInteractiveDimension,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        image:DecorationImage(image: AssetImage('assets/Stage_4_-_Potent_Concoction.webp'),fit: BoxFit.cover),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                      margin: isWildlife?null:const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: cCard,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(inventory.potions.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+                    ),
+
+                  ],
+                ),
+              ),
+            Spacer(
+              flex: 3,
+            ),
+            if(progress>=100)
+              Container(
+                width: 48, height: 48,
+                decoration: BoxDecoration(
+                  color: Color(0xFF5E7356),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child:  const Icon(Icons.check,color: Colors.white,),
+              )
+              else ProgressCircle(progress: progress),
+            Spacer(),
+
+          ],
+        ),
+      ),
+    );
+  }
+  Widget _buildRequirementStats() {
+    final formatter = NumberFormat.decimalPattern();
+    final formattedNumber = formatter.format(inventory.count);
+    return Row(
+      children: [
+        _stat("NEEDED", formattedNumber.toString()),
+        const SizedBox(width: 24),
+        _stat("HAVE", formatter.format(inventory.have).toString()),
+      ],
+    );
+  }
+  Widget _stat(String label, String val) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 15, color: Colors.grey)),
+        Text(val, style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 20)),
+      ],
+    );
+  }
+
 }

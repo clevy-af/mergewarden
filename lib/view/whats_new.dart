@@ -13,7 +13,7 @@ class ChangelogPage extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.transparent,
+        color: cLightBackground,
         borderRadius: BorderRadius.circular(20),
         // Dashed border look
         border: Border.all(
@@ -27,10 +27,10 @@ class ChangelogPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color:  Colors.lightGreen[100],
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: Colors.grey[400]),
+            child: Icon(icon, color: Colors.lightGreen[400]),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -57,65 +57,80 @@ class ChangelogPage extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: cBackground,
-      appBar: AppBar(
-        backgroundColor: cCard,
-        automaticallyImplyLeading: false,
-        animateColor: true,
-        actions: [
-          CloseButton(
-            color: Colors.white,
-          )
-        ],
-      ),
-      body: Center(
-        child: Container(
-          constraints:  BoxConstraints(maxWidth: 600), // Perfect for Web
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: ListView(
-            shrinkWrap: true,
-            children: [
+    return Card(
+      color: cBackground,
+      child: Container(
+        constraints:  BoxConstraints(maxWidth: 600), // Perfect for Web
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            Row(mainAxisAlignment:MainAxisAlignment.end,children: [CloseButton()],),
 
-              _buildComingSoon(brief: 'Wildlife images and inventory support!',icon: Icons.timer, title: 'In the Workshop'),
-              const SizedBox(height: 20),
-              const Text("What's New in the Shed",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
-              const SizedBox(height: 20),
-              // _buildLogEntry(
-              //   date: "April 2026",
-              //   version: "v2.1.0",
-              //   title: "The Potential Plan Update",
-              //   description: "We've added a new master calculator to see how far your current inventory can grow!",
-              //   icon: Icons.auto_awesome,
-              //   color: Colors.orangeAccent,
-              // ),
-              _buildLogEntry(
-                date: "Apr 2026",
-                version: "v1.5.2",
-                title: "Pest Control",
-                description: "Tongue-eating Louse caused Stage number to be replaced by stage name; found it, squished it. ",
-                icon: Icons.bug_report_outlined,
-                color: Colors.redAccent,
+            Expanded(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+
+                  _buildComingSoon(brief: 'Wildlife images and up-to-date quest list!',icon: Icons.timer, title: 'What\'s Brewing?'),
+                  const SizedBox(height: 20),
+                  const Text("Ledger of the Keeper",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
+                  const SizedBox(height: 20),
+                  // _buildLogEntry(
+                  //   date: "April 2026",
+                  //   version: "v2.1.0",
+                  //   title: "The Potential Plan Update",
+                  //   description: "We've added a new master calculator to see how far your current inventory can grow!",
+                  //   icon: Icons.auto_awesome,
+                  //   color: Colors.orangeAccent,
+                  // ),
+                  _buildLogEntry(
+                    date: "May 2026",
+                    version: "v1.6.1",
+                    title: "Goals Remastered",
+                    description: "Listened to feedback and made the goal updating experience better.",
+                    icon: Icons.update,
+                    color: Colors.cyan,
+                  ),
+                  _buildLogEntry(
+                    date: "Apr 2026",
+                    version: "v1.6.0",
+                    title: "The Workbench Journal",
+                    description: "Say hello to \n1.Goals: you can adjust your calculations with items you have in game or made later."
+                        "\n2.Bug Reports: If you see any issues, report it back to me."
+                        "\n3.Choice Memory: The website opens to where you last left from and remembers your merge5 preference too."
+                        "\nAlso, the calculator engine got corroded, needed some greasing!",
+                    icon: Icons.bookmark,
+                    color: Colors.deepPurple,
+                  ),
+                  _buildLogEntry(
+                    date: "Apr 2026",
+                    version: "v1.5.2",
+                    title: "Pest Control",
+                    description: "Tongue-eating Louse caused Stage number to be replaced by stage name; found it, squished it. ",
+                    icon: Icons.bug_report_outlined,
+                    color: Colors.redAccent,
+                  ),
+                  _buildLogEntry(
+                    date: "March 2026",
+                    version: "v1.2.0",
+                    title: "Potions & Whimsy",
+                    description: "All chain items aesthetics captured. Potion addition to calculations, along with option to decide whether to include merge3 or not.",
+                    icon: Icons.phone_iphone,
+                    color: Colors.lightBlueAccent,
+                  ),
+                  _buildLogEntry(
+                    date: "Feb 2026",
+                    version: "v1.0.0",
+                    title: "Let's Calculate",
+                    description: "Initial launch of assitant platform for MG. Merge calculator tailored for MG rocked the show. Happy merging!",
+                    icon: Icons.local_florist,
+                    color: Colors.greenAccent,
+                  ),
+                ],
               ),
-              _buildLogEntry(
-                date: "March 2026",
-                version: "v1.2.0",
-                title: "Potions & Whimsy",
-                description: "All chain items aesthetics captured. Potion addition to calculations, along with option to decide whether to include merge3 or not.",
-                icon: Icons.phone_iphone,
-                color: Colors.lightBlueAccent,
-              ),
-              _buildLogEntry(
-                date: "Feb 2026",
-                version: "v1.0.0",
-                title: "Let's Calculate",
-                description: "Initial launch of assitant platform for MG. Merge calculator tailored for MG rocked the show. Happy merging!",
-                icon: Icons.local_florist,
-                color: Colors.greenAccent,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

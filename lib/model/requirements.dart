@@ -37,7 +37,7 @@ class Breakup {
 }
 
 class Inventory extends Breakup {
-  final int have;
+  int have;
   final int havePotions;
 
 

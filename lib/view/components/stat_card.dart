@@ -10,6 +10,7 @@ import 'package:mergewarden/utils/calculator.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
+import 'package:mergewarden/view/home.dart';
 
 class CentralStatsCard extends StatefulWidget {
   const CentralStatsCard({super.key, });
@@ -24,7 +25,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
   TextEditingController countController=TextEditingController();
   TextEditingController stageController=TextEditingController();
   TextEditingController potionController=TextEditingController();
-  bool merge5Only=true;
+
 
   @override
   void dispose() {
@@ -37,361 +38,431 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
 
   @override
   Widget build(BuildContext context) {
-    return CardBox(
-
-      child: targetItem==null?Column(
-        children: [
-          ValueListenableBuilder(
-            valueListenable:  HiveProvider.appBox.listenable(keys: ['type']),
-            builder:(context,data,_) {
-              bool isWildlife=data.get('type')=='wildlife';
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(),
-                  Semantics(
-                      label: 'Merge Gardens Calculator Header',
-                      child: Text('Target ${isWildlife?'Wildlife' : 'Item'} Calculator',
-                        style:  TextStyle(fontSize:context.isDesktop?30:20,
-                            fontWeight: FontWeight.bold),),
-                  ),
-                  Tooltip(
-                    message: 'How to Use',
-                    // message: 'Enter Chain name to select and get stage details easily, add count for target items.\n The required items will be calculated and broken down per stage, visible below.',
-                    preferBelow: true,
-                    triggerMode: TooltipTriggerMode.tap,
-                    child: IconButton(
-                        onPressed: showExplainerDialog,
-                        icon: Icon(Icons.question_mark_outlined,color: cCard,),
-                      // tooltip: 'Info',
-                    ),
-                  ),
-                ],
-              );
-            }
-          ),
-          ValueListenableBuilder(
-              valueListenable: HiveProvider.appBox.listenable(keys: ['type','chain']),
-              builder: (context,data,_) {
-                bool isWildlife=data.get('type')=='wildlife';
-
-                if(isWildlife){
-                  chainController = TextEditingController()..text='Wildlife';
-                  data.put('chain',chainController.text);
-
-                }
-                else {
-                  chainController.clear();
-                }
-                return Container(
-                  margin: const EdgeInsets.all(8.0),
-
-                  key: ValueKey(data.get('type')),
-                  child: isWildlife?TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Enter ${isWildlife?'Wildlife' : 'Chain'} Name',
-                      labelText: '${isWildlife?'Wildlife' : 'Chain'} Name',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                    ),
-                    readOnly: isWildlife,
-                    controller: chainController,
-                  ):
-                  Semantics(
-                    label: 'Merge Gardens Calculation Chain Autocomplete',
-                    child: Autocomplete<String>(
-                      optionsBuilder: (TextEditingValue textEditingValue) {
-                        if (textEditingValue.text.isEmpty) {
-                          return const Iterable<String>.empty();
-                        }
-                        return chains.map((e) => e['name'].toString(),).where((String option) {
-                          return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
-                        });
-                      },
-                      optionsViewBuilder: (context, onSelected, options) {
-                        return Material(
-                          color: cLightBackground,
-                          surfaceTintColor: cCreme,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemExtent: 50,
-                            itemCount: options.length,
-                            itemBuilder: (context, index) {
-                              final option = options.elementAt(index);
-                              return ListTile(
-                                title: Text(option),
-                                onTap: () => onSelected(option),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      // displayStringForOption: (option) => option,
-                      onSelected: (String selection) {
-                        // print('You selected: $selection');
-                      HiveProvider.appBox.put('chain', chains.firstWhere((element) => element['name'].contains(selection),orElse: () => {'id':null},)['id']);
-
-                      },
-                      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                        // chainController=controller;
-                        return TextField(
-                          controller: controller,
-                          focusNode: focusNode,
-                          decoration:  InputDecoration(
-                            labelText: 'Chain Name',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),),
-                        );
-                      },
-                    ),
-                  ),
-                );
-              }
-          ),
-
-          Stack(
-            alignment: Alignment.centerLeft,
-            children: [
-              ValueListenableBuilder(
-                  valueListenable: HiveProvider.appBox.listenable(keys: ['chain']),
-                  // key: ValueKey(null),
-                  builder: (context,data,_) {
-                    String? chainId=data.get('chain');
-                    Iterable stages=chainItems[chainId]??[];
-                    HiveProvider.appBox.put('chain0', stages.where((element) => element['stage']==0,).isNotEmpty);
-                    if(chainId!=null&&stages.isNotEmpty||chainId=='Wildlife') {
-                      return Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15.0),
-                            border: Border.all(color: Color(0xFF000000),width: 0.6)
-                        ),
-                        margin: EdgeInsets.all(8),
-                        child: DropdownButton<int>(
-                          isExpanded: true,
-                          dropdownColor: cLightBackground,
-                          focusColor: cCreme,
-                          value: int.tryParse(stageController.text),
-                          underline: SizedBox(),
-                          onChanged: ( newValue) {
-                            setState(() { stageController.text = (newValue??0) .toString(); });
-                          },
-                          items:chainId=='Wildlife'?List.generate(wildlifeChain.length, (index) => DropdownMenuItem<int>(
-                            value: wildlifeChain[index]['stage'] ,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              child:Text( wildlifeChain[index]['name'] ),
-                            ),
-                          )
-                          ): List.generate(stages.length, (index) => DropdownMenuItem<int>(
-                            value: stages.elementAt(index)['stage'],
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text('Stage ${stages.elementAt(index)['stage']}: ${stages.elementAt(index)['name']}'),
-                            ),
-                          ),),
-                        ),
-                      );
-                    } else {
-                      return Semantics(
-                        label: 'Merge Gardens Calculation Target Stage TextField',
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextFormField(
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              hintText: 'Enter stage of target item',
-                              labelText: 'Target Stage',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                                borderSide: BorderSide()
-                              ),
-                            ),
-                            controller: stageController,
-                          ),
-                        ),
-                      );
-                    }
-                  }
-              ),
-              Positioned(
-                  top: 0,
-                  left: 5,
-                  child: Text('*')
-              )
-            ],
-          ),
-
-          Stack(
-            alignment: Alignment.centerLeft,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Semantics(
-                  label: 'Merge Gardens Calculation Target Count TextField',
-                  child:TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: 'Enter number of target items',
-                      labelText: 'Target Count',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                    ),
-                    controller: countController,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                left: 5,
-                  child: Text('*')
-              )
-            ],
-          ),
-          ValueListenableBuilder(
-              valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
-              builder: (context,data,_) {
-                bool isWildlife=data.get('type')=='wildlife';
-                if(isWildlife) return SizedBox();
-              return Semantics(
-                label: 'Merge Gardens Calculation Potion TextField',
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: 'Enter number of potions available',
-                      labelText: 'Potion Count',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                          borderSide: BorderSide()
-                      ),
-                    ),
-                    controller: potionController,
-                  ),
-                ),
-              );
-            }
-          ),
-          Container(
-            alignment: Alignment.centerLeft,
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('Fields marked with * are mandatory.',style: hintStyle,)
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
+                if(context.isDesktop)  TextLogo(),
+                if(context.isDesktop) const SizedBox(width: 20),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ValueListenableBuilder(
+                      valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
+                      builder: (context,data,_) {
+                        return ActionChip(
+                            tooltip: 'Basic Item Calculator',
+                            side: data.get('type')=='items'?BorderSide(color: cCard,width: 2):null,
+                            onPressed: () async {
+                              await  HiveProvider.appBox.put('type', 'items');
+                              await  HiveProvider.appBox.put('chain', null);
+                              HiveProvider.appBox.delete('breakdown');
+                              stageController.clear();
+                              countController.clear();
+                              chainController.clear();
+                            },
+                            label: Text('Items')
+                        );
+                      }
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child:ValueListenableBuilder(
+                      valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
+                      builder: (context,data,_) {
+                        return ActionChip(
+                          tooltip: 'Basic Wildlife Calculator',
+                          label: Text('Wildlife'),
+                          side: data.get('type')=='wildlife'?BorderSide(color: cCard,width: 2):null,
+                          onPressed: () async {
+                            await  HiveProvider.appBox.put('type', 'wildlife');
+                            HiveProvider.appBox.delete('breakdown');
+                            stageController.clear();
+                            countController.clear();
+                            chainController.clear();
+                            },
+                        );
+                      }
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        Padding(
+          padding: EdgeInsetsGeometry.symmetric(vertical: 5),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal:context.isDesktop?MediaQuery.of(context).size.width*0.15:18),
+          child: CardBox(
+
+            child: targetItem==null?Column(
+              children: [
                 ValueListenableBuilder(
-                    valueListenable:  HiveProvider.appBox.listenable(keys: ['type']),
-                    builder:(context,data,_) {
-                      // bool isWildlife=data.get('type')=='wildlife';
+                  valueListenable:  HiveProvider.appBox.listenable(keys: ['type']),
+                  builder:(context,data,_) {
+                    bool isWildlife=data.get('type')=='wildlife';
+                    // print({'type':data.get('type')});
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(),
+                        Semantics(
+                            label: 'Merge Gardens Calculator Header',
+                            child: Text('Target ${isWildlife?'Wildlife' : 'Item'} Calculator',
+                              style:  TextStyle(fontSize:context.isDesktop?30:20,
+                                  fontWeight: FontWeight.bold),),
+                        ),
+                        Tooltip(
+                          message: 'How to Use',
+                          // message: 'Enter Chain name to select and get stage details easily, add count for target items.\n The required items will be calculated and broken down per stage, visible below.',
+                          preferBelow: true,
+                          triggerMode: TooltipTriggerMode.tap,
+                          child: IconButton(
+                              onPressed: showExplainerDialog,
+                              icon: Icon(Icons.question_mark_outlined,color: cCard,),
+                            // tooltip: 'Info',
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                ),
+                ValueListenableBuilder(
+                    valueListenable: HiveProvider.appBox.listenable(keys: ['type','chain']),
+                    builder: (context,data,_) {
+                      bool isWildlife=data.get('type')=='wildlife';
+
+                      if(isWildlife){
+                        chainController = TextEditingController()..text='Wildlife';
+                        data.put('chain',chainController.text);
+
+                      }
+                      else {
+                        chainController.clear();
+                      }
+                      return Container(
+                        margin: const EdgeInsets.all(8.0),
+
+                        key: ValueKey(data.get('type')),
+                        child: isWildlife?TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Enter ${isWildlife?'Wildlife' : 'Chain'} Name',
+                            labelText: '${isWildlife?'Wildlife' : 'Chain'} Name',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                          ),
+                          readOnly: isWildlife,
+                          controller: chainController,
+                        ):
+                        Semantics(
+                          label: 'Merge Gardens Calculation Chain Autocomplete',
+                          child: Autocomplete<String>(
+                            optionsBuilder: (TextEditingValue textEditingValue) {
+                              if (textEditingValue.text.isEmpty) {
+                                return const Iterable<String>.empty();
+                              }
+                              return chains.map((e) => e['name'].toString(),).where((String option) {
+                                return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                              });
+                            },
+                            optionsViewBuilder: (context, onSelected, options) {
+                              return Material(
+                                color: cLightBackground,
+                                surfaceTintColor: cCreme,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemExtent: 50,
+                                  itemCount: options.length,
+                                  itemBuilder: (context, index) {
+                                    final option = options.elementAt(index);
+                                    return ListTile(
+                                      title: Text(option),
+                                      onTap: () => onSelected(option),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            // displayStringForOption: (option) => option,
+                            onSelected: (String selection) {
+                              // print('You selected: $selection');
+                            HiveProvider.appBox.put('chain', chains.firstWhere((element) => element['name'].contains(selection),orElse: () => {'id':null},)['id']);
+
+                            },
+                            fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                              // chainController=controller;
+                              return TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                decoration:  InputDecoration(
+                                  labelText: 'Chain Name',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),),
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    }
+                ),
+
+                Stack(
+                  alignment: Alignment.centerLeft,
+                  children: [
+                    ValueListenableBuilder(
+                        valueListenable: HiveProvider.appBox.listenable(keys: ['chain']),
+                        // key: ValueKey(null),
+                        builder: (context,data,_) {
+                          String? chainId=data.get('chain');
+                          Iterable stages=chainItems[chainId]??[];
+                          HiveProvider.appBox.put('chain0', stages.where((element) => element['stage']==0,).isNotEmpty);
+                          // print( HiveProvider.appBox.get('chain0',));
+                          if(chainId!=null&&stages.isNotEmpty||chainId=='Wildlife') {
+                            return Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  border: Border.all(color: Color(0xFF000000),width: 0.6)
+                              ),
+                              margin: EdgeInsets.all(8),
+                              child: DropdownButton<int>(
+                                isExpanded: true,
+                                dropdownColor: cLightBackground,
+                                focusColor: cCreme,
+                                value: int.tryParse(stageController.text),
+                                underline: SizedBox(),
+                                onChanged: ( newValue) {
+                                  setState(() { stageController.text = (newValue??0) .toString(); });
+                                },
+                                items:chainId=='Wildlife'?List.generate(wildlifeChain.length, (index) => DropdownMenuItem<int>(
+                                  value: wildlifeChain[index]['stage'] ,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    child:Text( wildlifeChain[index]['name'] ),
+                                  ),
+                                )
+                                ): List.generate(stages.length, (index) => DropdownMenuItem<int>(
+                                  value: stages.elementAt(index)['stage'],
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: Text('Stage ${stages.elementAt(index)['stage']}: ${stages.elementAt(index)['name']}'),
+                                  ),
+                                ),),
+                              ),
+                            );
+                          } else {
+                            return Semantics(
+                              label: 'Merge Gardens Calculation Target Stage TextField',
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextFormField(
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter stage of target item',
+                                    labelText: 'Target Stage',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      borderSide: BorderSide()
+                                    ),
+                                  ),
+                                  controller: stageController,
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                    ),
+                    Positioned(
+                        top: 0,
+                        left: 5,
+                        child: Text('*')
+                    )
+                  ],
+                ),
+
+                Stack(
+                  alignment: Alignment.centerLeft,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Semantics(
+                        label: 'Merge Gardens Calculation Target Count TextField',
+                        child:TextFormField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: 'Enter number of target items',
+                            labelText: 'Target Count',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                          ),
+                          controller: countController,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 0,
+                      left: 5,
+                        child: Text('*')
+                    )
+                  ],
+                ),
+                ValueListenableBuilder(
+                    valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
+                    builder: (context,data,_) {
+                      bool isWildlife=data.get('type')=='wildlife';
+                      if(isWildlife) return SizedBox();
                     return Semantics(
-                      value: 'Checkbox for Merge 5 Only calculation',
-                      child: Checkbox(
-                          value: merge5Only,
-                          activeColor: cCard,
-                          onChanged:(value) {
-                            setState(() {
-                              merge5Only=value??false;
-                            });
-                          },
+                      label: 'Merge Gardens Calculation Potion TextField',
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: 'Enter number of potions available',
+                            labelText: 'Potion Count',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                                borderSide: BorderSide()
+                            ),
+                          ),
+                          controller: potionController,
+                        ),
                       ),
                     );
                   }
                 ),
-                Text('Merge 5 Only')
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          Semantics(
-            label: 'Merge Gardens Calculation Button',
-            child: TextButton(
-                onPressed: () {
-                  String? targetName,chainUrl;
-                  if(stageController.text.isEmpty||countController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Filling in target details mandatory.')));
-                    return;
-                  }
-
-                  int? stageCount,stageLevel;
-                  stageCount=int.tryParse(countController.text);
-                  stageLevel=int.tryParse(stageController.text);
-                  if([stageLevel,stageCount].contains(null)) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Numeric values make sense, don\'t they?')));
-                    return;
-                  }
-                  // print('still going ahead?');
-                  String? chainId=HiveProvider.appBox.get('chain');
-                  bool isWildlife=HiveProvider.appBox.get('type')=='wildlife';
-                  // print({'chain':chainId,'stage':stageController.text,'count':countController.text,'type':HiveProvider.appBox.get('type')});
-                  setState(() {
-
-                  // print(chainController.text);
-                  var stageNumber = int.parse(stageController.text);
-                  if(chainId!=null&&chainController.text!='Wildlife') {
-                    // chainName=chains.firstWhere((element) => element['name'].contains(chainController.text),orElse: () => {'id':null},)['id'];
-
-                      Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==stageNumber,orElse: () => {'name':null,'url':null},);
-                      targetName=data?['name'];
-                      chainUrl=data?['url'];
-                      // print(chainUrl);
-                  }
-                  targetItem=TargetItem(
-                    isWildlife:isWildlife ,
-                    has0: HiveProvider.appBox.get('chain0'),
-                      merge5: merge5Only,
-                      stageName: targetName??'Stage $stageNumber ${HiveProvider.appBox.get('type')=='wildlife'?'Wildlife':'Item'}',
-                      url: chainUrl,
-                      chainId: chainId, count: int.tryParse(countController.text)??0,
-                      stage: stageNumber
-                  );
-                });
-                  HiveProvider().putBreakDown(isWildlife?MergeCalculator.calculateWildlife(targetItem!.stage, targetItem!.count,merge5Only):
-                  MergeCalculator.getFullBreakdown(targetItem!.stage, targetItem!.count,int.tryParse(potionController.text)??0,HiveProvider.appBox.get('chain0'),merge5Only)
-                  );
-                },
-                style: TextButton.styleFrom(
-                  backgroundColor: cCard,
-                  padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10)
+                Container(
+                  alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('Fields marked with * are mandatory.',style: hintStyle,)
                 ),
-                child: Text("Calculate!",
-                  style: TextStyle(letterSpacing: 1.5, fontSize: 12, fontWeight: FontWeight.bold,color: Colors.white),)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      ValueListenableBuilder(
+                          valueListenable:  HiveProvider.appBox.listenable(keys: ['merge5Checkbox']),
+                          builder:(context,data,_) {
+                            bool merge5Only=data.get('merge5Checkbox')??false;
+                          return Semantics(
+                            value: 'Checkbox for Merge 5 Only calculation',
+                            child: Checkbox(
+                                value: merge5Only,
+                                activeColor: cCard,
+                                onChanged:(value) => HiveProvider.appBox.put('merge5Checkbox',value),
+                            ),
+                          );
+                        }
+                      ),
+                      Text('Merge 5 Only')
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Semantics(
+                  label: 'Merge Gardens Calculation Button',
+                  child: TextButton(
+                      onPressed: () {
+                        String? targetName,chainUrl;
+                        if(stageController.text.isEmpty||countController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Filling in target details mandatory.')));
+                          return;
+                        }
+                        var merge5Only = HiveProvider.appBox.get('merge5Checkbox')??false;
+
+                        int? stageCount,stageLevel;
+                        stageCount=int.tryParse(countController.text);
+                        stageLevel=int.tryParse(stageController.text);
+                        if([stageLevel,stageCount].contains(null)) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Numeric values make sense, don\'t they?')));
+                          return;
+                        }
+                        // print('still going ahead?');
+                        String? chainId=HiveProvider.appBox.get('chain');
+                        bool isWildlife=HiveProvider.appBox.get('type')=='wildlife';
+                        // print({'chain':chainId,'stage':stageController.text,
+                        //   'count':countController.text,
+                        //   'type':HiveProvider.appBox.get('type'),
+                        //   'chain0':HiveProvider.appBox.get('chain0'),
+                        //
+                        // });
+                        // print(chainController.text);
+                        int stageNumber = int.parse(stageController.text);
+                        // print(stageNumber);
+
+                        if(chainId!=null&&chainController.text!='Wildlife') {
+                          // chainName=chains.firstWhere((element) => element['name'].contains(chainController.text),orElse: () => {'id':null},)['id'];
+
+                          Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==stageNumber,orElse: () => {'name':null,'url':null},);
+                          targetName=data?['name'];
+                          chainUrl=data?['url'];
+                          // print(chainUrl);
+                        }
+                        setState(() {
+
+
+                        targetItem=TargetItem(
+                          isWildlife:isWildlife ,
+                          has0: HiveProvider.appBox.get('chain0')??false,
+                            merge5: merge5Only,
+                            stageName: HiveProvider.appBox.get('type')=='wildlife'?wildlifeChain.firstWhere((element) => element['stage']==stageNumber,orElse: () => {'name':'Wildlife'},)['name']:targetName??'Stage $stageNumber ${'Item'}',
+                            url: chainUrl,
+                            chainId: chainId, count: int.tryParse(countController.text)??0,
+                            stage: stageNumber
+                        );
+                      });
+                        HiveProvider().putBreakDown(isWildlife?MergeCalculator.calculateWildlife(targetItem!.stage, targetItem!.count,merge5Only):
+                        MergeCalculator.getFullBreakdown(targetItem!.stage, targetItem!.count,int.tryParse(potionController.text)??0,HiveProvider.appBox.get('chain0'),merge5Only)
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: cCard,
+                        padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10)
+                      ),
+                      child: Text("Calculate!",
+                        style: TextStyle(letterSpacing: 1.5, fontSize: 12, fontWeight: FontWeight.bold,color: Colors.white),)
+                  ),
+                ),
+              ],
+            ):
+            TargetPage(
+              targetItem: targetItem,
+                onReset: () {
+              setState(() {
+                targetItem=null;
+                HiveProvider.appBox.delete('chain');
+                stageController.clear();
+                countController.clear();
+                potionController.clear();
+                HiveProvider.appBox.delete('breakdown');
+              });
+            },
+              onGoalSet: () {
+                List<Inventory> inventories=[];
+                for(int i=1;i<HiveProvider.appBox.get('breakdown').length;i++)
+                  {
+                    inventories.add(Inventory.fromJson(HiveProvider.appBox.get('breakdown')[i]));
+                  }
+                HiveProvider().putGoal(
+                    GoalData(
+                      uid: DateTime.now().millisecondsSinceEpoch.toString(),
+                      potions: int.tryParse(potionController.text)??0,
+                      createdAt: DateTime.now().millisecondsSinceEpoch,
+                        targetItem: targetItem!,
+                        inventory: inventories
+                    )
+                );
+              },
             ),
           ),
-        ],
-      ):
-      TargetPage(
-        targetItem: targetItem,
-          onReset: () {
-        setState(() {
-          targetItem=null;
-          HiveProvider.appBox.delete('chain');
-          stageController.clear();
-          countController.clear();
-          potionController.clear();
-          HiveProvider.appBox.delete('breakdown');
-        });
-      },
-        onGoalSet: () {
-          List<Inventory> inventories=[];
-          for(int i=0;i<HiveProvider.appBox.get('breakdown').length;i++)
-            {
-              inventories.add(Inventory.fromJson(HiveProvider.appBox.get('breakdown')[i]));
-            }
-          HiveProvider().putGoal(
-              GoalData(
-                potions: int.tryParse(potionController.text)??0,
-                createdAt: DateTime.now().millisecondsSinceEpoch,
-                  targetItem: targetItem!,
-                  inventory: inventories
-              )
-          );
-        },
-      ),
+        ),
+      ],
     );
   }
 
@@ -547,7 +618,7 @@ class TargetPage extends StatelessWidget {
         Semantics(
           label: 'Merge Gardens Calculation Result',
           child: Text(
-            "Breakdown for ${targetItem?.count} Stage ${targetItem?.stage} ${HiveProvider.appBox.get('type')=='wildlife'?'Wildlife':'Items'}",
+            "Breakdown for ${targetItem?.count} Stage ${targetItem?.stage==45?4.5:targetItem?.stage} ${HiveProvider.appBox.get('type')=='wildlife'?'Wildlife':'Items'}",
             style: TextStyle(letterSpacing: 1.5, fontSize:context.isDesktop?20:15, fontWeight: FontWeight.bold),
           ),
         ),
@@ -566,15 +637,18 @@ class TargetPage extends StatelessWidget {
 class TargetItemView extends StatelessWidget {
   const TargetItemView({
     super.key,
-    required this.targetItem,
+    required this.targetItem, this.width, this.height,
   });
 
   final TargetItem? targetItem;
+  final double? width;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
+    var heightValue =height?? MediaQuery.of(context).size.height*0.3;
     return SizedBox(
-      width: MediaQuery.of(context).size.width,
+      width: width??MediaQuery.of(context).size.width,
       child: Column(
 
         children: [
@@ -585,8 +659,8 @@ class TargetItemView extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 // margin: EdgeInsets.all(8),
-                height: MediaQuery.of(context).size.height*0.4,
-                width:MediaQuery.of(context).size.height*0.4,
+                height: heightValue,
+                width:heightValue,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: cCard,
@@ -603,7 +677,8 @@ class TargetItemView extends StatelessWidget {
             label: 'Merge Gardens Target Text',
             child: Text(
               (targetItem?.stageName??targetItem?.chainId).toString(),
-              style: TextStyle(fontSize: context.isDesktop?40:30, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50)),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: context.isDesktop?30:20, fontWeight: FontWeight.w200, color: Color(0xFF2C3E50),),
             ),
           ),
         ],
@@ -835,13 +910,13 @@ class ProgressCircle extends StatelessWidget {
           margin: const EdgeInsets.all(8.0),
           child: CircularProgressIndicator(
             color: cCard,
-            value: progress/100,
+            value: (progress/100).clamp(0, 100),
             backgroundColor: cBackground,
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text('${progress.percent}%',),
+          child: Text('${(progress).clamp(0, 100).percent}%',),
         )
       ],
     );
