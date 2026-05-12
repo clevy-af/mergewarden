@@ -5,6 +5,7 @@ import 'package:mergewarden/model/json.dart';
 import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/model/target_item.dart';
 import 'package:mergewarden/utils/colors.dart';
+import 'package:mergewarden/utils/constants.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
 import 'package:mergewarden/view/confetti.dart';
@@ -138,7 +139,7 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                     padding: const EdgeInsets.fromLTRB( 8,16,8,8),
                     child: TargetItemView(
                       targetItem: targetItem,
-                      width: context.screenSize.width*0.14,
+                      width: context.screenSize.width*(context.screenSize.width>kDesktopBreak?0.14:0.3),
                       height: context.screenSize.height*0.2,
                     ),
                   ),
@@ -189,7 +190,7 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                         spacing: 10,
                         // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          if(widget.goalData!.progress!=100)
+                          if(widget.goalData!.progress<100)
                             Tooltip(
                               message: 'Tap to Update Inventory of Goal',
                               child: TextButton.icon(
@@ -294,6 +295,138 @@ class GoalLevelCard extends StatelessWidget {
     }
 
     double progress=count==0?100:have/count*100;
+    Widget rowChild=Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Spacer(),
+        if(chainId!=null&&chainId!='Wildlife')
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            height: context.screenSize.height*0.15,
+            width: context.screenSize.height*0.15,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              image: chainId!=null?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+            ),
+          ),
+        SizedBox(width: 15,),
+        _stat(isWildlife?'':'Stage $level', title),
+        Spacer(
+          flex: 2,
+        ),
+        _buildRequirementStats(),
+        SizedBox(width: 15,),
+        if(inventory.potions>0)
+          Padding(
+            padding: EdgeInsetsGeometry.all(5),
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12,),
+                  height: kMinInteractiveDimension,
+                  alignment: Alignment.bottomCenter,
+                  width:kMinInteractiveDimension,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    image:DecorationImage(image: AssetImage('assets/Stage_4_-_Potent_Concoction.webp'),fit: BoxFit.cover),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  margin: isWildlife?null:const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: cCard,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(inventory.potions.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+                ),
+
+              ],
+            ),
+          ),
+        Spacer(
+          flex: 3,
+        ),
+        if(progress>=100)
+          Container(
+            width: 48, height: 48,
+            decoration: BoxDecoration(
+              color: Color(0xFF5E7356),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child:  const Icon(Icons.check,color: Colors.white,),
+          )
+        else ProgressCircle(progress: progress),
+        Spacer(),
+
+      ],
+    );
+    Widget columnChild=Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if(chainId!=null&&chainId!='Wildlife')
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            height: context.screenSize.height*0.15,
+            width: context.screenSize.height*0.15,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              image: chainId!=null?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+            ),
+          ),
+        Spacer(),
+
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _rowStat(isWildlife?'':'Stage $level', title,true),
+            SizedBox(height: 10,),
+            _buildRequirementStats(),
+          ],
+        ),
+        Spacer(),
+        if(inventory.potions>0)
+          Padding(
+            padding: EdgeInsetsGeometry.all(5),
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12,),
+                  height: kMinInteractiveDimension,
+                  alignment: Alignment.bottomCenter,
+                  width:kMinInteractiveDimension,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    image:DecorationImage(image: AssetImage('assets/Stage_4_-_Potent_Concoction.webp'),fit: BoxFit.cover),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  margin: isWildlife?null:const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: cCard,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(inventory.potions.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+                ),
+
+              ],
+            ),
+          ),
+        if(progress>=100)
+          Container(
+            width: 48, height: 48,
+            decoration: BoxDecoration(
+              color: Color(0xFF5E7356),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child:  const Icon(Icons.check,color: Colors.white,),
+          )
+        else ProgressCircle(progress: progress),
+      ],
+    );
     return Semantics(
       label: 'Merge Gardens Calculation Stage $level Item',
       child: Container(
@@ -303,73 +436,12 @@ class GoalLevelCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
         ),
         alignment: Alignment.center,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Spacer(),
-            if(chainId!=null&&chainId!='Wildlife')
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                height: context.screenSize.height*0.15,
-                width: context.screenSize.height*0.15,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  image: chainId!=null?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
-                ),
-              ),
-            SizedBox(width: 15,),
-            _stat(isWildlife?'':'Stage $level', title),
-            Spacer(
-              flex: 2,
-            ),
-            _buildRequirementStats(),
-            SizedBox(width: 15,),
-            if(inventory.potions>0)
-              Padding(
-                padding: EdgeInsetsGeometry.all(5),
-                child: Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12,),
-                      height: kMinInteractiveDimension,
-                      alignment: Alignment.bottomCenter,
-                      width:kMinInteractiveDimension,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        image:DecorationImage(image: AssetImage('assets/Stage_4_-_Potent_Concoction.webp'),fit: BoxFit.cover),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                      margin: isWildlife?null:const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: cCard,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(inventory.potions.toString(), style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
-                    ),
-
-                  ],
-                ),
-              ),
-            Spacer(
-              flex: 3,
-            ),
-            if(progress>=100)
-              Container(
-                width: 48, height: 48,
-                decoration: BoxDecoration(
-                  color: Color(0xFF5E7356),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child:  const Icon(Icons.check,color: Colors.white,),
-              )
-              else ProgressCircle(progress: progress),
-            Spacer(),
-
-          ],
-        ),
+        child: LayoutBuilder(builder: (context, constraints) {
+          if(constraints.maxWidth>kDesktopBreak) {
+            return rowChild;
+          }
+          return columnChild;
+        },),
       ),
     );
   }
@@ -391,6 +463,18 @@ class GoalLevelCard extends StatelessWidget {
         Text(label, style: const TextStyle(fontSize: 15, color: Colors.grey)),
         Text(val, style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 20)),
       ],
+    );
+  }
+  Widget _rowStat(String label, String val,[bool addDot=false]) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 15, color: Colors.grey)),
+        if(addDot)
+          Text('\t•\t', style: const TextStyle(fontSize: 15, color: Colors.grey)),
+
+        Text(val, style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 15)),
+      ].reversed.toList(),
     );
   }
 

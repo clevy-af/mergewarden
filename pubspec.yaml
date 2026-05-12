@@ -1,8 +1,8 @@
 name: mergewarden
-description: "A MergeGardens Calculator."
+description: "A MergeGardens Assistant Portal."
 publish_to: 'none'
 
-version: 1.6.1
+version: 1.6.3
 
 environment:
   sdk: ^3.8.1

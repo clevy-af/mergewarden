@@ -3,6 +3,7 @@ import 'package:mergewarden/model/json.dart';
 import 'package:mergewarden/model/target_item.dart';
 import 'package:mergewarden/utils/calculator.dart';
 import 'package:mergewarden/utils/colors.dart';
+import 'package:mergewarden/utils/constants.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
 
@@ -93,7 +94,7 @@ class _InventoryPopupState extends State<InventoryPopup> {
                                             focusColor: cCreme,
                                             value: int.tryParse(stageController.text),
                                             underline: SizedBox(),
-                                            menuWidth: context.screenSize.width*.25,
+                                            menuWidth: context.screenSize.width*(context.screenSize.width>kDesktopBreak?0.25:0.6),
                                             onChanged: ( newValue) {
                                               if(newValue!=null) {
                                                 setState(() => tempInventory[newValue] = 1);

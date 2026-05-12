@@ -182,33 +182,36 @@ class _GoalScreenViewState extends State<GoalScreenView> {
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
-          child: Row(
-            children: [
-              if(context.isDesktop)TextLogo(),
-              if(context.isDesktop) SizedBox(width: 10,),
-              Expanded(
-                child: SizedBox(
-                  height: kMinInteractiveDimension,
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    key: ObjectKey(goals),
-                    separatorBuilder: (context, index) => SizedBox(width: 8,),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: goals.length,
-                    itemBuilder: (context, index) => ActionChip(
-                        tooltip: 'Goal Item ${index+1}',
-                        side:goals.elementAt(index).uid==activeGoal?.uid? BorderSide(color: cCard,width: 2):null,
-                        onPressed: () {
-                          setState(() {
-                          activeGoal=goals.elementAt(index);
-                          });
-                        },
-                        label: Text(goals.elementAt(index).targetItem.stageName??'Item  ${index+1}')
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                if(context.isDesktop)TextLogo(),
+                if(context.isDesktop) SizedBox(width: 10,),
+                Expanded(
+                  child: SizedBox(
+                    height: kMinInteractiveDimension,
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      key: ObjectKey(goals),
+                      separatorBuilder: (context, index) => SizedBox(width: 8,),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: goals.length,
+                      itemBuilder: (context, index) => ActionChip(
+                          tooltip: 'Goal Item ${index+1}',
+                          side:goals.elementAt(index).uid==activeGoal?.uid? BorderSide(color: cCard,width: 2):null,
+                          onPressed: () {
+                            setState(() {
+                            activeGoal=goals.elementAt(index);
+                            });
+                          },
+                          label: Text(goals.elementAt(index).targetItem.stageName??'Item  ${index+1}')
+                      ),
                     ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
         SliverPadding(
@@ -216,7 +219,9 @@ class _GoalScreenViewState extends State<GoalScreenView> {
         ),
         // Central Progress Card
         SliverToBoxAdapter(
-          child:  Center(
+          child:  Container(
+            alignment: Alignment.center,
+              padding: EdgeInsets.all(15),
               child: CentralGoalCard(
             onUpdate: (Map<int,int>p0) {
               // print(p0);
@@ -300,9 +305,12 @@ class _GoalScreenViewState extends State<GoalScreenView> {
           padding: EdgeInsetsGeometry.symmetric(vertical: 10),
         ),
         SliverToBoxAdapter(
-          child:  Text(
-            "Required per Level".toUpperCase(),
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color:Colors.black),
+          child:  Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text(
+              "Required per Level".toUpperCase(),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color:Colors.black),
+            ),
           ),
         ),
         SliverToBoxAdapter(
