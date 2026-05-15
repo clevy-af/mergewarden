@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mergewarden/model/goal_data.dart';
-import 'package:mergewarden/model/json.dart';
+import 'package:mergewarden/model/knowledge_base.dart';
 import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/model/target_item.dart';
 import 'package:mergewarden/utils/colors.dart';
@@ -60,13 +60,13 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                 const Text('• In the top card, you can see your target details -'),
                 const Text('\t- Target Stage Item image and name, along with count.'),
                 const Text('\t- Progress of completing this goal. If this shows 100%, it means you have enough to merge up to target, if you haven\'t already.'),
-                const Text('\t- Update Inventory: Add/subtract your inventory items to adjust your progress. The value in form as well as `have` reflect your inventory count for the respective stage.'),
+                const Text('\t- Update Inventory: Add/subtract your inventory items to adjust your progress. This will auto-update other stages to accommodate the item(eg adding 5 stage 2s would update stage 3: 2, stage 2: 5, stage 1: 13.)'),
                 const Text('\t- Reset: Start over, like turning a new leaf.'),
                 const Text('\t- Delete: If you are done, you can remove this from goals to stop tracking it.'),
                 const Divider(height: 20),
                 const Text('• In the list below, you will find:'),
                 const Text('\t- Stage Item image and name.'),
-                const Text('\t- Needed: number of items you need to reach the target and have: what you have currently.'),
+                const Text('\t- Needed: number of items you need to reach the target and Have: what you have currently.'),
                 const Text('\t- Potion: number of potions used. Note that this count is not included in needed/have.'),
                 const Text('\t- Progress Circle: your progress in collecting items of this stage, shows checkmark if done (needed=have).'),
                 const SizedBox(height: 10),
@@ -169,7 +169,8 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                       const SizedBox(height: 10),
                       Text("${targetItem?.count} Stage ${targetItem?.stage} Items", style: TextStyle(fontSize:context.isDesktop?30:20,color: Colors.white70)),
                       const SizedBox(height: 10),
-                      Text(targetItem?.chainId=='Wildlife'?'Of Wildlife':"Of ${chains.firstWhere((element) => element['id']==targetItem?.chainId,)['name']} Chain", style:const TextStyle(color: Colors.white, fontSize: 10)),
+                      if(targetItem?.chainId!=null)
+                      Text(targetItem?.isWildlife==true?'Of Wildlife':"Of ${chains.firstWhere((element) => element['id']==targetItem?.chainId,)['name']} Chain", style:const TextStyle(color: Colors.white, fontSize: 10)),
                       const SizedBox(height: 15),
                       Padding(
                         padding: const EdgeInsets.only(right: 15),
@@ -203,8 +204,9 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                                     barrierDismissible: true,
                                     context: context,
                                     builder: (context) => InventoryPopup(
-                                      chainID: targetItem!.chainId!,
-                                      targetStage: targetItem!.stage,
+                                      chainID: targetItem?.chainId,
+                                      isWildlife: targetItem?.isWildlife??false,
+                                      targetStage: targetItem?.stage??0,
                                       onUpdate: (p0) {
                                       final result=widget.onUpdate(p0);
                                         Navigator.of(context).pop();
@@ -275,7 +277,8 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
 class GoalLevelCard extends StatelessWidget {
   final Inventory inventory;
   final String? chainId;
-  const GoalLevelCard({super.key, required this.inventory, this.chainId});
+  final bool isWildlife;
+  const GoalLevelCard({super.key, required this.inventory, this.chainId, required this.isWildlife});
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +288,7 @@ class GoalLevelCard extends StatelessWidget {
     // print(chainId);
     Map? data=chainItems[chainId??0]?.firstWhere((element) => element['stage']==level,orElse: () => {'name':"Stage $level"},);
     String title=data?['name']??'Stage $level';
-    var isWildlife = chainId=='Wildlife';
+    // var isWildlife = chainId=='Wildlife';
     if (isWildlife) {
       if (level == 45) {
         title = "Magnificent Eggs";
@@ -299,14 +302,14 @@ class GoalLevelCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Spacer(),
-        if(chainId!=null&&chainId!='Wildlife')
+        if(chainId!=null)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             height: context.screenSize.height*0.15,
             width: context.screenSize.height*0.15,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              image: chainId!=null?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+              image:DecorationImage(image: AssetImage(isWildlife?'wildlife/$chainId$level.webp':'assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),),
             ),
           ),
         SizedBox(width: 15,),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mergewarden/model/json.dart';
+import 'package:mergewarden/model/knowledge_base.dart';
 import 'package:mergewarden/model/target_item.dart';
 import 'package:mergewarden/utils/calculator.dart';
 import 'package:mergewarden/utils/colors.dart';
@@ -10,11 +10,12 @@ import 'package:mergewarden/view/components/stat_card.dart';
 class InventoryPopup extends StatefulWidget {
   final String? chainID;
   final int targetStage;
+  final bool isWildlife;
   final Function(Map<int, int>) onUpdate;
 
   const InventoryPopup({
     super.key,
-    required this.onUpdate, required this.chainID, required this.targetStage,
+    required this.onUpdate, required this.chainID, required this.targetStage, required this.isWildlife,
   });
 
 
@@ -24,6 +25,13 @@ class InventoryPopup extends StatefulWidget {
 
 class _InventoryPopupState extends State<InventoryPopup> {
     Map<int, int> tempInventory={};
+    TextEditingController stageController=TextEditingController();
+
+    @override
+  void dispose() {
+    stageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +56,10 @@ class _InventoryPopupState extends State<InventoryPopup> {
                           for (var entry in  tempInventory.entries){
                             children.add(_InventoryCard(
                               level: entry.key,
+                              isWildlife: widget.isWildlife,
                               chainId: widget.chainID,
                               count: entry.value,
-                              stageName:MergeCalculator.stageName(widget.chainID,entry.key) ,
+                              stageName:MergeCalculator.stageName(widget.chainID,entry.key,widget.isWildlife) ,
                               onChanged: (newVal) {
                                 setState(() => tempInventory[entry.key] = newVal);
                               },
@@ -70,78 +79,123 @@ class _InventoryPopupState extends State<InventoryPopup> {
                                 Builder(
 
                                     builder: (context) {
-                                      TextEditingController stageController=TextEditingController();
 
                                       Iterable stages=[];
-                                      if(widget.chainID=='Wildlife')
-                                        {
-                                         stages= wildlifeChain.sublist(0, wildlifeChain.indexWhere((value)=>value['stage']==widget.targetStage,));
-                                        }
-                                      else{
-                                        stages=chainItems[widget.chainID]?.sublist(0,widget.targetStage)??[];
-                                      }
-                                      // print(stages);
-                                      if(widget.chainID!=null&&stages.isNotEmpty||widget.chainID=='Wildlife') {
-                                        return Container(
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(15.0),
-                                              border: Border.all(color: Color(0xFF000000),width: 0.6)
-                                          ),
-                                          margin: EdgeInsets.all(8),
-                                          child: DropdownButton<int>(
-                                            isExpanded: true,
-                                            dropdownColor: cLightBackground,
-                                            focusColor: cCreme,
-                                            value: int.tryParse(stageController.text),
-                                            underline: SizedBox(),
-                                            menuWidth: context.screenSize.width*(context.screenSize.width>kDesktopBreak?0.25:0.6),
-                                            onChanged: ( newValue) {
-                                              if(newValue!=null) {
-                                                setState(() => tempInventory[newValue] = 1);
-                                              }
-                                            },
-                                            items:stages.map((e) => DropdownMenuItem<int>(
-                                              value: e['stage'] ,
-                                              child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                                child:Text("Stage ${e['stage']}: ${e['name']}" ),
-                                              ),
-                                            )
-                                            ).toList()
-                                            //     :
-                                            // List.generate(widget.targetStage, (index) => DropdownMenuItem<int>(
-                                            //   value: stages.elementAt(index)['stage'],
-                                            //   child: Padding(
-                                            //     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                            //     child: Text('Stage ${stages.elementAt(index)['stage']}: ${stages.elementAt(index)['name']}'),
-                                            //   ),
-                                            // ),),
-                                          ),
-                                        );
-                                      } else {
+                                      if(widget.chainID==null) {
                                         return Semantics(
-                                          label: 'Merge Gardens Calculation Target Stage TextField',
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: TextFormField(
-                                              keyboardType: TextInputType.number,
-                                              decoration: InputDecoration(
-                                                hintText: 'Enter stage of target item',
-                                                labelText: 'Target Stage',
-                                                border: OutlineInputBorder(
-                                                    borderRadius: BorderRadius.circular(15.0),
-                                                    borderSide: BorderSide()
-                                                ),
+                                        label: 'Update Inventory TextField',
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: TextFormField(
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              hintText: 'Enter stage of item',
+                                              labelText: 'Item Stage',
+                                              border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(15.0),
+                                                  borderSide: BorderSide()
                                               ),
-                                              controller: stageController,
                                             ),
+                                            controller: stageController,
                                           ),
-                                        );
+                                        ),
+                                      );
+                                      }
+                                      else {
+                                        if (widget.isWildlife) {
+                                          stages = wildlifeStages.sublist(0,
+                                              wildlifeStages.indexWhere((
+                                                  value) =>
+                                              value['stage'] ==
+                                                  widget.targetStage,));
+                                        }
+                                        else {
+                                          stages = chainItems[widget.chainID]
+                                              ?.sublist(
+                                              0, widget.targetStage) ?? [];
+                                        }
+                                        // print(stages);
+                                        if (stages.isNotEmpty || widget.isWildlife) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius
+                                                    .circular(15.0),
+                                                border: Border.all(
+                                                    color: Color(0xFF000000),
+                                                    width: 0.6)
+                                            ),
+                                            margin: EdgeInsets.all(8),
+                                            child: DropdownButton<int>(
+                                                isExpanded: true,
+                                                dropdownColor: cLightBackground,
+                                                focusColor: cCreme,
+                                                value: int.tryParse(
+                                                    stageController.text),
+                                                underline: SizedBox(),
+                                                menuWidth: context.screenSize
+                                                    .width *
+                                                    (context.screenSize.width >
+                                                        kDesktopBreak
+                                                        ? 0.25
+                                                        : 0.6),
+                                                onChanged: (newValue) {
+                                                  if (newValue != null) {
+                                                    setState(() =>
+                                                    tempInventory[newValue] =
+                                                    1);
+                                                  }
+                                                },
+                                                items: stages.map((e) =>
+                                                    DropdownMenuItem<int>(
+                                                      value: e['stage'],
+                                                      child: Padding(
+                                                        padding: const EdgeInsets
+                                                            .symmetric(
+                                                            horizontal: 8.0),
+                                                        child: Text(
+                                                            "Stage ${e['stage']}: ${e['name']}"),
+                                                      ),
+                                                    )
+                                                ).toList()
+                                            ),
+                                          );
+                                        }
+                                        else {
+                                          return SizedBox();
+                                        }
                                       }
                                     }
                                 ),
+                                if(widget.chainID==null)
+                                  Builder(
+                                    builder: (context) {
+                                      return TextButton(
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: cCard,
+                                        ),
+                                        // borderRadius: BorderRadius.circular(50),
+                                        onPressed: () {
+                                          if (stageController.text.isEmpty) {
+                                            return;
+                                          }
+                                          int? stage= int.tryParse(stageController.text);
+                                          if (stage!=null) {
+                                            setState(() =>
+                                            tempInventory[stage] =
+                                            1);
+                                          }
+                                          else {
+                                            stageController.clear();
+                                          }
+                                        },
+                                        child: Text('Submit',style: TextStyle(color: Colors.white),),
+                                      );
+                                    }
+                                  ),
                                 SizedBox(height: kMinInteractiveDimension,),
-                                Text('Select a stage to add'),
+                                Text(
+                                    '${widget.chainID==null?'Type':'Select'} a stage to add'
+                                ),
                               ],
                             ),
                           ));
@@ -224,11 +278,12 @@ class _InventoryPopupState extends State<InventoryPopup> {
 class _InventoryCard extends StatelessWidget {
   final int level;
   final int count;
+  final bool isWildlife;
   final String? chainId;
   final String? stageName;
   final ValueChanged<int> onChanged;
 
-  const _InventoryCard({required this.level, required this.count, required this.onChanged, required this.chainId, this.stageName});
+  const _InventoryCard({required this.level, required this.count, required this.onChanged, required this.chainId, this.stageName, required this.isWildlife});
 
   @override
   Widget build(BuildContext context) {
@@ -246,7 +301,7 @@ class _InventoryCard extends StatelessWidget {
             height: kMinInteractiveDimension,
               targetItem: TargetItem(
               merge5: false, has0: false, count: count, stage: level,
-              isWildlife: chainId=='Wildlife',chainId: chainId,
+              isWildlife:isWildlife,chainId: chainId,
             stageName: stageName
           )
           ) ,

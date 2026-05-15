@@ -137,13 +137,16 @@ class CalculatorScreen extends StatelessWidget {
                                     mainAxisSpacing: 20,
                                   ),
                                   itemCount: data.length,
-                                  itemBuilder: (context, index) =>  LevelCard(
+                                  itemBuilder: (context, index) {
+                                    var isWildlife = value.get('type')=='wildlife';
+                                    return LevelCard(
                                       level: data.elementAt(index)['stage'],
                                       potions: data.elementAt(index)['potions'],
                                     count: data.elementAt(index)['count'],
-                                    chainId: value.get('chain'),
-                                    isWildlife: value.get('type')=='wildlife',
-                                  ),
+                                    chainId: value.get('chain')?.toString().replaceAll(' ', isWildlife?'':'_'),
+                                    isWildlife: isWildlife,
+                                  );
+                                  },
                                 );
                               }
                             ),
@@ -327,6 +330,7 @@ class _GoalScreenViewState extends State<GoalScreenView> {
                     separatorBuilder: (context, index) => SizedBox(height: 8,),
                     itemCount:activeGoal!.inventorySorted .length,
                     itemBuilder: (context, index) =>  GoalLevelCard(
+                      isWildlife: activeGoal!.targetItem.isWildlife,
                       key: ValueKey(activeGoal!.inventorySorted[index]),
                     inventory: activeGoal!.inventorySorted[index],
                       chainId: activeGoal!.targetItem.chainId,

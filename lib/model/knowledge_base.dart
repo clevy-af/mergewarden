@@ -57,10 +57,9 @@ List<Map<String,dynamic>> chains= [
   {"name": "Recycled Boosters", "id": "Recycled_Boosters", "stages": 4},
   {"name": "Uncle Elwood's Experiment", "id": "Uncle_Elwood's_Experiment", "stages": 4},
   {"name": "Time Skip", "id": "Time_Skip", "stages": 4},
+  {"name": "Garden Guardians", "id": "Garden_Guardians", "stages": 9,"masterpiece":23 },
   // {"name": "Wildlife", "id": "Wildlife", "stages": 8},
 ];
-
-const String imageUrl='https://store-images.s-microsoft.com/image/apps.41185.14321666486326182.fa278455-44db-4ead-94ab-964c9c1f1290.ab4dc92b-e9f7-4a07-93f7-60053e3f7868?h=253';
 
 List<String> wildlifeList = [
   "Ameraucana Chicken",
@@ -88,7 +87,7 @@ List<String> wildlifeList = [
   "Honey Bee",
   "Hoopoe",
   "Hummingbird",
-  "Hummingbird Hawk-moth",
+  "Northern Cardinal",
   "Kingfisher",
   "Ladybug",
   "Long Eared Owl",
@@ -114,12 +113,6 @@ List<String> wildlifeList = [
   "Toucan",
   "White Bat",
   "Woodpecker",
-  // Note: The following items appear on the Wiki's wildlife deadend/category pages
-  "Blue Ghost Firefly",
-  "Japanese Firefly",
-  "Garden Gnome",
-  "Mystery Bird",
-  "Mystery Mammal"
 ];
 Map<String,List> chainItems= {
   'Amber_Wishing_Stars': [
@@ -742,7 +735,7 @@ Map<String,List> chainItems= {
     {"name": "Timber Cuts", "stage": 2},
     {"name": "Timber Pile", "stage": 3},
     {"name": "Bundle of Timber", "stage": 4},
-    {"name": "Lenghts of Timber", "stage": 5},
+    {"name": "Lengths of Timber", "stage": 5},
     {"name": "Stack of Timber", "stage": 6},
     {"name": "Sturdy Timber Pile", "stage": 7},
     {"name": "Plentiful Timber Pile", "stage": 8},
@@ -897,12 +890,22 @@ Map<String,List> chainItems= {
     {"name": "Tranquil Garden", "stage": 7},
     {"name": "Quiescent Garden", "stage": 8},
     {"name": "Serene Garden", "stage": 9},
-    {"name": "Enlightened Sanctuary", "stage": 10}
+    {"name": "Enlightened Sanctuary", "stage": 10},
   ],
-
+  'Garden_Guardians':[
+    {"name": "Egg Relic", "stage": 1},
+    {"name": "Bluebird Idol", "stage": 2},
+    {"name": "Hummingbird Icon", "stage": 3},
+    {"name": "Bat Relic", "stage": 4},
+    {"name": "Butterfly Statue", "stage": 5},
+    {"name": "Squirrel Giant", "stage": 6},
+    {"name": "Bee Guard", "stage": 7},
+    {"name": "Woodpecker Ward", "stage": 8},
+    {"name": "Ladybug Guardian", "stage": 9}
+  ],
 };
 
-List<Map> wildlifeChain= [
+List<Map> wildlifeStages= [
     {"name": "Eggs", "stage": 0},
     {"name": "Stage 1", "stage": 1},
     {"name": "Stage 2", "stage": 2},

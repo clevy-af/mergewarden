@@ -1,6 +1,5 @@
 import 'dart:math';
-
-import 'package:mergewarden/model/json.dart';
+import 'package:mergewarden/model/knowledge_base.dart';
 import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/utils/extension.dart';
 
@@ -270,17 +269,22 @@ class MergeCalculator {
     return ghostInventory;
   }
 
-  static String stageName(String? chainId,int stage){
-    Map? data=chainItems[chainId??0]?.firstWhere((element) => element['stage']==stage,orElse: () => {'name':"Stage $stage"},);
-    String title=data?['name']??'Stage $stage';
+  static String stageName(String? chainId,int stage,[bool isWildlife=false]){
+    String title='Stage $stage';
+    if(chainId==null&&!isWildlife) {
+      return title;
+    }
+
     // print(isWildlife);
-    if (chainId=='Wildlife') {
+    if (isWildlife) {
       if (stage == 45) {
         title = "Magnificent Eggs";
       } else  if(stage==0){
         title = "Eggs";
       }
     }
+    Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==stage,orElse: () => {'name':"Stage $stage"},);
+    title=data?['name']??'Stage $stage';
   return title;
   }
 }

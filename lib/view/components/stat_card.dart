@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
-import 'package:mergewarden/model/json.dart';
+import 'package:mergewarden/model/knowledge_base.dart';
 import 'package:mergewarden/model/goal_data.dart';
 import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/model/target_item.dart';
@@ -137,8 +137,8 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                       bool isWildlife=data.get('type')=='wildlife';
 
                       if(isWildlife){
-                        chainController = TextEditingController()..text='Wildlife';
-                        data.put('chain',chainController.text);
+                        // chainController = TextEditingController()..text='Wildlife';
+                        // data.put('chain',chainController.text);
 
                       }
                       else {
@@ -148,25 +148,19 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                         margin: const EdgeInsets.all(8.0),
 
                         key: ValueKey(data.get('type')),
-                        child: isWildlife?TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Enter ${isWildlife?'Wildlife' : 'Chain'} Name',
-                            labelText: '${isWildlife?'Wildlife' : 'Chain'} Name',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                          ),
-                          readOnly: isWildlife,
-                          controller: chainController,
-                        ):
-                        Semantics(
+                        child: Semantics(
                           label: 'Merge Gardens Calculation Chain Autocomplete',
                           child: Autocomplete<String>(
                             optionsBuilder: (TextEditingValue textEditingValue) {
                               if (textEditingValue.text.isEmpty) {
                                 return const Iterable<String>.empty();
                               }
-                              return chains.map((e) => e['name'].toString(),).where((String option) {
+                              if(isWildlife) {
+                                return wildlifeList.where((String option) {
+                                return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                              });
+                              }
+                                return chains.map((e) => e['name'].toString(),).where((String option) {
                                 return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
                               });
                             },
@@ -191,7 +185,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                             // displayStringForOption: (option) => option,
                             onSelected: (String selection) {
                               // print('You selected: $selection');
-                            HiveProvider.appBox.put('chain', chains.firstWhere((element) => element['name'].contains(selection),orElse: () => {'id':null},)['id']);
+                            HiveProvider.appBox.put('chain', selection);
 
                             },
                             fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
@@ -200,7 +194,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                                 controller: controller,
                                 focusNode: focusNode,
                                 decoration:  InputDecoration(
-                                  labelText: 'Chain Name',
+                                  labelText: '${isWildlife?'Wildlife':'Chain'} Name',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15.0),
                                   ),),
@@ -216,14 +210,15 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                   alignment: Alignment.centerLeft,
                   children: [
                     ValueListenableBuilder(
-                        valueListenable: HiveProvider.appBox.listenable(keys: ['chain']),
+                        valueListenable: HiveProvider.appBox.listenable(keys: ['chain','type']),
                         // key: ValueKey(null),
                         builder: (context,data,_) {
-                          String? chainId=data.get('chain');
+                          bool isWildlife=data.get('type')=='wildlife';
+                          String? chainId=data.get('chain')?.toString().replaceAll(' ', isWildlife?'':'_');
                           Iterable stages=chainItems[chainId]??[];
                           HiveProvider.appBox.put('chain0', stages.where((element) => element['stage']==0,).isNotEmpty);
                           // print( HiveProvider.appBox.get('chain0',));
-                          if(chainId!=null&&stages.isNotEmpty||chainId=='Wildlife') {
+                          if(chainId!=null&&stages.isNotEmpty||isWildlife) {
                             return Container(
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(15.0),
@@ -239,11 +234,11 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                                 onChanged: ( newValue) {
                                   setState(() { stageController.text = (newValue??0) .toString(); });
                                 },
-                                items:chainId=='Wildlife'?List.generate(wildlifeChain.length, (index) => DropdownMenuItem<int>(
-                                  value: wildlifeChain[index]['stage'] ,
+                                items:isWildlife?List.generate(wildlifeStages.length, (index) => DropdownMenuItem<int>(
+                                  value: wildlifeStages[index]['stage'] ,
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                    child:Text( wildlifeChain[index]['name'] ),
+                                    child:Text( wildlifeStages[index]['name'] ),
                                   ),
                                 )
                                 ): List.generate(stages.length, (index) => DropdownMenuItem<int>(
@@ -369,7 +364,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                   label: 'Merge Gardens Calculation Button',
                   child: TextButton(
                       onPressed: () {
-                        String? targetName,chainUrl;
+                        String? targetName;
                         if(stageController.text.isEmpty||countController.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Filling in target details mandatory.')));
                           return;
@@ -384,8 +379,8 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                           return;
                         }
                         // print('still going ahead?');
-                        String? chainId=HiveProvider.appBox.get('chain');
                         bool isWildlife=HiveProvider.appBox.get('type')=='wildlife';
+                        String? chainId=HiveProvider.appBox.get('chain')?.toString().replaceAll(' ', isWildlife?'':'_');
                         // print({'chain':chainId,'stage':stageController.text,
                         //   'count':countController.text,
                         //   'type':HiveProvider.appBox.get('type'),
@@ -396,14 +391,14 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                         int stageNumber = int.parse(stageController.text);
                         // print(stageNumber);
 
-                        if(chainId!=null&&chainController.text!='Wildlife') {
+                        if(chainId!=null&&!isWildlife) {
                           // chainName=chains.firstWhere((element) => element['name'].contains(chainController.text),orElse: () => {'id':null},)['id'];
 
                           Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==stageNumber,orElse: () => {'name':null,'url':null},);
                           targetName=data?['name'];
-                          chainUrl=data?['url'];
-                          // print(chainUrl);
+                          // print(targetName);
                         }
+
                         setState(() {
 
 
@@ -411,8 +406,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                           isWildlife:isWildlife ,
                           has0: HiveProvider.appBox.get('chain0')??false,
                             merge5: merge5Only,
-                            stageName: HiveProvider.appBox.get('type')=='wildlife'?wildlifeChain.firstWhere((element) => element['stage']==stageNumber,orElse: () => {'name':'Wildlife'},)['name']:targetName??'Stage $stageNumber ${'Item'}',
-                            url: chainUrl,
+                            stageName:isWildlife?wildlifeStages.firstWhere((element) => element['stage']==stageNumber,orElse: () => {'name':'Wildlife'},)['name']:targetName??'Stage $stageNumber ${'Item'}',
                             chainId: chainId, count: int.tryParse(countController.text)??0,
                             stage: stageNumber
                         );
@@ -437,8 +431,8 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
               setState(() {
                 targetItem=null;
                 HiveProvider.appBox.delete('chain');
-                stageController.clear();
-                countController.clear();
+                // stageController.clear();
+                // countController.clear();
                 potionController.clear();
                 HiveProvider.appBox.delete('breakdown');
               });
@@ -647,6 +641,21 @@ class TargetItemView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var heightValue =height?? MediaQuery.of(context).size.height*0.3;
+    var assetName = '';
+    if(targetItem?.chainId!=null){
+      if(targetItem?.isWildlife==false) {
+        assetName ='Stage_${targetItem?.stage}_-_${targetItem?.stageName?.replaceAll(' ', '_')}';
+      } else {
+        assetName='wildlife/${targetItem?.chainId}${targetItem?.stage}';
+      }
+    }
+    else {
+      if(targetItem?.isWildlife==false) {
+        assetName ='book';
+      } else {
+        assetName='wildlife';
+      }
+    }
     return SizedBox(
       width: width??MediaQuery.of(context).size.width,
       child: Column(
@@ -665,7 +674,7 @@ class TargetItemView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                   color: cCard,
                   image: DecorationImage(
-                      image: AssetImage('assets/${targetItem?.chainId!=null&&targetItem?.chainId!='Wildlife'?'Stage_${targetItem?.stage}_-_${targetItem?.stageName?.replaceAll(' ', '_')}':'wildlife'}.webp'),
+                      image: AssetImage('$assetName.webp'),
                       fit: BoxFit.contain
                   ),
                 ),
@@ -701,6 +710,7 @@ class LevelCard extends StatelessWidget {
     Map? data=chainItems[chainId??0]?.firstWhere((element) => element['stage']==level,orElse: () => {'name':"Stage $level"},);
    String title=data?['name']??'Stage $level';
    // print(isWildlife);
+   print(chainId.runtimeType);
     if (isWildlife) {
       if (level == 45) {
         title = "Magnificent Eggs";
@@ -728,14 +738,14 @@ class LevelCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(showStage?'Stage $level':title, style: showStage?const TextStyle(color: Colors.grey):stageStyle),
-                if(chainId!=null&&chainId!='Wildlife')
+                if(chainId!=null)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   height: kMinInteractiveDimension,
                   width:kMinInteractiveDimension,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
-                    image: chainId!=null?DecorationImage(image: AssetImage('assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),):null,
+                    image: DecorationImage(image: AssetImage(isWildlife?chainId!=null?'wildlife/$chainId$level.webp':'wildlife.webp':'assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),),
                   ),
                 ),
                 if(showStage)

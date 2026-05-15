@@ -71,19 +71,19 @@ class ChangelogPage extends StatelessWidget {
                 shrinkWrap: true,
                 children: [
 
-                  _buildComingSoon(brief: 'Wildlife images and up-to-date quest list!',icon: Icons.timer, title: 'What\'s Brewing?'),
+                  _buildComingSoon(brief: 'More informative quest list and chain metadata!',icon: Icons.timer, title: 'What\'s Brewing?'),
                   const SizedBox(height: 20),
                   const Text("Ledger of the Keeper",
                       style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
                   const SizedBox(height: 20),
-                  // _buildLogEntry(
-                  //   date: "April 2026",
-                  //   version: "v2.1.0",
-                  //   title: "The Potential Plan Update",
-                  //   description: "We've added a new master calculator to see how far your current inventory can grow!",
-                  //   icon: Icons.auto_awesome,
-                  //   color: Colors.orangeAccent,
-                  // ),
+                  _buildLogEntry(
+                    date: "May 2026",
+                    version: "v1.6.4",
+                    title: "The Photogenic Wildlife",
+                    description: "Added images for wildlife, the ones wiki had at least, so that you can appreciate their LOOKS!",
+                    icon: Icons.phone_android_outlined,
+                    color: Colors.lightBlueAccent,
+                  ),
                   _buildLogEntry(
                     date: "May 2026",
                     version: "v1.6.1",
