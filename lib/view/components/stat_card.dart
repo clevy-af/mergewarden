@@ -10,6 +10,7 @@ import 'package:mergewarden/utils/calculator.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
+import 'package:mergewarden/utils/strings.dart';
 import 'package:mergewarden/view/home.dart';
 
 class CentralStatsCard extends StatefulWidget {
@@ -58,7 +59,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                             onPressed: () async {
                               await  HiveProvider.appBox.put('type', 'items');
                               await  HiveProvider.appBox.put('chain', null);
-                              HiveProvider.appBox.delete('breakdown');
+                              HiveProvider.session.delete(sBreakdownKey);
                               stageController.clear();
                               countController.clear();
                               chainController.clear();
@@ -79,7 +80,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                           side: data.get('type')=='wildlife'?BorderSide(color: cCard,width: 2):null,
                           onPressed: () async {
                             await  HiveProvider.appBox.put('type', 'wildlife');
-                            HiveProvider.appBox.delete('breakdown');
+                            HiveProvider.session.delete(sBreakdownKey);
                             stageController.clear();
                             countController.clear();
                             chainController.clear();
@@ -431,17 +432,17 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
               setState(() {
                 targetItem=null;
                 HiveProvider.appBox.delete('chain');
-                // stageController.clear();
-                // countController.clear();
+                stageController.clear();
+                countController.clear();
                 potionController.clear();
-                HiveProvider.appBox.delete('breakdown');
+                HiveProvider.session.delete(sBreakdownKey);
               });
             },
               onGoalSet: () {
                 List<Inventory> inventories=[];
-                for(int i=1;i<HiveProvider.appBox.get('breakdown').length;i++)
+                for(int i=1;i<HiveProvider.session.get(sBreakdownKey).length;i++)
                   {
-                    inventories.add(Inventory.fromJson(HiveProvider.appBox.get('breakdown')[i]));
+                    inventories.add(Inventory.fromJson(HiveProvider.session.get(sBreakdownKey)[i]));
                   }
                 HiveProvider().putGoal(
                     GoalData(
@@ -576,9 +577,8 @@ class LineIndicator extends StatelessWidget {
 
 
 class TargetPage extends StatelessWidget {
-  const TargetPage({super.key,  this.targetItem, required this.onReset, this.completed, required this.onGoalSet});
+  const TargetPage({super.key,  this.targetItem, required this.onReset, required this.onGoalSet});
   final TargetItem? targetItem;
-  final double? completed;
   final VoidCallback onReset;
   final VoidCallback onGoalSet;
 
@@ -616,13 +616,6 @@ class TargetPage extends StatelessWidget {
             style: TextStyle(letterSpacing: 1.5, fontSize:context.isDesktop?20:15, fontWeight: FontWeight.bold),
           ),
         ),
-        if(completed!=null)
-        SizedBox(height: 5,),
-        if(completed!=null)
-          LineIndicator(value: completed!),
-        if(completed!=null)
-        Text("PROGRESS: 0%", style: TextStyle(color: Colors.grey,fontSize: MediaQuery.of(context).size.width*0.03, fontWeight: FontWeight.bold)),
-
       ],
     );
   }
@@ -665,20 +658,7 @@ class TargetItemView extends StatelessWidget {
 
             Semantics(
               label: 'Merge Gardens Target Item',
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                // margin: EdgeInsets.all(8),
-                height: heightValue,
-                width:heightValue,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: cCard,
-                  image: DecorationImage(
-                      image: AssetImage('$assetName.webp'),
-                      fit: BoxFit.contain
-                  ),
-                ),
-              ),
+              child: StageItemImage(heightValue: heightValue, assetName: assetName),
             ),
           const SizedBox(height: 20),
 
@@ -691,6 +671,36 @@ class TargetItemView extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class StageItemImage extends StatelessWidget {
+  const StageItemImage({
+    super.key,
+     this.heightValue,
+    required this.assetName, this.borderRadius,
+  });
+
+  final double? heightValue;
+  final BorderRadius? borderRadius;
+  final String assetName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      // margin: EdgeInsets.all(8),
+      height: heightValue,
+      width:heightValue,
+      decoration: BoxDecoration(
+        borderRadius: borderRadius??BorderRadius.circular(15),
+        color: cCard,
+        image: DecorationImage(
+            image: AssetImage('$assetName.webp'),
+            fit: BoxFit.contain
+        ),
       ),
     );
   }
@@ -710,7 +720,7 @@ class LevelCard extends StatelessWidget {
     Map? data=chainItems[chainId??0]?.firstWhere((element) => element['stage']==level,orElse: () => {'name':"Stage $level"},);
    String title=data?['name']??'Stage $level';
    // print(isWildlife);
-   print(chainId.runtimeType);
+   // print(chainId.runtimeType);
     if (isWildlife) {
       if (level == 45) {
         title = "Magnificent Eggs";

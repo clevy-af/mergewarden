@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+//https://discord.com/api/webhooks/1507690191329169471/rLfeUEJAk__84kG5pnJUuNxOxECv1muKjSaFvVs-jV-YQmjf9jmm3JDlYbPPdRMzUfs5
+
+//github url
+//https://discord.com/api/webhooks/1507691711168512020/jDa109UpQikVra9npKpDQ1vvgvfexaj6zOVTwt5d21q1ENdWM3gdQdpuyUIUfp4nl22t
 
 Future<bool> sendBugReport(String message, String contact) async {
   final url = Uri.parse('https://formspree.io/f/xeenedrl');

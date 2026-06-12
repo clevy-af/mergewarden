@@ -23,6 +23,7 @@ class GoalData {
     "uid": uid,
     "createdAt": createdAt,
   };
+
   double get progress {
     double progress=0;
     for(int i=0;i<inventory.length;i++) {

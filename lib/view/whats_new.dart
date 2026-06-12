@@ -78,7 +78,7 @@ class ChangelogPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   _buildLogEntry(
                     date: "May 2026",
-                    version: "v1.6.4",
+                    version: "v1.6.5",
                     title: "The Photogenic Wildlife",
                     description: "Added images for wildlife, the ones wiki had at least, so that you can appreciate their LOOKS!",
                     icon: Icons.phone_android_outlined,
