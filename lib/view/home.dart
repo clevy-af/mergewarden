@@ -1,5 +1,7 @@
+import 'dart:js_interop';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
@@ -46,6 +48,21 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     _selectedPage = Destinations.values.elementAt(HiveProvider.appBox.get('homepage')??0);
     super.initState();
+    web.window.navigator.serviceWorker.addEventListener(
+      'controllerchange', (web.Event event) {
+        HiveProvider.session.put('app_update', true);
+      }.toJS,
+    );
+  web.window.navigator.serviceWorker.addEventListener(
+      'install', (web.Event event) {
+       print('hi the');
+      }.toJS,
+    );
+  web.window.navigator.serviceWorker.addEventListener(
+      'fetch', (web.Event event) {
+       print('hi fethced');
+      }.toJS,
+    );
   }
 
   @override
@@ -118,13 +135,15 @@ class NavigationLine extends StatelessWidget {
               ],
             ),
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
+              margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   image: DecorationImage(image: AssetImage('assets/logo.webp'))
               ),
               height: 60,width: 60,
             ),
+
+            Text('v1.2.5',style: TextStyle( fontSize: 12,color: cCreme),),
 
             LinkButton(
               link: 'https://futureplaygames.zendesk.com/hc/en-us/categories/360002343379-Merge-Gardens',
@@ -183,9 +202,20 @@ class NavigationLine extends StatelessWidget {
               onPressed: ()=>DiscordInviteButton().showDiscordPopup(context),
               child: Text('Discord Server',style: TextStyle(color: cCreme),)
           ),
-          TextButton(
-              onPressed: () => showAdaptiveDialog(context: context, builder: (context) => Center(child: ChangelogPage()),),
-              child: Text('Changelog',style: TextStyle(color: cCreme),)
+          ValueListenableBuilder(
+            valueListenable: HiveProvider.session.listenable(keys: ['app_update']),
+            builder: (context,data,_) {
+              return TextButton(
+                  onPressed: () => showAdaptiveDialog(context: context, builder: (context) => Center(child: ChangelogPage()),),
+                  child: Stack(
+                    alignment: AlignmentGeometry.topRight,
+                    children: [
+                      Text('Changelog',style: TextStyle(color: cCreme),),
+                    if(data.toMap()['app_update']==true)  Icon(Icons.new_releases_outlined,color: cRed,),
+                    ],
+                  )
+              );
+            }
           ),
         ],
       ),

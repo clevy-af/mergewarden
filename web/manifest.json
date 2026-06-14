@@ -1,35 +1,53 @@
 {
-    "name": "mergewarden",
-    "short_name": "mergewarden",
+    "name": "Merge Warden",
+    "short_name": "Garden Companion",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
+    "background_color": "#5E7356",
     "theme_color": "#0175C2",
-    "description": "The ultimate calculator for Merge Gardens. Calculate item chains, wildlife merges, and stage requirements instantly.",
+    "description": "A friendly companion for your Merge Gardens adventure. Plan progress with our merge calculator and goal tracker. More features blooming! \uD83C\uDF3F✨",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {
             "src": "icons/icon-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "src": "icons/icon-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
-            "src": "icons/icon-512-maskable.png",
+            "src": "icons/icon-192-maskable.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "icons/",
+            "src": "icons/icon-512-maskable.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshots/desktop_preview.png",
+            "sizes": "1368x768",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Warden Desktop Layout"
+        },
+        {
+            "src": "screenshots/mobile_preview.png",
+            "sizes": "1284x2542",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Warden Mobile Layout"
         }
     ]
 }

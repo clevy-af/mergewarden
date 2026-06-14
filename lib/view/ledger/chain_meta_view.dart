@@ -133,7 +133,7 @@ class ChainDetailView extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text("Chain Item Stages (${chainData.totalStages})", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text("Chain Stages (${chainData.totalStages})", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             // Row(
             //   children: [
             //     TextButton(onPressed: () {}, child: const Text("List View", style: TextStyle(color: kTextSubtle))),
@@ -145,7 +145,7 @@ class ChainDetailView extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 220,
+          height: 250,
           child: Scrollbar(
             trackVisibility: true,
             controller: scrollController,
@@ -236,7 +236,7 @@ class ChainDetailView extends StatelessWidget {
   Widget _stageCard(int level,MergeItem data) => InkWell(
     onTap: () => onTapStage(level),
     child: Container(
-      width: 160,
+      width: 180,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: kCardBg, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black12)),
       child: Column(
@@ -245,7 +245,7 @@ class ChainDetailView extends StatelessWidget {
         children: [
           StageItemImage(heightValue: kMinInteractiveDimension*2.5, assetName:'Stage_${data.stage}_-_${data.name.replaceAll(' ', '_')}'),
           const SizedBox(height: 8),
-          Text(data.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          Text(data.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14,),maxLines: 2,textAlign: TextAlign.center,),
           Text("Stage ${data.stage}", style: const TextStyle( fontSize: 14)),
           // const Row(
           //   mainAxisAlignment: MainAxisAlignment.spaceBetween,

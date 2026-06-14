@@ -687,19 +687,22 @@ class StageItemImage extends StatelessWidget {
   final BorderRadius? borderRadius;
   final String assetName;
 
+  ImageProvider get imageProvider =>AssetImage(assetName);
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      // margin: EdgeInsets.all(8),
-      height: heightValue,
-      width:heightValue,
-      decoration: BoxDecoration(
-        borderRadius: borderRadius??BorderRadius.circular(15),
-        color: cCard,
-        image: DecorationImage(
-            image: AssetImage('$assetName.webp'),
-            fit: BoxFit.contain
+    return Card(
+      color: cCard,
+      child: Container(
+        margin: EdgeInsets.all(8),
+        height: heightValue,
+        width:heightValue,
+        decoration: BoxDecoration(
+          borderRadius: borderRadius??BorderRadius.circular(15),
+          image: DecorationImage(
+              image: AssetImage('assets/$assetName.webp'),
+              fit: BoxFit.contain
+          ),
         ),
       ),
     );
@@ -748,16 +751,9 @@ class LevelCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(showStage?'Stage $level':title, style: showStage?const TextStyle(color: Colors.grey):stageStyle),
+
                 if(chainId!=null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  height: kMinInteractiveDimension,
-                  width:kMinInteractiveDimension,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    image: DecorationImage(image: AssetImage(isWildlife?chainId!=null?'wildlife/$chainId$level.webp':'wildlife.webp':'assets/Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),),
-                  ),
-                ),
+                  StageItemImage(assetName: isWildlife?chainId!=null?'wildlife/$chainId$level':'wildlife':'Stage_${level}_-_${title.replaceAll(' ', '_')}',heightValue: kMinInteractiveDimension,),
                 if(showStage)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),

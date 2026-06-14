@@ -308,15 +308,7 @@ class GoalLevelCard extends StatelessWidget {
       children: [
         Spacer(),
         if(chainId!=null)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            height: context.screenSize.height*0.15,
-            width: context.screenSize.height*0.15,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              image:DecorationImage(image: AssetImage(isWildlife?'wildlife/$chainId$level.webp':'Stage_${level}_-_${title.replaceAll(' ', '_')}.webp'),),
-            ),
-          ),
+          StageItemImage(heightValue: context.screenSize.height*0.15, assetName: isWildlife?'wildlife/$chainId$level':'Stage_${level}_-_${title.replaceAll(' ', '_')}'),
         SizedBox(width: 15,),
         _stat(isWildlife?'':'Stage $level', title),
         Spacer(

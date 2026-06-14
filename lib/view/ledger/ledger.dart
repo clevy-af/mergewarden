@@ -174,10 +174,7 @@ class _LedgerPageState extends State<LedgerPage> {
     );
   }
 
-Widget _breadcrumbSeparator() => Padding(
-  padding: const EdgeInsets.all(8.0),
-  child: Text('‣',style: TextStyle(fontSize: 20),),
-);
+Widget _breadcrumbSeparator() => Text('‣',style: TextStyle(fontSize: 20),);
 
 
 
@@ -328,7 +325,7 @@ class _LedgerGridViewState extends State<LedgerGridView> {
                   ),
                   // const SizedBox(height: 4),
                   // Text(chain.subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: Colors.black45)),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 3),
                   if (chain.masterpiece!=null)
                     Text('#${'Masterpiece'.toUpperCase()} '"${chain.masterpiece}", style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF2D6A4F))),
                 ],
