@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mergewarden/model/merge_gardens.dart';
 import 'package:mergewarden/utils/colors.dart';
+import 'package:mergewarden/utils/extension.dart';
+import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
 
 // --- STYLES ---
@@ -42,9 +44,10 @@ class ChainDetailView extends StatelessWidget {
             _buildStagesSection(),
             const SizedBox(height: 32),
             if(chainData.masterpiece!=null)
-            _buildMasterpieceSpotlight(),
-            const SizedBox(height: 32),
-            _buildCalculatorCta(),
+            _buildMasterpieceSpotlight(context),
+            const SizedBox(height: 12),
+            // const SizedBox(height: 32),
+            // _buildCalculatorCta(),
           ],
         ),
       ),
@@ -165,23 +168,23 @@ class ChainDetailView extends StatelessWidget {
   }
 
   // Masterpiece Spotlight (Imperial Jar)
-  Widget _buildMasterpieceSpotlight() {
+  Widget _buildMasterpieceSpotlight(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(color: const Color(0xFFE8EAE6), borderRadius: BorderRadius.circular(24)),
       child: Row(
         children: [
-          Container(
-            width: 180, height: 180,
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-            child: const Icon(Icons.image, size: 60, color: Colors.black12),
+          Expanded(child: StageItemImage(
+            assetName: 'Stage_${chainData.items.last.stage}_-_${chainData.items.last.name.replaceAll(' ', '_')}',
+           heightValue: context.screenSize.height*0.2, ),
           ),
           const SizedBox(width: 24),
           Expanded(
+            flex: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Masterpiece", style: TextStyle(letterSpacing: 1.2, fontSize: 10, fontWeight: FontWeight.bold, color: kTextSubtle)),
+                 Text("# Masterpiece ${chainData.masterpiece}", style: TextStyle(letterSpacing: 1.2, fontSize: 10, fontWeight: FontWeight.bold, color: kTextSubtle)),
                 const SizedBox(height: 4),
                  Text("${chainData.items.last.name} (Stage ${chainData.items.last.stage})", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
@@ -271,22 +274,37 @@ class ChainDetailView extends StatelessWidget {
     ),
   );
 
-  Widget _buildCalculatorCta() => Container(
+  Widget _buildCalculatorCta() {
+    String plural = chainData.items.firstWhere((
+            element) => element.stage==1,
+            orElse:() => chainData.items.first
+        ).name.split(' ').last.toLowerCase();
+    if(!plural.endsWith('s')){
+      plural+='s';
+    }
+    return Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(color: const Color(0xFFFDECE8), borderRadius: BorderRadius.circular(16)),
     child: Row(
       children: [
         const Icon(Icons.calculate, color: Color(0xFF8B4513)),
         const SizedBox(width: 16),
-        const Expanded(child: Text("Vase Calculator: Exactly how many shards you need.", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF8B4513)))),
+        Expanded(child: Text("${chainData.title} Calculator: Exactly how many $plural you need.",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF8B4513)))),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () async {
+
+            await HiveProvider.appBox.put('chain', chainData.id);
+            await HiveProvider.appBox.put('type', 'items');
+
+          },
           style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF8B4513), foregroundColor: Colors.white),
           child: const Text("Open Calculator"),
         )
       ],
     ),
   );
+  }
 }
 
 class ChainLabel extends StatelessWidget {

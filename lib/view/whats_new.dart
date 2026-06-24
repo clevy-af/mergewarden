@@ -1,5 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:mergewarden/utils/colors.dart';
+import 'package:mergewarden/utils/hive_provider.dart';
+import 'package:web/web.dart' as web;
+
+class AppUpdateListener extends StatefulWidget {
+  const AppUpdateListener({super.key});
+
+  @override
+  State<AppUpdateListener> createState() => _AppUpdateListenerState();
+}
+
+class _AppUpdateListenerState extends State<AppUpdateListener> {
+
+
+  @override
+  Widget build(BuildContext context) {
+      return ValueListenableBuilder(
+        valueListenable: HiveProvider.appBox.listenable(keys:[ 'app_update_required']),
+        builder: (context, value, child) {
+          if(value.toMap()['app_update_required']==true) {
+            return MaterialBanner(
+            backgroundColor: Colors.amber.shade900,
+            leading: const Icon(Icons.system_update_rounded, color: Colors.white),
+            content: const Text(
+              'A new version of the app features/code is available! Reload now to swap to the latest engine update.',
+              style: TextStyle(color: Colors.white),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => web.window.location.reload(),
+                child: const Text('RELOAD APP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          );
+          }
+          return SizedBox();
+
+        }
+      );
+  }
+}
 
 class ChangelogPage extends StatelessWidget {
   const ChangelogPage({super.key});
@@ -73,8 +114,8 @@ class ChangelogPage extends StatelessWidget {
 
                   _buildComingSoon(brief: 'More informative quest list and chain metadata!',icon: Icons.timer, title: 'What\'s Brewing?'),
                   const SizedBox(height: 20),
-                  const Text("Ledger of the Keeper",
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
+                  AppUpdateListener(),
+                  const Text("Ledger of the Keeper", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
                   const SizedBox(height: 20),
                   _buildLogEntry(
                     date: "May 2026",

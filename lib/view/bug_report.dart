@@ -71,7 +71,7 @@ class _BugReportFormState extends State<BugReportForm> {
               const Text("Report a Bug",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
               const SizedBox(height: 8),
-              const Text("Found a bug in the shed? Let us know.",
+              const Text("Found a bug in the shed? Let us know. Do provide an email to ask follow-ups or more info. Discord users can utilise the dedicated server channel to provide more info and relevant screenshots.",
                   style: TextStyle(color: Colors.grey, fontSize: 13)),
               const SizedBox(height: 20),
 

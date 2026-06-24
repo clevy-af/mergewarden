@@ -1,13 +1,13 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:mergewarden/model/secrets.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:web/web.dart' as web;
 
 /// A Text Button that launches the stylized Merge Warden Discord Invitation Portal.
 class DiscordInviteButton extends StatelessWidget {
-  final String discordUrl = 'https://discord.gg/SmdYS6cY6';
 
   const DiscordInviteButton({super.key});
 
@@ -77,10 +77,10 @@ class DiscordInviteButton extends StatelessWidget {
                       const SizedBox(height: 20),
 
                       // Landmark Features
-                      _buildFeatureRow("📜", "The Warden's Code", "Decent, organized spaces managed by our Guards."),
-                      _buildFeatureRow("🗃️", "Crowdsourced Ledgers", "Contribute to every bit of information from prices to loots, directly to our database."),
-                      _buildFeatureRow("🔬", "Mutation Watcher Feeds", "Get real-time patch updates, new releases, and suggest changes direct from/to the engineering soil."),
-                      _buildFeatureRow("🔔", "Notifications", "Get real-time updates on game alerts not provided by MG, managed by gardeners."),
+                      _buildFeatureRow(Icons.rule,Colors.brown, "The Warden's Code", "Decent, organized spaces managed by Guards."),//"📜",
+                      _buildFeatureRow(Icons.info_outlined,Colors.blue, "Crowdsourced Ledgers", "Contribute to every bit of information from prices to loots, directly to our database."),//"🗃️",
+                      _buildFeatureRow(Icons.science_outlined, Colors.green, "Mutation Watcher Feeds", "Get real-time patch updates, new releases, and suggest changes direct from/to the engineering soil."),//"🔬",
+                      _buildFeatureRow(Icons.notifications_on_outlined,Colors.amber,"Notifications", "Get real-time updates on game alerts not provided by MG, managed by Warden caretaker."),//"🔔",
 
                       const SizedBox(height: 15),
 
@@ -118,13 +118,14 @@ class DiscordInviteButton extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureRow(String emoji, String title, String description) {
+  Widget _buildFeatureRow(IconData icon,Color color, String title, String description) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(emoji, style: TextStyle(fontSize: 20)),
+          Icon(icon,size: 20,color: color,),
+          // Text(emoji, style: TextStyle(fontSize: 20)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

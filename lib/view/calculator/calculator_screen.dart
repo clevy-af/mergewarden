@@ -6,8 +6,9 @@ import 'package:mergewarden/view/components/stat_card.dart';
 
 class CalculatorScreen extends StatelessWidget {
   const CalculatorScreen({
-    super.key,
+    super.key, this.data,
   });
+  final CalculateMe? data;
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +17,7 @@ class CalculatorScreen extends StatelessWidget {
 
         // Central Progress Card
         SliverToBoxAdapter(
-
-          child:  CentralStatsCard(),
+          child:  CentralStatsCard(data: data,),
         ),
         SliverPadding(
           padding: EdgeInsetsGeometry.symmetric(vertical: 5),

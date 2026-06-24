@@ -10,6 +10,7 @@ import 'package:mergewarden/view/bug_report.dart';
 import 'package:mergewarden/view/calculator/calculator_screen.dart';
 import 'package:mergewarden/view/components/goal_card.dart';
 import 'package:mergewarden/view/discord_invite.dart';
+import 'package:mergewarden/view/version_number_and_caching.dart';
 import 'package:mergewarden/view/ledger/animated_stack.dart';
 import 'package:mergewarden/view/whats_new.dart';
 import 'package:web/web.dart' as web;
@@ -26,22 +27,23 @@ class _DashboardState extends State<Dashboard> {
   late Destinations _selectedPage;
 
   late BuildContext scaffoldContext;
+  void onChangedDestination(int index){
+    HiveProvider.appBox.put('homepage',index);
+    var destinations = Destinations.values.elementAt(index);
+    setState(() {
+      _selectedPage=destinations;
+    });
+    HiveProvider.appBox.put('chain', null);
+
+    if(destinations==Destinations.goals&&HiveProvider.goals.keys.isNotEmpty) {
+      HiveProvider.appBox.put('goalIndex', HiveProvider.goals.keys.first);
+      // print('home');
+    }
+  }
 
   Widget  get navigationRail => NavigationLine(
       index: _selectedPage.index,
-      onChanged: (value) {
-        HiveProvider.appBox.put('homepage',value);
-    var destinations = Destinations.values.elementAt(value);
-        setState(() {
-    _selectedPage=destinations;
-  });
-        HiveProvider.appBox.put('chain', null);
-
-        if(destinations==Destinations.goals&&HiveProvider.goals.keys.isNotEmpty) {
-          HiveProvider.appBox.put('goalIndex', HiveProvider.goals.keys.first);
-          // print('home');
-        }
-      },
+      onChanged: onChangedDestination,
   );
 
   @override
@@ -50,18 +52,8 @@ class _DashboardState extends State<Dashboard> {
     super.initState();
     web.window.navigator.serviceWorker.addEventListener(
       'controllerchange', (web.Event event) {
-        HiveProvider.session.put('app_update', true);
-      }.toJS,
-    );
-  web.window.navigator.serviceWorker.addEventListener(
-      'install', (web.Event event) {
-       print('hi the');
-      }.toJS,
-    );
-  web.window.navigator.serviceWorker.addEventListener(
-      'fetch', (web.Event event) {
-       print('hi fethced');
-      }.toJS,
+      HiveProvider.appBox.put('app_update_required', true);
+    }.toJS,
     );
   }
 
@@ -98,12 +90,19 @@ class _DashboardState extends State<Dashboard> {
                 // width:MediaQuery.of(context).size.width*0.9 ,
                 padding:  EdgeInsets.symmetric(horizontal: context.isDesktop?MediaQuery.of(context).size.width*0.05:0),
 
-                child:[
-                  CalculatorScreen(),
-                  GoalScreenView(),
-                  MultiLayerStackContainer(),
-                  // LedgerPage(),
-                ][_selectedPage.index],
+                child:Column(
+                  children: [
+                    AssetCacheBanner(),
+                    Expanded(
+                      child: [
+                        CalculatorScreen(),
+                        GoalScreenView(),
+                        MultiLayerStackContainer(),
+                        // LedgerPage(),
+                      ][_selectedPage.index],
+                    ),
+                  ],
+                ),
               ),
             ),
         ],
@@ -142,8 +141,7 @@ class NavigationLine extends StatelessWidget {
               ),
               height: 60,width: 60,
             ),
-
-            Text('v1.2.5',style: TextStyle( fontSize: 12,color: cCreme),),
+            VersionNumber(),
 
             LinkButton(
               link: 'https://futureplaygames.zendesk.com/hc/en-us/categories/360002343379-Merge-Gardens',

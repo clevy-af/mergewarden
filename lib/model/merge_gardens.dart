@@ -1815,7 +1815,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Berry-Bushes'),
     title: 'Berry Bushes',
     subtitle: '',
-    masterpiece: 0,
+    masterpiece: 20,
     items: [
       MergeItem(
         id: ID('item:Sprouting-Berry-Bush'),
@@ -4068,8 +4068,8 @@ List<MergeChain> mergeChains=[
         format: TileFormat(1, 1),
       ),
       MergeItem(
-        id: ID('item:Lion-Statue'),
-        name: 'Lion Statue',
+        id: ID('item:Bat-Relic'),
+        name: 'Bat Relic',
         stage: 4,
         description: 'A bat statue entwined in thorns.',
         descriptors: [],
@@ -4081,7 +4081,7 @@ List<MergeChain> mergeChains=[
         gemPrice: null,
         helpfulTips: [],
         harvestRewards: [],
-        mergingRewards: [ID('item:Pegasus-Statue')],
+        mergingRewards: [ID('item:Butterfly-Statue')],
         spawnedItems: [],
         tapRewards: [],
         vanishOnTap: false,
@@ -4091,9 +4091,105 @@ List<MergeChain> mergeChains=[
         format: TileFormat(1, 1),
       ),
       MergeItem(
-        id: ID('item:Pegasus-Statue'),
-        name: 'Pegasus Statue',
+        id: ID('item:Butterfly-Statue'),
+        name: 'Butterfly Statue',
         stage: 5,
+        description: 'A butterfly statue sprouting rose buds in the vines.',
+        descriptors: [],
+        sourced: [],
+        daisyQuests: [],
+        richardTrade: false,
+        dailyChecklist: false,
+        sellValue: null,
+        gemPrice: null,
+        helpfulTips: [],
+        harvestRewards: [],
+        mergingRewards: [
+          ID('item:Squirrel-Giant')
+        ],
+        spawnedItems: [],
+        tapRewards: [],
+        vanishOnTap: false,
+        vanishOnHarvest: false,
+        vanishAfterSpawn: false,
+        notes: ['Merging produce boosters.'],
+        format: TileFormat(1, 1),
+      ),
+      MergeItem(
+        id: ID('item:Squirrel-Giant'),
+        name: 'Squirrel Giant',
+        stage: 6,
+        description: 'A butterfly statue sprouting rose buds in the vines.',
+        descriptors: [],
+        sourced: [],
+        daisyQuests: [],
+        richardTrade: false,
+        dailyChecklist: false,
+        sellValue: null,
+        gemPrice: null,
+        helpfulTips: [],
+        harvestRewards: [],
+        mergingRewards: [
+          ID('item:Bee-Guard')
+        ],
+        spawnedItems: [],
+        tapRewards: [],
+        vanishOnTap: false,
+        vanishOnHarvest: false,
+        vanishAfterSpawn: false,
+        notes: ['Merging produce boosters.'],
+        format: TileFormat(1, 1),
+      ),
+      MergeItem(
+        id: ID('item:Bee-Guard'),
+        name: 'Bee Guard',
+        stage: 7,
+        description: 'A butterfly statue sprouting rose buds in the vines.',
+        descriptors: [],
+        sourced: [],
+        daisyQuests: [],
+        richardTrade: false,
+        dailyChecklist: false,
+        sellValue: null,
+        gemPrice: null,
+        helpfulTips: [],
+        harvestRewards: [],
+        mergingRewards: [ID('item:Woodpecker-Ward')],
+        spawnedItems: [],
+        tapRewards: [],
+        vanishOnTap: false,
+        vanishOnHarvest: false,
+        vanishAfterSpawn: false,
+        notes: ['Merging produce boosters.'],
+        format: TileFormat(1, 1),
+      ),
+      MergeItem(
+        id: ID('item:Woodpecker-Ward'),
+        name: 'Woodpecker Ward',
+        stage: 8,
+        description: 'A butterfly statue sprouting rose buds in the vines.',
+        descriptors: [],
+        sourced: [],
+        daisyQuests: [],
+        richardTrade: false,
+        dailyChecklist: false,
+        sellValue: null,
+        gemPrice: null,
+        helpfulTips: [],
+        harvestRewards: [],
+        mergingRewards: [ID('item:Ladybug-Guardian')],
+        spawnedItems: [],
+        tapRewards: [],
+        vanishOnTap: false,
+        vanishOnHarvest: false,
+        vanishAfterSpawn: false,
+        notes: ['Merging produce boosters.'],
+        format: TileFormat(1, 1),
+      ),
+      MergeItem(
+        id: ID('item:Ladybug-Guardian'),
+        name: 'Ladybug Guardian',
+        stage: 9,
         description: 'A butterfly statue sprouting rose buds in the vines.',
         descriptors: [],
         sourced: [],
@@ -4110,17 +4206,17 @@ List<MergeChain> mergeChains=[
         vanishOnTap: false,
         vanishOnHarvest: false,
         vanishAfterSpawn: false,
-        notes: ['Merging Fountains can produce these and Wildlife Eggs.'],
+        notes: ['Merging produce boosters.'],
         format: TileFormat(1, 1),
       ),
     ],
-    notes: ['Garden Statues are obtained by merging Fountains.'],
+    notes: ['Obtained by playing maze.'],
   ),
   MergeChain(
     id: ID('chain:Gardening-Tools'),
     title: 'Gardening Tools',
     subtitle: '',
-    masterpiece: 0,
+    masterpiece: 18,
     items: [
       MergeItem(
         id: ID('item:Gardening-Glove'),
@@ -4591,7 +4687,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Grasses'),
     title: 'Grasses',
     subtitle: '',
-    masterpiece: 0,
+    masterpiece: 3,
     items: [
       MergeItem(
         id: ID('item:Mossy-Pebbles'),
@@ -4967,7 +5063,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Mole-Hills'),
     title: 'Mole Hills',
     subtitle: 'Merge to grow and foster a source of hidden treasures.',
-    masterpiece: 0,
+    masterpiece: 4,
     items: [
       MergeItem(
         id: ID('item:Compost'),
@@ -5360,7 +5456,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Mushrooms'),
     title: 'Mushrooms',
     subtitle: '',
-    masterpiece: 0,
+    masterpiece: 11,
     items: [
       MergeItem(
         id: ID('item:Button-Mushroom'),
@@ -5871,7 +5967,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Oak-Trees'),
     title: 'Oak Trees',
     subtitle: '',
-    masterpiece: 0,
+    masterpiece: 5,
     items: [
       MergeItem(
         id: ID('item:Acorn'),
@@ -6195,7 +6291,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Ornamental-Vases'),
     title: 'Ornamental Vases',
     subtitle: 'These refined masterpieces grow Fruit Trees nearby.',
-    masterpiece: 0,
+    masterpiece: 21,
     items: [
       MergeItem(
         id: ID('item:Earthenware-Vase'),
@@ -6462,7 +6558,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Ponds'),
     title: 'Ponds',
     subtitle: '',
-    masterpiece: 0,
+    masterpiece: 6,
     items: [
       MergeItem(
         id: ID('item:Puddle'),
@@ -6684,7 +6780,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Poplar-Trees'),
     title: 'Poplar Trees',
     subtitle: '',
-    masterpiece: 0,
+    masterpiece: 1,
     items: [
       MergeItem(
         id: ID('item:Poplar-Tree-Leaf'),
@@ -6758,7 +6854,7 @@ List<MergeChain> mergeChains=[
       MergeItem(
         id: ID('item:Young-Poplar'),
         name: 'Young Poplar',
-        stage: 2,
+        stage: 3,
         description: '',
         descriptors: [],
         sourced: [],
@@ -7155,8 +7251,8 @@ List<MergeChain> mergeChains=[
   MergeChain(
     id: ID('chain:Rocks'),
     title: 'Rocks',
-    subtitle: 'The humblr rock is packed full of history, merge to discover artefacts.',
-    masterpiece: 0,
+    subtitle: 'The humble rock is packed full of history, merge to discover artefacts.',
+    masterpiece: 14,
     items: [
       MergeItem(
         id: ID('item:Strange-Slab'),
@@ -7354,7 +7450,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Roman-Ruins'),
     title: 'Roman Ruins',
     subtitle: 'Illustrious archeological discoveries from bygone golden age.',
-    masterpiece: 0,
+    masterpiece: 15,
     items: [
       MergeItem(
         id: ID('item:Historic-Fragments'),
@@ -7996,7 +8092,7 @@ List<MergeChain> mergeChains=[
         gemPrice: null,
         helpfulTips: [],
         harvestRewards: [ID('item:Wood')],
-        mergingRewards: [ID('item:Lenghts-of-Timber')],
+        mergingRewards: [ID('item:Lengths-of-Timber')],
         spawnedItems: [],
         tapRewards: [ID('item:Wood')],
         vanishOnTap: false,
@@ -8006,8 +8102,8 @@ List<MergeChain> mergeChains=[
         format: TileFormat(1, 1),
       ),
       MergeItem(
-        id: ID('item:Lenghts-of-Timber'),
-        name: 'Lenghts of Timber',
+        id: ID('item:Lengths-of-Timber'),
+        name: 'Lengths of Timber',
         stage: 5,
         description: '',
         descriptors: [],
@@ -8189,7 +8285,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Topiaries'),
     title: 'Topiaries',
     subtitle: '',
-    masterpiece: 0,
+    masterpiece: 16,
     items: [
       MergeItem(
         id: ID('item:Duckling-Topiary'),
@@ -8617,7 +8713,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Tulips'),
     title: 'Tulips',
     subtitle: '',
-    masterpiece: 0,
+    masterpiece: 7,
     items: [
       MergeItem(
         id: ID('item:Tulip-Bulb'),
@@ -9123,7 +9219,7 @@ List<MergeChain> mergeChains=[
         vanishOnTap: false,
         vanishOnHarvest: false,
         vanishAfterSpawn: false,
-        notes: ['Selling vegetables usually gets more coins than merging or harvesting.', 'If you want chests, harvest them.'],
+        notes: ['Selling vegetables usually gets you more coins than merging or harvesting.', 'If you want chests, harvest them.'],
         format: TileFormat(1, 1),
       ),
     ],
@@ -9136,7 +9232,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Vines'),
     title: 'Vines',
     subtitle: '',
-    masterpiece: 0,
+    masterpiece: 9,
     items: [
       MergeItem(
         id: ID('item:Seedling-Vine'),
@@ -9460,7 +9556,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Wild-Flowers'),
     title: 'Wild Flowers',
     subtitle: 'Harvest for nectar by dragging wildlife onto them or double tapping.',
-    masterpiece: 0,
+    masterpiece: 2,
     items: [
       MergeItem(
         id: ID('item:Wild-Flower-Seed'),
@@ -9591,7 +9687,7 @@ List<MergeChain> mergeChains=[
         gemPrice: null,
         helpfulTips: [],
         harvestRewards: [ID('item:Nectar-Blue')],
-        mergingRewards: [ID('item:Hosta')],
+        mergingRewards: [ID('item:Poppy')],
         spawnedItems: [],
         tapRewards: [],
         vanishOnTap: false,
@@ -9601,8 +9697,8 @@ List<MergeChain> mergeChains=[
         format: TileFormat(1, 1),
       ),
       MergeItem(
-        id: ID('item:Hosta'),
-        name: 'Hosta',
+        id: ID('item:Poppy'),
+        name: 'Poppy',
         stage: 6,
         description: '',
         descriptors: [],
@@ -9611,10 +9707,10 @@ List<MergeChain> mergeChains=[
         richardTrade: false,
         dailyChecklist: false,
         sellValue: null,
-        gemPrice: 16,
+        gemPrice: 8,
         helpfulTips: [],
         harvestRewards: [ID('item:Nectar-Red')],
-        mergingRewards: [ID('item:Poppy')],
+        mergingRewards: [ID('item:Foxglove')],
         spawnedItems: [],
         tapRewards: [],
         vanishOnTap: false,
@@ -9623,9 +9719,10 @@ List<MergeChain> mergeChains=[
         notes: ['Produces Red Nectar.'],
         format: TileFormat(1, 1),
       ),
+
       MergeItem(
-        id: ID('item:Poppy'),
-        name: 'Poppy',
+        id: ID('item:Hosta'),
+        name: 'Hosta',
         stage: 7,
         description: '',
         descriptors: [],
@@ -9634,7 +9731,7 @@ List<MergeChain> mergeChains=[
         richardTrade: false,
         dailyChecklist: false,
         sellValue: null,
-        gemPrice: 8,
+        gemPrice: 16,
         helpfulTips: [],
         harvestRewards: [ID('item:Nectar-Red')],
         mergingRewards: [ID('item:Foxglove')],
@@ -10928,12 +11025,5 @@ void main() {
 
   print("Found: $hasString");
 }
-
-To help refine this further, let me know:
-
-* Do you need to frequently update or add items to these lists after creating them?
-* Are you searching for exact string matches, or do you need partial/case-insensitive matching?
-* Would you like an example of how to handle JSON parsing (fromJson) for this specific nested setup?
-
 
 */

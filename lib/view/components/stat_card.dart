@@ -13,8 +13,20 @@ import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/utils/strings.dart';
 import 'package:mergewarden/view/home.dart';
 
+
+class CalculateMe{
+  final String chain;
+  final String count;
+  final String stage;
+  final String potion;
+  CalculateMe({
+    required this.stage, required this.chain,
+    required this.count, required this.potion,
+  });
+}
 class CentralStatsCard extends StatefulWidget {
-  const CentralStatsCard({super.key, });
+  const CentralStatsCard({super.key, this.data, });
+  final CalculateMe? data;
 
   @override
   State<CentralStatsCard> createState() => _CentralStatsCardState();
@@ -27,6 +39,16 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
   TextEditingController stageController=TextEditingController();
   TextEditingController potionController=TextEditingController();
 
+  @override
+  void initState() {
+    if(widget.data!=null) {
+      chainController.text=widget.data!.chain;
+      countController.text=widget.data!.count;
+      stageController.text=widget.data!.stage;
+      potionController.text=widget.data!.potion;
+    }
+    super.initState();
+  }
 
   @override
   void dispose() {
