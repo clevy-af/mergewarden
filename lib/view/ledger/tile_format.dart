@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mergewarden/utils/colors.dart';
 
 class TileFormat {
   // horizontal, x-axis.
@@ -9,6 +10,7 @@ class TileFormat {
 
   @override
   String toString() => toJson().toString();
+  String toText() => '$rows x $columns';
 
   Map<String, dynamic> toJson() => {"rows": rows, "columns": columns,};
 
@@ -18,20 +20,33 @@ class TileFormat {
 
 }
 
-void _gridSizeBox(BuildContext context,TileFormat format) {
-  showAdaptiveDialog(context: context, builder:(context) =>  Dialog(
+void gridSizeBox(BuildContext context,TileFormat format) {
+  showAdaptiveDialog(context: context,
+      barrierDismissible: true,
+      builder:(context) {
+        int squares = format.rows*format.columns;
+        return Dialog(
     child: Container(
       width: 100,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F3F4),
+        color: cFillBackground,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.black12),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text("BOARD SIZE", style: TextStyle(fontSize: 9, color: Colors.black54, fontWeight: FontWeight.bold)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(width: 8,),
+
+              const Text("ITEM ON BOARD", style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold)),
+
+              CloseButton(),
+            ],
+          ),
           const SizedBox(height: 8),
           // 2x2 Mini Grid Visualizer
           SizedBox(
@@ -59,9 +74,10 @@ void _gridSizeBox(BuildContext context,TileFormat format) {
             ),
           ),
           const SizedBox(height: 6),
-          Text("${format.rows} × ${format.columns} ( ${format.rows*format.columns} Squares)", style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+          Text("${format.rows} × ${format.columns} ( $squares Square${squares==1?'':'s'} )", style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
         ],
       ),
     ) ,
-  ));
+  );
+      });
 }

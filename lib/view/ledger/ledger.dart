@@ -1,185 +1,71 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:mergewarden/model/knowledge_base.dart';
 import 'package:mergewarden/model/merge_gardens.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
-import 'package:mergewarden/view/home.dart';
+import 'package:mergewarden/utils/hive_provider.dart';
+import 'package:mergewarden/view/components/info_button.dart';
+import 'package:mergewarden/view/components/stat_card.dart';
+import 'package:mergewarden/view/ledger/stage_meta_view.dart';
 
-
-// --- MAIN PAGE ---
-
-class LedgerPage extends StatefulWidget {
-  const LedgerPage({super.key});
-
-  @override
-  State<LedgerPage> createState() => _LedgerPageState();
-}
-
-class _LedgerPageState extends State<LedgerPage> {
-  Map<String,dynamic>? _selectedChain;
-  Map<String,dynamic>? _selectedItem;
-  int _currentIndex=0;
-  int _previousIndex=0;
-
-  bool get isMovingForward  => _currentIndex >= _previousIndex;
-
+class _ExplainerContent extends StatelessWidget {
+  const _ExplainerContent();
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildBreadcrumbs(),
-          // Expanded(
-          //   child: AnimatedSwitcher(
-          //     duration: kThemeAnimationDuration * 4,
-          //     layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
-          //       // If moving backward, the old child (in previousChildren) needs to sit ON TOP of the new child
-          //       if (!isMovingForward) {
-          //         return Stack(
-          //           alignment: Alignment.center,
-          //           children: [
-          //             if (currentChild != null) currentChild, // New child underneath
-          //             ...previousChildren,                   // Old child on top
-          //           ],
-          //         );
-          //       }
-          //
-          //       // Default forward behavior: New child sits on top
-          //       return Stack(
-          //         alignment: Alignment.center,
-          //         children: [
-          //           ...previousChildren,                   // Old child underneath
-          //           if (currentChild != null) currentChild, // New child on top
-          //         ],
-          //       );
-          //     },
-          //     transitionBuilder: (child, animation) {
-          //       final ValueKey<int>? childKey = child.key as ValueKey<int>?;
-          //       final bool isIncoming = childKey?.value == _currentIndex;
-          //
-          //       Offset beginOffset;
-          //
-          //       if (isMovingForward) {
-          //         beginOffset = isIncoming ? const Offset(1.0, 0.0) : const Offset(0.0, 0.0);
-          //       } else {
-          //         beginOffset = isIncoming ? const Offset(0.0, 0.0) : const Offset(1.0, 0.0);
-          //       }
-          //
-          //       return SlideTransition(
-          //         position: Tween<Offset>(
-          //           begin: beginOffset,
-          //           end: Offset.zero,
-          //         ).animate(CurvedAnimation(
-          //           parent: animation,
-          //           curve: Curves.easeInOut,
-          //         )),
-          //         child: child,
-          //       );
-          //     },
-          //     child: _selectedItem != null ? ItemDetailView(
-          //       key: const PageStorageKey(2),
-          //       // Ensure view tracking keys match indices exactly
-          //       chainName: _selectedChain?['name'] ?? 'MG',
-          //       itemData: _selectedItem!,
-          //       onBack: () {
-          //         setState(() {
-          //           _currentIndex = 1;
-          //           _previousIndex = 2;
-          //           _selectedItem = null;
-          //         });
-          //       },
-          //     ) : _selectedChain != null ?
-          //     ChainDetailView(
-          //       key: const PageStorageKey(1),
-          //       // Ensure view tracking keys match indices exactly
-          //       onTapStage: (p0) {
-          //         setState(() {
-          //           _currentIndex = 2;
-          //           _previousIndex = 1;
-          //           _selectedItem = chainItems[_selectedChain?['id']]?[p0];
-          //         });
-          //       },
-          //       chainData: _selectedChain!,
-          //       onBack: () {
-          //         setState(() {
-          //           _currentIndex = 0;
-          //           _previousIndex = 1;
-          //           _selectedChain = null;
-          //         });
-          //       },
-          //     )
-          //         : LedgerGridView(
-          //       key: const PageStorageKey(0),
-          //           onTapCard:  (chain) {
-          //             _currentIndex=1;
-          //             _previousIndex=0;
-          //             setState(() => _selectedChain = chain);
-          //
-          //           },
-          //         ),
-          //   ),
-          //
-          // ),
+          _buildSectionHeader('1. Breadcrumb Navigation'),
+          _buildBulletPoint('Active Tab (default is Ledger): ', 'Indicates the current active section of the application. On clicking any card, your next active tab would be the chain. And likewise for stage item. Clicking any of these labels takes you back. Alternatively, you can click back button in subsequent screens to navigate.'),
+          const Divider(height: 24),
+          _buildSectionHeader('2. Filters'),
+          _buildBulletPoint('Preset Filters: ', 'Quick toggles like "All", "Saved", and "Masterpiece" for quick access.'),
+          _buildBulletPoint('Alphabetical Index: ', 'A-Z buttons to jump directly to specific chain names.'),
+
+          const Divider(height: 24),
+
+          _buildSectionHeader('3. Chain Cards'),
+          _buildBulletPoint('Visual Asset: ', 'A square showing the  first and last element for reference.'),
+          _buildBulletPoint('Chain Name: ', 'Bold text identifying the chain (e.g., Amber Wishing Stars).'),
+          _buildBulletPoint('Masterpiece Tag: ', 'Small sub-text for showing if the chain is a masterpiece,eg. #MASTERPIECE 12.'),
+          _buildBulletPoint('Save Button: ', 'A bookmark icon at the bottom-right to save the item for later use.'),
         ],
       ),
     );
   }
 
-  // 1. BREADCRUMBS
-  Widget _buildBreadcrumbs() {
+  Widget _buildSectionHeader(String text) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-      child: Row(
-        children: [
-
-          _breadcrumbItem("Ledger", isRoot: true, onTap:_selectedChain==null?null: () {
-            setState(() {
-              _selectedChain = null;
-              _selectedItem = null;
-              _currentIndex=0;
-              _previousIndex=1;
-            });
-          }),
-          if (_selectedChain != null) ...[
-            _breadcrumbSeparator(),
-            _breadcrumbItem(_selectedChain!['name'], onTap: _selectedItem==null?null:() => setState(() {
-              _selectedItem = null;
-              _currentIndex=1;
-              _previousIndex=2;
-            })),
-          ],
-          if (_selectedItem != null) ...[
-            _breadcrumbSeparator(),
-            _breadcrumbItem(_selectedItem!['name']),
-          ],
-          Spacer(),
-          TextLogo(),
-
-        ],
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
       ),
     );
   }
 
-  Widget _breadcrumbItem(String label, {bool isRoot = false, VoidCallback? onTap}) {
-    return TextButton(
-      onPressed: onTap,
-      child: Text(label,style: TextStyle(
-        color: onTap != null ? Colors.white :cCard,
-        fontWeight: onTap != null ? FontWeight.normal : FontWeight.bold,
-        fontSize: 13,
-      ),),
+  Widget _buildBulletPoint(String prefix, String body) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
+      child: RichText(
+        text: TextSpan(
+          style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.3),
+          children: [
+            const TextSpan(text: '• ', style: TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(text: prefix, style: const TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(text: body),
+          ],
+        ),
+      ),
     );
   }
-
-Widget _breadcrumbSeparator() => Text('‣',style: TextStyle(fontSize: 20),);
-
-
-
 }
 
+// --- MAIN PAGE ---
 class LedgerGridView extends StatefulWidget {
   const LedgerGridView({super.key, required this.onTapCard});
   final Function(MergeChain) onTapCard;
@@ -193,6 +79,34 @@ class _LedgerGridViewState extends State<LedgerGridView> {
 
   final List<String> _alphabet = ["All","Saved","Masterpiece"]+getAvailableAlphabets();
   List<MergeChain> filteredList=[];
+
+
+  void showExplainerDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text(
+            'How To Use Ledger',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF556B2F)),
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          contentPadding: const EdgeInsets.all(24),
+          children: [
+            const SizedBox(width: 500, child: _ExplainerContent()),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Got it', style: TextStyle(color: Color(0xFF556B2F))),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -221,7 +135,9 @@ class _LedgerGridViewState extends State<LedgerGridView> {
               onPressed: () {
                 _activeAlpha = char;
                 switch(_activeAlpha.toLowerCase()){
-                  case 'saved': filteredList=[];break;
+                  case 'saved':
+                    List<String> chainIds= HiveProvider.appBox.get('savedChains')??[];
+                    filteredList=mergeChains.where((element) => chainIds.contains(element.id.value ),).toList();break;
                   case 'all':filteredList=mergeChains; break;
                   case 'masterpiece': filteredList=mergeChains.where((element) => element.masterpiece!=null,).toList()..sort((a, b) => a.masterpiece!.compareTo(b.masterpiece!),);break;
                   default: filteredList=mergeChains.where((element) => element.title[0]==char,).toList();
@@ -256,64 +172,50 @@ class _LedgerGridViewState extends State<LedgerGridView> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
+          borderRadius: BorderRadius.circular(15),
+          border:  Border.all(color: cCreme.withAlpha(150))
+          // boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 2))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Card(
-              color: cCard,
-              clipBehavior: Clip.antiAlias, // Ensures clean edges
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: SizedBox(
-                height: 180, // Define your card height
-                width: double.infinity,
-                child: Stack(
-                  clipBehavior: Clip.antiAlias,
-                  children: [
-                    // Image 1: Bottom-Left Triangle (Rotated Clipper)
-                    Positioned.fill(
-                      child: RotatedBox(
-                        quarterTurns: 2, // Flips the clipper to the opposite corner
-                        child: ClipPath(
-                          clipper: GappedDiagonalClipper(gap: 4.0, isTopRight: false),
-                          child: RotatedBox(
-                            quarterTurns: 2, // Flips the image back right-side up
-                            child: Image.asset(
-                              'assets/''Stage_${lastItem.stage}_-_${lastItem.name.replaceAll(' ', '_')}.webp',
-                              fit: BoxFit.cover,
-                            ),
+            SizedBox(
+              // margin: EdgeInsets.only(top: 3),
+              height: 180, // Define your card height
+              width: double.infinity,
+              child: Stack(
+                clipBehavior: Clip.hardEdge,
+                children: [
+                  // Image 1: Bottom-Left Triangle (Rotated Clipper)
+                  Positioned.fill(
+                    child: RotatedBox(
+                      quarterTurns: 2, // Flips the clipper to the opposite corner
+                      child: ClipPath(
+                        clipper: GappedDiagonalClipper(gap: 3.0, isTopRight: false),
+                        child: RotatedBox(
+                          quarterTurns: 2, // Flips the image back right-side up
+                          child: StageItemImage(
+                            assetName: 'Stage_${lastItem.stage}_-_${lastItem.name.replaceAll(' ', '_')}',
                           ),
                         ),
                       ),
                     ),
+                  ),
 
-                    // Image 2: Top-Right Triangle
-                    Positioned.fill(
+                  // Image 2: Top-Right Triangle
+                  Positioned.fill(
                     child: ClipPath(
                       clipper: GappedDiagonalClipper(gap: 4.0, isTopRight: false),
-                      child: Image.asset(
-                        'assets/''Stage_${firstItem.stage}_-_${firstItem.name.replaceAll(' ', '_')}.webp',
-                        fit: BoxFit.cover,
-                        ),
+                      child: StageItemImage(
+                        assetName: 'Stage_${firstItem.stage}_-_${firstItem.name.replaceAll(' ', '_')}',
+                      ),
                     ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            // // Image Placeholder
-            // Expanded(
-            //   child: StageItemImage(
-            //       borderRadius:BorderRadius.only(
-            //           topLeft: Radius.circular(15),
-            //           topRight: Radius.circular(15)
-            //       ),
-            //       assetName: 'Stage_${lastItem?['stage']}_-_${lastItem?['name'].toString().replaceAll(' ', '_')}'),
-            // ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              padding: const EdgeInsets.fromLTRB(16, 5, 16, 5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -323,11 +225,41 @@ class _LedgerGridViewState extends State<LedgerGridView> {
                     maxLines: 1,
                   )
                   ),
-                  // const SizedBox(height: 4),
-                  // Text(chain.subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: Colors.black45)),
                   const SizedBox(height: 3),
-                  if (chain.masterpiece!=null)
-                    Text('#${'Masterpiece'.toUpperCase()} '"${chain.masterpiece}", style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF2D6A4F))),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (chain.masterpiece!=null)
+                        Text('#${'Masterpiece'.toUpperCase()} '"${chain.masterpiece}",
+                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF2D6A4F))
+                        )
+                        else SizedBox(),
+                      ValueListenableBuilder(
+                        valueListenable: HiveProvider.appBox.listenable(keys: ['savedChains']),
+                        builder: (context, value, child) {
+                                List<String> chainIds= value.toMap()['savedChains']??[];
+                                bool isSaved= chainIds.contains(chain.id.value);
+                          return IconButton.outlined(
+                            style: IconButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                                  side: BorderSide(color: cCreme),
+                              visualDensity: VisualDensity(vertical: -3)
+                            ),
+                              onPressed: () async {
+                                if(isSaved) {
+                                  chainIds.remove(chain.id.value);
+                                } else {
+                                  chainIds.add(chain.id.value);
+
+                                }
+                                await HiveProvider.appBox.put('savedChains', chainIds);
+                              },
+                              icon:Icon(isSaved?Icons.bookmark_added_rounded:Icons.bookmark_border,color: isSaved?cCard:kTextDark,),
+                          );
+                        }
+                      )
+                      ],
+                    ),
                 ],
               ),
             )
@@ -336,6 +268,7 @@ class _LedgerGridViewState extends State<LedgerGridView> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -348,14 +281,24 @@ class _LedgerGridViewState extends State<LedgerGridView> {
           )),
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all( 8),
-            child: Text("Discover and interact with any chain from your garden.",
-              style: TextStyle(fontSize: context.screenSize.width*0.02,
-                color: Colors.black,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(width: 5,),
+              Padding(
+                padding: const EdgeInsets.all( 8),
+                child: Text("Discover and interact with any chain from your garden.",
+                  style: TextStyle(fontSize: context.screenSize.width*0.02,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
+              Padding(
+                padding: const EdgeInsets.only(top:8,right: 8.0),
+                child: InfoButton(onPressed: () => showExplainerDialog(context)),
+              )
+            ],
           ),
           _buildFilterStrip(),
           Expanded(
@@ -365,9 +308,10 @@ class _LedgerGridViewState extends State<LedgerGridView> {
                 shrinkWrap: true,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: MediaQuery.of(context).size.width > 900 ? 4 : MediaQuery.of(context).size.width > 600 ? 2 : 1,
-                  mainAxisSpacing: 20,
-                  crossAxisSpacing: 20,
-                  childAspectRatio: 0.85,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  mainAxisExtent: MediaQuery.of(context).size.width < 900?MediaQuery.of(context).size.height/2.2:null,
+                  childAspectRatio:4/4.5,//(context.screenSize.width/5)/(context.screenSize.height/2),// 0.83,
                 ),
                 itemCount: filteredList.length,
                 itemBuilder:  (context, index) => _buildChainCard(filteredList[index]),

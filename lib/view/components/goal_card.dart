@@ -11,6 +11,7 @@ import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/constants.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
+import 'package:mergewarden/view/components/info_button.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
 import 'package:mergewarden/view/confetti.dart';
 import 'package:mergewarden/view/home.dart';
@@ -112,7 +113,7 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        buildTooltip(),
+                        InfoButton(onPressed:  showExplainerDialog),
 
                       ],
                     ),
@@ -159,7 +160,7 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                         children: [
                           _buildBadge("CURRENT GOAL"),
                           Spacer(),
-                          buildTooltip(),
+                          InfoButton(onPressed:  showExplainerDialog),
                         ],
                       ),
                       Builder(
@@ -172,7 +173,7 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                           }
                       ),
                       const SizedBox(height: 10),
-                      Text("${targetItem?.count} Stage ${targetItem?.stage} Items", style: TextStyle(fontSize:context.isDesktop?30:20,color: Colors.white70)),
+                      Text("${targetItem?.count} Stage ${targetItem?.stage} Item${targetItem?.count==1?'':'s'}", style: TextStyle(fontSize:context.isDesktop?30:20,color: Colors.white70)),
                       const SizedBox(height: 10),
                       if(targetItem?.chainId!=null)
                       Text(targetItem?.isWildlife==true?'Of Wildlife':"Of ${chains.firstWhere((element) => element['id']==targetItem?.chainId,)['name']} Chain", style:const TextStyle(color: Colors.white, fontSize: 10)),
@@ -188,7 +189,7 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 25),
-                        child: Text("Progress: ${widget.goalData?.progress.clamp(0, 100).toStringAsFixed(2)} %", style: const TextStyle(fontSize: 18, color: Colors.white,)),
+                        child: Text("Progress: ${widget.goalData?.progress.clamp(0, 100).toStringAsFixed(widget.goalData?.progress==0?0:2)} %", style: const TextStyle(fontSize: 18, color: Colors.white,)),
                       ),
                       // const SizedBox(height: 30),
                       Wrap(
@@ -251,20 +252,6 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
           ),
       ],
     );
-  }
-
-  Tooltip buildTooltip() {
-    return Tooltip(
-                                message: 'How to Use',
-                                // message: 'Enter Chain name to select and get stage details easily, add count for target items.\n The required items will be calculated and broken down per stage, visible below.',
-                                preferBelow: true,
-                                triggerMode: TooltipTriggerMode.tap,
-                                child: IconButton(
-                                  onPressed: showExplainerDialog,
-                                  icon: Icon(Icons.question_mark_outlined,color: Colors.white,),
-                                  // tooltip: 'Info',
-                                ),
-                              );
   }
 
   Widget _buildBadge(String text) {

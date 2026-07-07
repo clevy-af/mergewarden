@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mergewarden/model/merge_gardens.dart';
-import 'package:mergewarden/utils/colors.dart';
+import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/view/home.dart';
 import 'package:mergewarden/view/ledger/chain_meta_view.dart';
 import 'package:mergewarden/view/ledger/ledger.dart';
 import 'package:mergewarden/view/ledger/stage_meta_view.dart';
 
 
-class MultiLayerStackContainer extends StatefulWidget {
-  const MultiLayerStackContainer({super.key});
+class SandwichStack extends StatefulWidget {
+  const SandwichStack({super.key});
 
   @override
-  State<MultiLayerStackContainer> createState() => _MultiLayerStackContainerState();
+  State<SandwichStack> createState() => _SandwichStackState();
 }
 
-class _MultiLayerStackContainerState extends State<MultiLayerStackContainer> with TickerProviderStateMixin {
+class _SandwichStackState extends State<SandwichStack> with TickerProviderStateMixin {
   // Animation Controllers for Slide Transition Layers
   late AnimationController _controllerB;
   late AnimationController _controllerC;
@@ -161,17 +161,14 @@ class _MultiLayerStackContainerState extends State<MultiLayerStackContainer> wit
                   );
                 },
 
-                child: _selectedItem==null?SizedBox():ItemDetailView(
+                child: _selectedItem==null?SizedBox():StageMetaView(
                     itemData: _selectedItem!,
                   onBack: _popToB,
-                    chainName: _selectedChain?.title ?? 'MG',
+                  onNextItem: _selectedItem!.stage<_selectedChain!.items.length?(p0) => _navigateToC(_selectedChain!.items[p0]):null,
+
+                  chainName: _selectedChain?.title ?? 'MG',
                 ),
 
-                // child: ScreenC(
-                //   project: _selectedProject,
-                //   categoryName: _selectedChain?['title'] ?? 'Category',
-                //   onBack: _popToB,
-                // ),
               ),
             ],
           ),
@@ -184,54 +181,46 @@ class _MultiLayerStackContainerState extends State<MultiLayerStackContainer> wit
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       // color: const Color(0xFF0F111A),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Dynamic Breadcrumb List Builder
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  // Root home indicator
-                  _BreadcrumbItem(
-                    label: "Ledger",
-                    isActive: _currentDepth == 0,
-                    onTap: _currentDepth==0?null:_popToA,
+          Row(
+            children: [
+              // Dynamic Breadcrumb List Builder
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      // Root home indicator
+                      _BreadcrumbItem(
+                        label: "Ledger",
+                        isActive: _currentDepth == 0,
+                        onTap: _currentDepth==0?null:_popToA,
+                      ),
+                      if (_currentDepth >= 1) ...[
+                        const Icon(Icons.chevron_right, size: 16, color: Color(0xFF4A4E69)),
+                        _BreadcrumbItem(
+                          label: _selectedChain?.title ?? '',
+                          isActive: _currentDepth == 1,
+                          onTap: _popToB,
+                        ),
+                      ],
+                      if (_currentDepth >= 2) ...[
+                        const Icon(Icons.chevron_right, size: 16, color: Color(0xFF4A4E69)),
+                        _BreadcrumbItem(
+                          label: _selectedItem?.name ?? '',
+                          isActive: _currentDepth == 2,
+                        ),
+                      ],
+                    ],
                   ),
-                  if (_currentDepth >= 1) ...[
-                    const Icon(Icons.chevron_right, size: 16, color: Color(0xFF4A4E69)),
-                    _BreadcrumbItem(
-                      label: _selectedChain?.title ?? '',
-                      isActive: _currentDepth == 1,
-                      onTap: _popToB,
-                    ),
-                  ],
-                  if (_currentDepth >= 2) ...[
-                    const Icon(Icons.chevron_right, size: 16, color: Color(0xFF4A4E69)),
-                    _BreadcrumbItem(
-                      label: _selectedItem?.name ?? '',
-                      isActive: _currentDepth == 2,
-                    ),
-                  ],
-                ],
+                ),
               ),
-            ),
+              if(context.screenSize.width>600)
+              TextLogo(),
+            ],
           ),
-          TextLogo(),
-          // Action Control Badge
-          // if (_currentDepth > 0)
-          //   ElevatedButton.icon(
-          //     onPressed: _currentDepth == 2 ? _popToB : _popToA,
-          //     icon: const Icon(Icons.arrow_back_rounded, size: 14),
-          //     label: const Text('Back', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-          //     style: ElevatedButton.styleFrom(
-          //       backgroundColor: const Color(0xFF1E2235),
-          //       foregroundColor: Colors.white,
-          //       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          //       elevation: 0,
-          //     ),
-          //   ),
         ],
       ),
     );
@@ -251,22 +240,21 @@ class _BreadcrumbItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var isCurrent = isActive ||onTap==null;
     return TextButton(
       onPressed: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color:  Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isActive ? cCard :onTap==null?Colors.black: Colors.white,
-            fontWeight: isActive ||onTap==null? FontWeight.bold : FontWeight.normal,
-            fontSize: 14,
-          ),
+      style: TextButton.styleFrom(
+         // visualDensity: VisualDensity(horizontal: -3),
+        padding: EdgeInsets.symmetric(horizontal: 5),
+        side: isCurrent?BorderSide(color: Colors.black):null,
+        shape: isCurrent? LinearBorder.bottom():null
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: isCurrent?Colors.black: Colors.white,
+          fontWeight: isCurrent? FontWeight.bold : FontWeight.normal,
+          fontSize: 14,
         ),
       ),
     );

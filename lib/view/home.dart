@@ -1,4 +1,3 @@
-import 'dart:js_interop';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -6,6 +5,7 @@ import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/utils/strings.dart';
+import 'package:mergewarden/view/active_issues.dart';
 import 'package:mergewarden/view/bug_report.dart';
 import 'package:mergewarden/view/calculator/calculator_screen.dart';
 import 'package:mergewarden/view/components/goal_card.dart';
@@ -50,11 +50,6 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     _selectedPage = Destinations.values.elementAt(HiveProvider.appBox.get('homepage')??0);
     super.initState();
-    web.window.navigator.serviceWorker.addEventListener(
-      'controllerchange', (web.Event event) {
-      HiveProvider.appBox.put('app_update_required', true);
-    }.toJS,
-    );
   }
 
   @override
@@ -75,6 +70,13 @@ class _DashboardState extends State<Dashboard> {
           } , icon:Icon( Icons.menu));
         }
       ),
+      actions: [
+        Builder(
+          builder: (context) {
+            return ActiveIssueButton(scaffoldContext: context,);
+          }
+        )
+      ],
       title: TextLogo(),
 
       ),
@@ -92,12 +94,22 @@ class _DashboardState extends State<Dashboard> {
 
                 child:Column(
                   children: [
-                    AssetCacheBanner(),
+                    Row(
+                      children: [
+                        Expanded(child: AssetCacheBanner()),
+                        if(context.isDesktop)  Builder(
+                          builder: (context) {
+                            return ActiveIssueButton(scaffoldContext: context,);
+                          }
+                        ),
+
+                      ],
+                    ),
                     Expanded(
                       child: [
                         CalculatorScreen(),
                         GoalScreenView(),
-                        MultiLayerStackContainer(),
+                        SandwichStack(),
                         // LedgerPage(),
                       ][_selectedPage.index],
                     ),
@@ -107,8 +119,41 @@ class _DashboardState extends State<Dashboard> {
             ),
         ],
       ),
+      endDrawer: Drawer(
+
+          child: ActiveIssuesDrawer()
+      ),
     );
   }
+}
+
+class ActiveIssueButton extends StatelessWidget {
+  const ActiveIssueButton({
+    super.key, required this.scaffoldContext,
+  });
+  final BuildContext scaffoldContext;
+
+  @override
+  Widget build(BuildContext context) {
+    if(activeIssues.isNotEmpty) {
+      return IconButton(
+            tooltip: 'MG Active Issues',
+              onPressed: () {
+            Scaffold.of(scaffoldContext).openEndDrawer();
+          } , icon:Row(
+            children: [
+              Icon( Icons.running_with_errors,color: cRed,),
+              Container(
+                  decoration:BoxDecoration(color: cRed,borderRadius: BorderRadius.circular(15)),
+                  padding:EdgeInsets.symmetric(horizontal: 3),
+                child: Text(activeIssues.length.toString(),style: TextStyle(color: Colors.white),),
+              )
+            ],
+          ));
+    }
+    return SizedBox();
+        }
+
 }
 
 
@@ -204,7 +249,9 @@ class NavigationLine extends StatelessWidget {
             valueListenable: HiveProvider.session.listenable(keys: ['app_update']),
             builder: (context,data,_) {
               return TextButton(
-                  onPressed: () => showAdaptiveDialog(context: context, builder: (context) => Center(child: ChangelogPage()),),
+                  onPressed: () => showAdaptiveDialog(context: context,
+                    barrierDismissible: true,
+                    builder: (context) => Center(child: ChangelogPage()),),
                   child: Stack(
                     alignment: AlignmentGeometry.topRight,
                     children: [

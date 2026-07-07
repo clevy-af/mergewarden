@@ -6,6 +6,8 @@ const Color cCard= Color(0xFF5E7356);
 const Color cBrown= Color(0xff4B3621);
 const Color cCreme= Color(0xffCCC7A3);
 const Color cRed= Color(0xFFB35A44);
+const Color cCacheRed= Color(0xFFD32F2F);
+const Color cDiscord= Color(0xff5865F2);
 final Color cLightBackground= Colors.white.withValues(alpha: 0.98);
 
 const TextStyle hintStyle=TextStyle(fontStyle: FontStyle.italic, color: Colors.blueGrey);

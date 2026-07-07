@@ -1,3 +1,4 @@
+import 'dart:js_interop';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -11,7 +12,9 @@ import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/utils/strings.dart';
+import 'package:mergewarden/view/components/info_button.dart';
 import 'package:mergewarden/view/home.dart';
+import 'package:web/web.dart' as web;
 
 
 class CalculateMe{
@@ -139,16 +142,9 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                               style:  TextStyle(fontSize:context.isDesktop?30:20,
                                   fontWeight: FontWeight.bold),),
                         ),
-                        Tooltip(
-                          message: 'How to Use',
-                          // message: 'Enter Chain name to select and get stage details easily, add count for target items.\n The required items will be calculated and broken down per stage, visible below.',
-                          preferBelow: true,
-                          triggerMode: TooltipTriggerMode.tap,
-                          child: IconButton(
-                              onPressed: showExplainerDialog,
-                              icon: Icon(Icons.question_mark_outlined,color: cCard,),
-                            // tooltip: 'Info',
-                          ),
+
+                        InfoButton(
+                              onPressed:showExplainerDialog,
                         ),
                       ],
                     );
@@ -710,23 +706,60 @@ class StageItemImage extends StatelessWidget {
   final String assetName;
 
   ImageProvider get imageProvider =>AssetImage(assetName);
+  Future<bool> isAssetCached(String assetPath) async {
+    try {
+      String currentVersion = HiveProvider.appBox.get('current_version') ?? '1';
+      final String currentCacheName = 'flutter-assets-cache-v$currentVersion';
+
+      final caches = web.window.caches;
+      final cacheJSObject = await caches.open(currentCacheName).toDart;
+
+      // Format path to match how you saved it (e.g., 'assets/assets/images/pic.webp')
+      final String correctedWebPath = 'assets/$assetPath';
+
+      // cache.match returns a Response object if found, or undefined if not found
+      final response = await cacheJSObject.match(correctedWebPath.toJS).toDart;
+      return (response != null);
+
+    } catch (e) {
+      // Fallback if cache reading fails or if not running on Web
+      return false;
+    }
+  }
+  bool isImageInMemory(String assetPath) {
+    // 1. Recreate the precise asset bundle provider key Flutter uses
+    final ImageProvider provider = AssetImage(assetPath);
+
+    // 2. Look up Flutter's global ImageCache
+    final ImageCacheStatus status = PaintingBinding.instance.imageCache.statusForKey(provider);
+
+    // 3. If 'untracked', it has never been requested.
+    // If 'pending', it's downloading.
+    // If 'keepAlive' or 'live', it is fully loaded in memory!
+    return (status.keepAlive || status.live||status.tracked);
+  }
 
   @override
   Widget build(BuildContext context) {
+    String assetPath = 'assets/$assetName.webp';
+    // bool isImageAllowed=HiveProvider.appBox.get('preload_assets')==true ||web.window.navigator.onLine;
     return Card(
       color: cCard,
-      child: Container(
-        margin: EdgeInsets.all(8),
-        height: heightValue,
-        width:heightValue,
-        decoration: BoxDecoration(
-          borderRadius: borderRadius??BorderRadius.circular(15),
-          image: DecorationImage(
-              image: AssetImage('assets/$assetName.webp'),
-              fit: BoxFit.contain
-          ),
-        ),
-      ),
+      child:  Container(
+            margin: EdgeInsets.all(8),
+            height: heightValue,
+            width:heightValue,
+            decoration: BoxDecoration(
+              borderRadius: borderRadius??BorderRadius.circular(15),
+              image: //isImageAllowed?
+              DecorationImage(
+                  image: AssetImage(assetPath),
+                  fit: BoxFit.contain
+              )
+                  // :null,
+            ),
+            // child: isImageAllowed?null: Icon(Icons.local_florist_sharp,size: heightValue!=null?heightValue!/2:null,),
+          )
     );
   }
 }
@@ -754,8 +787,11 @@ class LevelCard extends StatelessWidget {
       }
     }
     var showStage = !(title.contains('Stage')||title.contains('Eggs'));
+    // Locale browserLocale = WidgetsBinding.instance.platformDispatcher.locale;
+    Locale currentLocale = Localizations.localeOf(context);
+    // print(currentLocale);
     var stageStyle= TextStyle(fontWeight: FontWeight.bold,color: Colors.black);
-    final formatter = NumberFormat.decimalPattern();
+    final formatter = NumberFormat.compact(locale:currentLocale.toString());
     final formattedNumber = formatter.format(count);
     return Semantics(
       label: 'Merge Gardens Calculation Stage $level Item',

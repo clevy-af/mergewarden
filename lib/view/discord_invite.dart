@@ -5,6 +5,7 @@ import 'package:mergewarden/model/secrets.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:web/web.dart' as web;
+void openDiscordLink() async => web.window.open(discordUrl);
 
 /// A Text Button that launches the stylized Merge Warden Discord Invitation Portal.
 class DiscordInviteButton extends StatelessWidget {
@@ -94,9 +95,9 @@ class DiscordInviteButton extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           ElevatedButton.icon(
-                            onPressed: () async => web.window.open(discordUrl),
+                            onPressed: openDiscordLink,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xff5865F2),
+                              backgroundColor:cDiscord,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -117,6 +118,7 @@ class DiscordInviteButton extends StatelessWidget {
       },
     );
   }
+
 
   Widget _buildFeatureRow(IconData icon,Color color, String title, String description) {
     return Padding(
