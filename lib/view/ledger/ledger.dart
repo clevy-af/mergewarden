@@ -307,11 +307,11 @@ class _LedgerGridViewState extends State<LedgerGridView> {
               child: GridView.builder(
                 shrinkWrap: true,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: MediaQuery.of(context).size.width > 900 ? 4 : MediaQuery.of(context).size.width > 600 ? 2 : 1,
+                  crossAxisCount: MediaQuery.of(context).size.width > 900 ? 5 : MediaQuery.of(context).size.width > 600 ? 3 : 2,
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
                   mainAxisExtent: MediaQuery.of(context).size.width < 900?MediaQuery.of(context).size.height/2.2:null,
-                  childAspectRatio:4/4.5,//(context.screenSize.width/5)/(context.screenSize.height/2),// 0.83,
+                  childAspectRatio:0.8,//(context.screenSize.width/5)/(context.screenSize.height/2),// 0.83,
                 ),
                 itemCount: filteredList.length,
                 itemBuilder:  (context, index) => _buildChainCard(filteredList[index]),

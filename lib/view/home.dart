@@ -10,12 +10,13 @@ import 'package:mergewarden/view/bug_report.dart';
 import 'package:mergewarden/view/calculator/calculator_screen.dart';
 import 'package:mergewarden/view/components/goal_card.dart';
 import 'package:mergewarden/view/discord_invite.dart';
+import 'package:mergewarden/view/ledger/discovery_page.dart';
 import 'package:mergewarden/view/version_number_and_caching.dart';
 import 'package:mergewarden/view/ledger/animated_stack.dart';
 import 'package:mergewarden/view/whats_new.dart';
 import 'package:web/web.dart' as web;
 
-enum Destinations{calculator,goals,ledger}
+enum Destinations{calculator,goals,ledger,discovery}
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
 
@@ -27,15 +28,16 @@ class _DashboardState extends State<Dashboard> {
   late Destinations _selectedPage;
 
   late BuildContext scaffoldContext;
+
   void onChangedDestination(int index){
     HiveProvider.appBox.put('homepage',index);
-    var destinations = Destinations.values.elementAt(index);
+    var destination = Destinations.values.elementAt(index);
     setState(() {
-      _selectedPage=destinations;
+      _selectedPage=destination;
     });
     HiveProvider.appBox.put('chain', null);
 
-    if(destinations==Destinations.goals&&HiveProvider.goals.keys.isNotEmpty) {
+    if(destination==Destinations.goals&&HiveProvider.goals.keys.isNotEmpty) {
       HiveProvider.appBox.put('goalIndex', HiveProvider.goals.keys.first);
       // print('home');
     }
@@ -61,7 +63,7 @@ class _DashboardState extends State<Dashboard> {
         width: max(MediaQuery.of(context).size.width/3,200),
           child: navigationRail,
       ),
-      appBar: context.isDesktop?null: AppBar(
+      appBar: context.isDesktop||HiveProvider.session.get('isExporting')==true?null: AppBar(
         backgroundColor: cCard,
         leading: Builder(
         builder: (context) {
@@ -87,34 +89,43 @@ class _DashboardState extends State<Dashboard> {
           if(context.isDesktop) navigationRail,
 
             Expanded(
-              child: Container(
-                height: MediaQuery.of(context).size.height,
-                // width:MediaQuery.of(context).size.width*0.9 ,
-                padding:  EdgeInsets.symmetric(horizontal: context.isDesktop?MediaQuery.of(context).size.width*0.05:0),
+              child: Stack(
+                children: [
+                  Container(
+                    height: MediaQuery.of(context).size.height,
+                    // width:MediaQuery.of(context).size.width*0.9 ,
+                    padding:  EdgeInsets.symmetric(horizontal: context.isDesktop?MediaQuery.of(context).size.width*0.05:0),
 
-                child:Column(
-                  children: [
-                    Row(
+                    child:Column(
                       children: [
-                        Expanded(child: AssetCacheBanner()),
-                        if(context.isDesktop)  Builder(
-                          builder: (context) {
-                            return ActiveIssueButton(scaffoldContext: context,);
-                          }
+                        Row(
+                          children: [
+                            Expanded(child: AssetCacheBanner()),
+                          ],
                         ),
-
+                        Expanded(
+                          child: [
+                            CalculatorScreen(),
+                            GoalScreenView(),
+                            SandwichStack(),
+                            ChroniclesPage(),
+                            // LedgerPage(),
+                          ][_selectedPage.index],
+                        ),
                       ],
                     ),
-                    Expanded(
-                      child: [
-                        CalculatorScreen(),
-                        GoalScreenView(),
-                        SandwichStack(),
-                        // LedgerPage(),
-                      ][_selectedPage.index],
+                  ),
+                  if(context.isDesktop)  Positioned(
+                    top:0,
+                    right: 0,
+                    child: Builder(
+                        builder: (context) {
+                          return ActiveIssueButton(scaffoldContext: context,);
+                        }
                     ),
-                  ],
-                ),
+                  ),
+
+                ],
               ),
             ),
         ],
@@ -187,23 +198,23 @@ class NavigationLine extends StatelessWidget {
               height: 60,width: 60,
             ),
             VersionNumber(),
-
-            LinkButton(
-              link: 'https://futureplaygames.zendesk.com/hc/en-us/categories/360002343379-Merge-Gardens',
-              text: 'Futureplay',
-            ),
-            LinkButton(
-              link: 'https://mergegardens.com/',
-              text: 'Website',
-            ),
-            LinkButton(
-              link: 'https://merge-gardens.fandom.com/wiki/Merge_Gardens_Wiki',
-              text: 'Wiki',
-            ),
-            LinkButton(
-              link: 'https://store.mergegardens.com/en/',
-              text: 'Web Store',
-            ),
+            //
+            // LinkButton(
+            //   link: 'https://futureplaygames.zendesk.com/hc/en-us/categories/360002343379-Merge-Gardens',
+            //   text: 'Futureplay',
+            // ),
+            // LinkButton(
+            //   link: 'https://mergegardens.com/',
+            //   text: 'Website',
+            // ),
+            // LinkButton(
+            //   link: 'https://merge-gardens.fandom.com/wiki/Merge_Gardens_Wiki',
+            //   text: 'Wiki',
+            // ),
+            // LinkButton(
+            //   link: 'https://store.mergegardens.com/en/',
+            //   text: 'Web Store',
+            // ),
             Container(
               padding: const EdgeInsets.all(8.0),
               width: 88,
@@ -220,12 +231,16 @@ class NavigationLine extends StatelessWidget {
           label: Text('Calculator',style: TextStyle(color: Colors.white),),
         ),
         NavigationRailDestination(
-          icon: Icon(Icons.checklist_outlined),
+          icon: Icon(Icons.format_list_numbered),
           label: Text('Goals',style: TextStyle(color: Colors.white),),
         ),
         NavigationRailDestination(
           icon: Icon(Icons.book),
           label: Text('Ledger',style: TextStyle(color: Colors.white),),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.yard_outlined),
+          label: Text('Chronicles',style: TextStyle(color: Colors.white),),
         ),
 
       ],
@@ -348,26 +363,23 @@ class TextLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isDesktop=MediaQuery.of(context).size.width>500;
-    return Row(
-      children: [
-        Text.rich(TextSpan(
-          text: 'Merge Warden\n',
-          children:[
-            TextSpan(
-              text: 'for Merge Gardens.',
-              style: TextStyle(
-                  fontWeight: FontWeight.normal,fontSize: MediaQuery.of(context).size.width*(isDesktop?0.01:0.02),
+    return  Text.rich(TextSpan(
+      text: 'Merge Warden,\t',
+      style: TextStyle(fontFamily: 'Waterfall',fontSize: 40),
+      children:[
+        TextSpan(
+          text: 'for Merge Gardens.',
+          style: TextStyle(
+            fontWeight: FontWeight.normal,fontSize: MediaQuery.of(context).size.width*(0.016),
 
-              ),
-            ),
-          ],
-        ),
-          style: TextStyle(fontSize: MediaQuery.of(context).size.width*(isDesktop?0.02:0.04),fontWeight: FontWeight.bold),
-          maxLines: 3,
-          textAlign: TextAlign.right,
-          softWrap: true,
+          ),
         ),
       ],
+    ),
+      style: TextStyle(fontSize: MediaQuery.of(context).size.width*(isDesktop?0.02:0.04),fontWeight: FontWeight.bold),
+      maxLines: 3,
+      textAlign: TextAlign.right,
+      softWrap: true,
     );
   }
 }

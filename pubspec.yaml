@@ -2,7 +2,7 @@ name: mergewarden
 description: "A MergeGardens Assistant Portal."
 publish_to: 'none'
 
-version: 1.7.0 #1.6.5
+version: 1.8.0 #1.6.5
 
 environment:
   sdk: ^3.8.1
@@ -37,3 +37,11 @@ flutter:
   assets:
    - assets/
    - assets/wildlife/
+
+  fonts:
+    - family: Waterfall
+      fonts:
+        - asset: assets/fonts/Waterfall-Regular.ttf
+    - family: Audiowide
+      fonts:
+        - asset: assets/fonts/Audiowide-Regular.ttf

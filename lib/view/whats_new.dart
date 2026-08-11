@@ -55,6 +55,8 @@ class ChangelogPage extends StatelessWidget {
       ),
     );
   }
+
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -70,11 +72,19 @@ class ChangelogPage extends StatelessWidget {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-
-                  _buildComingSoon(brief: 'Interactive Quest list!',icon: Icons.timer, title: 'What\'s Brewing?'),
-                  const SizedBox(height: 20),
+                  //
+                  // _buildComingSoon(brief: 'Interactive Quest list!',icon: Icons.timer, title: 'What\'s Brewing?'),
+                  // const SizedBox(height: 20),
                   const Text("Ledger of the Keeper", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
                   const SizedBox(height: 20),
+                  _buildLogEntry(
+                    date: "Aug 2026",
+                    version: "v1.8.0",
+                    title: "Warden Chronicles",
+                    description: "You can view all masterpieces and track your progress. Added garden vibes for aesthetics. Also fixed caching banner not clearing.",
+                    icon: Icons.yard_outlined,
+                    color: Colors.lightGreen,
+                  ),
                   _buildLogEntry(
                     date: "Jul 2026",
                     version: "v1.7.0",

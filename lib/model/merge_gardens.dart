@@ -2321,7 +2321,6 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Coins'),
     title: 'Coins',
     subtitle: '',
-    masterpiece: 9,
     items: [
       MergeItem(
         id: ID('item:Gold-Coin'),
@@ -3100,7 +3099,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Fruit-Trees'),
     title: 'Fruit Trees',
     subtitle: '',
-    masterpiece: null,
+    masterpiece: 8,
     items: [
       MergeItem(
         id: ID('item:Fruit-Tree-Seed'),
@@ -3565,7 +3564,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Garden-Gnomes'),
     title: 'Garden Gnomes',
     subtitle: '',
-    masterpiece: null,
+    masterpiece: 17,
     items: [
       MergeItem(
         id: ID('item:Garden-Gnome'),
@@ -8979,7 +8978,7 @@ List<MergeChain> mergeChains=[
     id: ID('chain:Vegetable-Patches'),
     title: 'Vegetable Patches',
     subtitle: '',
-    masterpiece: null,
+    masterpiece: 10,
     items: [
       MergeItem(
         id: ID('item:Vegetable-Nursery'),

@@ -22,7 +22,7 @@ class _AssetCacheBannerState extends State<AssetCacheBanner> {
 
   @override
   void initState() {
-    _isVisible=!(HiveProvider.appBox.get('preload_assets')??false);
+    _isVisible=HiveProvider.appBox.get('preload_assets')==null;
     super.initState();
   }
 
@@ -149,7 +149,7 @@ class _AssetCacheBannerState extends State<AssetCacheBanner> {
     await _downloadAssetsAndWipeOld();
 
     // Persist the choice to local storage
-   HiveProvider.appBox.put('preload_assets', true);
+   await HiveProvider.appBox.put('preload_assets', true);
     setState(() {
       _isCaching = false;
     });
@@ -165,7 +165,7 @@ class _AssetCacheBannerState extends State<AssetCacheBanner> {
     });
 
     // Persist the choice to local storage
-   HiveProvider.appBox.put('preload_assets', false);
+   await HiveProvider.appBox.put('preload_assets', false);
 
   }
 

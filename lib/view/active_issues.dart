@@ -6,9 +6,15 @@ import 'package:mergewarden/view/components/stat_card.dart';
 import 'package:mergewarden/view/discord_invite.dart';
 final List<Map<String, String>> activeIssues = [
   {
-    'title': 'Gnome Glitch',
-    'description': 'Some players report technical glitches when upgrading gnomes. Upgrading results in gnomes disappearing.',
-    'image': 'Stage_1_-_Garden_Gnome',
+    'title': 'Stickers Glitch',
+    'description': 'Some players report technical glitch when stickers open. Clicking anywhere does not help and only restarting fixes the game back; but with loss of stickers.',
+    'image': 'stickers',
+    'severity': 'Fatal',
+  },
+  {
+    'title': 'Task Glitch',
+    'description': 'Some players report technical glitches when completing daisy tasks in events. Once few completed more quests do not show up.',
+    'image': 'mg_logo',
     'severity': 'Fatal',
   },
   {
@@ -157,6 +163,24 @@ class _ActiveIssuesDrawerState extends State<ActiveIssuesDrawer> {
                             fontSize: 12,
                             color: Colors.black87,
                             height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        if( issue['fix']!=null)Container(
+                          decoration: BoxDecoration(
+                            color: cCard,
+                            borderRadius: BorderRadius.circular(8)
+                          ),
+                           padding:EdgeInsets.all(5),
+                          child: Text(
+                            issue['fix']!,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              backgroundColor: cCard,
+
+                              color: Colors.white70,
+                              height: 1.4,
+                            ),
                           ),
                         ),
                       ],
