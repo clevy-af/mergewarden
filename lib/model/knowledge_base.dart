@@ -15,7 +15,7 @@ List<Map<String,dynamic>> chains= [
   {"name": "Rocks", "id": "Rocks", "stages": 8,"masterpiece":14},
   {"name": "Roman Ruins", "id": "Roman_Ruins", "stages": 9,"masterpiece":15},
   {"name": "Topiaries", "id": "Topiaries", "stages": 8,"masterpiece":16},
-  // {"name": "Garden Gnomes", "id": "Garden_Gnomes", "stages": 13,"masterpiece":17},
+  // {"name": " Gnomes", "id": "Garden_Gnomes", "stages": 13,"masterpiece":17},
   {"name": "Gardening Tools", "id": "Gardening_Tools", "stages": 20,"masterpiece":18},
   {"name": "Yard Games", "id": "Yard_Games", "stages": 12,"masterpiece":19},
   {"name": "Berry Bushes", "id": "Berry_Bushes", "stages": 13,"masterpiece":20},

@@ -28,23 +28,9 @@ class MyApp extends StatelessWidget {
       title: 'Merge Warden',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamilyFallback: [
-          'NotoColorEmoji',
-        ],
         colorScheme: ColorScheme.fromSeed(seedColor: cBackground),
-
       ),
       home: const Dashboard(),
     );
   }
 }
-
-
-// void main() {
-//   var calc = MergeCalculator();
-//   int targetLevel = 10;
-//   int count = 1;
-//
-//   print('To get $count of Level $targetLevel:');
-//   print('${calc.totalBaseNeeded(targetLevel, count)} Level 0 items needed.');
-// }
