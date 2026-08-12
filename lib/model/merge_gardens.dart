@@ -5714,7 +5714,7 @@ List<MergeChain> mergeChains=[
       MergeItem(
         id: ID('item:Mushroom-Tree-House'),
         name: 'Mushroom Tree House',
-        stage: 10,
+        stage: 11,
         description: '',
         descriptors: [],
         sourced: [],
