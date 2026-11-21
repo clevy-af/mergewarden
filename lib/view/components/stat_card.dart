@@ -1,21 +1,19 @@
-import 'dart:js_interop';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
-import 'package:mergewarden/model/knowledge_base.dart';
 import 'package:mergewarden/model/goal_data.dart';
+import 'package:mergewarden/model/knowledge_base.dart';
 import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/model/target_item.dart';
 import 'package:mergewarden/utils/calculator.dart';
 import 'package:mergewarden/utils/colors.dart';
+import 'package:mergewarden/utils/constants.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/utils/strings.dart';
 import 'package:mergewarden/view/components/info_button.dart';
 import 'package:mergewarden/view/home.dart';
-import 'package:web/web.dart' as web;
-
 
 class CalculateMe{
   final String chain;
@@ -127,28 +125,21 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
 
             child: targetItem==null?Column(
               children: [
-                ValueListenableBuilder(
-                  valueListenable:  HiveProvider.appBox.listenable(keys: ['type']),
-                  builder:(context,data,_) {
-                    bool isWildlife=data.get('type')=='wildlife';
-                    // print({'type':data.get('type')});
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(),
-                        Semantics(
-                            label: 'Merge Gardens Calculator Header',
-                            child: Text('Target ${isWildlife?'Wildlife' : 'Item'} Calculator',
-                              style:  TextStyle(fontSize:context.isDesktop?30:20,
-                                  fontWeight: FontWeight.bold),),
-                        ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(),
+                    Semantics(
+                      label: 'Merge Gardens Calculator Header',
+                      child: Text('Merge Calculator',
+                        style:  TextStyle(fontSize:context.isDesktop?30:20,
+                            fontWeight: FontWeight.bold),),
+                    ),
 
-                        InfoButton(
-                              onPressed:showExplainerDialog,
-                        ),
-                      ],
-                    );
-                  }
+                    InfoButton(
+                      onPressed:showExplainerDialog,
+                    ),
+                  ],
                 ),
                 ValueListenableBuilder(
                     valueListenable: HiveProvider.appBox.listenable(keys: ['type','chain']),
@@ -179,7 +170,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                                 return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
                               });
                               }
-                                return chains.map((e) => e['name'].toString(),).where((String option) {
+                                return chainsForCalc.map((e) => e['name'].toString(),).where((String option) {
                                 return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
                               });
                             },
@@ -203,8 +194,14 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                             },
                             // displayStringForOption: (option) => option,
                             onSelected: (String selection) {
-                              // print('You selected: $selection');
-                            HiveProvider.appBox.put('chain', selection);
+                              if(HiveProvider.appBox.get('type')=='wildlife')
+                                {
+                                  HiveProvider.appBox.put('chain', selection.replaceAll(' ', ''));
+                                  return;
+                                }
+                            var chainId = chainsForCalc.firstWhere((element) => element['name']== selection)['id'];
+                              // print('You selected: $selection and $chainId');
+                            HiveProvider.appBox.put('chain', chainId);
 
                             },
                             fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
@@ -233,8 +230,10 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                         // key: ValueKey(null),
                         builder: (context,data,_) {
                           bool isWildlife=data.get('type')=='wildlife';
-                          String? chainId=data.get('chain')?.toString().replaceAll(' ', isWildlife?'':'_');
+                          String? chainId=data.get('chain')?.toString();
+                          // print(chainId);
                           Iterable stages=chainItems[chainId]??[];
+
                           HiveProvider.appBox.put('chain0', stages.where((element) => element['stage']==0,).isNotEmpty);
                           // print( HiveProvider.appBox.get('chain0',));
                           if(chainId!=null&&stages.isNotEmpty||isWildlife) {
@@ -378,6 +377,19 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                     ],
                   ),
                 ),
+
+                ValueListenableBuilder(
+                    valueListenable: HiveProvider.appBox.listenable(keys: ['type']),
+                    builder: (context,data,_) {
+                      bool isWildlife=data.get('type')=='wildlife';
+                      if(!isWildlife) return SizedBox();
+                    return Container(
+                        alignment: Alignment.centerLeft,
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Text('Advised to check this for maximum benefit.',style: hintStyle,)
+                    );
+                  }
+                ),
                 const SizedBox(height: 20),
                 Semantics(
                   label: 'Merge Gardens Calculation Button',
@@ -399,33 +411,29 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                         }
                         // print('still going ahead?');
                         bool isWildlife=HiveProvider.appBox.get('type')=='wildlife';
-                        String? chainId=HiveProvider.appBox.get('chain')?.toString().replaceAll(' ', isWildlife?'':'_');
-                        // print({'chain':chainId,'stage':stageController.text,
-                        //   'count':countController.text,
-                        //   'type':HiveProvider.appBox.get('type'),
-                        //   'chain0':HiveProvider.appBox.get('chain0'),
-                        //
-                        // });
-                        // print(chainController.text);
+                        String? chainId=HiveProvider.appBox.get('chain');
+
+                        // print(chainId);
                         int stageNumber = int.parse(stageController.text);
                         // print(stageNumber);
 
                         if(chainId!=null&&!isWildlife) {
-                          // chainName=chains.firstWhere((element) => element['name'].contains(chainController.text),orElse: () => {'id':null},)['id'];
 
-                          Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==stageNumber,orElse: () => {'name':null,'url':null},);
+                          // print(chainItems[chainId]?.first);
+                          Map? data=chainItems[chainId]?.where((element) => element['stage']==stageNumber,
+                            // orElse: () =>{'name':null,'stage':0,'url':null},
+                          ).first;
+                          // print(data);
                           targetName=data?['name'];
                           // print(targetName);
                         }
-
                         setState(() {
-
 
                         targetItem=TargetItem(
                           isWildlife:isWildlife ,
                           has0: HiveProvider.appBox.get('chain0')??false,
                             merge5: merge5Only,
-                            stageName:isWildlife?wildlifeStages.firstWhere((element) => element['stage']==stageNumber,orElse: () => {'name':'Wildlife'},)['name']:targetName??'Stage $stageNumber ${'Item'}',
+                            stageName:isWildlife?wildlifeStages.firstWhere((element) => element['stage']==stageNumber,orElse: () => {'name':'Wildlife','stage':0},)['name']:targetName??'Stage $stageNumber ${'Item'}',
                             chainId: chainId, count: int.tryParse(countController.text)??0,
                             stage: stageNumber
                         );
@@ -567,8 +575,8 @@ class CardBox extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 15,left: 15,right: 15,top: 10),
       // alignment: Alignment.topCenter,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
+        color:Colors.white.withValues(alpha:0.8),
+        borderRadius: kBorderRadius15,
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.05), blurRadius: 20)],
       ),
       child: child,
@@ -602,38 +610,49 @@ class TargetPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget buttonsList= Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Tooltip(
+          message: 'Add As Goal for tracking progress',
+          child: TextButton(
+
+            onPressed: onGoalSet,
+            child: Text('Add As Goal'),
+          ),
+        ),
+        SizedBox(width: 8,),
+        Semantics(
+          label: 'Reset calculation',
+          child: TextButton(
+
+            onPressed: onReset,
+            child: Text('Reset'),
+          )
+        ),
+      ],
+    );
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Tooltip(
-              message: 'Add To GoalS',
-              child: TextButton(
-
-                onPressed: onGoalSet,
-                child: Text('Add As Goal'),
-              ),
-            ),
-            SizedBox(width: 8,),
+            Spacer(),
             Semantics(
-              label: 'Merge Gardens Calculation Reset Button',
-              child: IconButton(
-                  tooltip: 'Reset',
-                  onPressed: onReset, icon: Icon(Icons.refresh)),
+              label: 'Merge Gardens Calculation Header',
+              child: Text('Merge Breakdown',
+                style:  TextStyle(fontSize:context.isDesktop?20:15,
+                    fontWeight: FontWeight.bold),),
             ),
+            Spacer(),
+            if(context.screenSize.width>=kDesktopBreak)
+              buttonsList
           ],
         ),
-
-        TargetItemView(targetItem: targetItem),
-
-        Semantics(
-          label: 'Merge Gardens Calculation Result',
-          child: Text(
-            "Breakdown for ${targetItem?.count} Stage ${targetItem?.stage==45?4.5:targetItem?.stage} ${HiveProvider.appBox.get('type')=='wildlife'?'Wildlife':'Items'}",
-            style: TextStyle(letterSpacing: 1.5, fontSize:context.isDesktop?20:15, fontWeight: FontWeight.bold),
-          ),
-        ),
+        if(context.screenSize.width<kDesktopBreak)
+          SizedBox(height: 8,),
+        if(context.screenSize.width<kDesktopBreak)
+          buttonsList
       ],
     );
   }
@@ -705,61 +724,25 @@ class StageItemImage extends StatelessWidget {
   final BorderRadius? borderRadius;
   final String assetName;
 
-  ImageProvider get imageProvider =>AssetImage(assetName);
-  Future<bool> isAssetCached(String assetPath) async {
-    try {
-      String currentVersion = HiveProvider.appBox.get('current_version') ?? '1';
-      final String currentCacheName = 'flutter-assets-cache-v$currentVersion';
+  Widget  image() =>Image.asset('assets/$assetName.webp',
+    fit: BoxFit.contain,
+    height: heightValue,
+    width: heightValue,
+    errorBuilder: (context, error, stackTrace) => Image.asset('assets/mystery.webp',height: heightValue,width: heightValue,),
+  );
 
-      final caches = web.window.caches;
-      final cacheJSObject = await caches.open(currentCacheName).toDart;
-
-      // Format path to match how you saved it (e.g., 'assets/assets/images/pic.webp')
-      final String correctedWebPath = 'assets/$assetPath';
-
-      // cache.match returns a Response object if found, or undefined if not found
-      final response = await cacheJSObject.match(correctedWebPath.toJS).toDart;
-      return (response != null);
-
-    } catch (e) {
-      // Fallback if cache reading fails or if not running on Web
-      return false;
-    }
-  }
-  bool isImageInMemory(String assetPath) {
-    // 1. Recreate the precise asset bundle provider key Flutter uses
-    final ImageProvider provider = AssetImage(assetPath);
-
-    // 2. Look up Flutter's global ImageCache
-    final ImageCacheStatus status = PaintingBinding.instance.imageCache.statusForKey(provider);
-
-    // 3. If 'untracked', it has never been requested.
-    // If 'pending', it's downloading.
-    // If 'keepAlive' or 'live', it is fully loaded in memory!
-    return (status.keepAlive || status.live||status.tracked);
-  }
 
   @override
   Widget build(BuildContext context) {
-    String assetPath = 'assets/$assetName.webp';
-    // bool isImageAllowed=HiveProvider.appBox.get('preload_assets')==true ||web.window.navigator.onLine;
     return Card(
       color: cCard,
       child:  Container(
             margin: EdgeInsets.all(8),
-            height: heightValue,
-            width:heightValue,
             decoration: BoxDecoration(
-              borderRadius: borderRadius??BorderRadius.circular(15),
-              image: //isImageAllowed?
-              DecorationImage(
-                  image: AssetImage(assetPath),
-                  fit: BoxFit.contain
-              )
-                  // :null,
+              borderRadius: borderRadius??kBorderRadius15,
             ),
-            // child: isImageAllowed?null: Icon(Icons.local_florist_sharp,size: heightValue!=null?heightValue!/2:null,),
-          )
+            child:image(),
+      )
     );
   }
 }
@@ -775,7 +758,9 @@ class LevelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Map? data=chainItems[chainId??0]?.firstWhere((element) => element['stage']==level,orElse: () => {'name':"Stage $level"},);
+    Map? data=chainItems[chainId]?.where((element) => element['stage']==level,
+      // orElse: () => {'name':"Stage $level"},
+    ).first;
    String title=data?['name']??'Stage $level';
    // print(isWildlife);
    // print(chainId.runtimeType);
@@ -808,7 +793,7 @@ class LevelCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(showStage?'Stage $level':title, style: showStage?const TextStyle(color: Colors.grey):stageStyle),
+                Text(showStage?'Stage $level':title,textAlign: TextAlign.center, style: showStage?const TextStyle(color: Colors.grey):stageStyle),
 
                 if(chainId!=null)
                   StageItemImage(assetName: isWildlife?chainId!=null?'wildlife/$chainId$level':'wildlife':'Stage_${level}_-_${title.replaceAll(' ', '_')}',heightValue: kMinInteractiveDimension,),
@@ -838,10 +823,10 @@ class LevelCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12,),
                     height: kMinInteractiveDimension,
-                    alignment: Alignment.bottomCenter,
+                    // alignment: Alignment.bottomCenter,
                     width:kMinInteractiveDimension,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: kBorderRadius15,
                       image:DecorationImage(image: AssetImage('assets/Stage_4_-_Potent_Concoction.webp'),fit: BoxFit.cover),
                     ),
                   ),
@@ -915,7 +900,7 @@ class PotionView extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             width:cardHeight,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: kBorderRadius15,
               image:DecorationImage(image: AssetImage('assets/Stage_4_-_Potent_Concoction_old.webp'),),
             ),
           ),

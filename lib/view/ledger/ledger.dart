@@ -1,14 +1,15 @@
+import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:mergewarden/model/knowledge_base.dart';
-import 'package:mergewarden/model/merge_gardens.dart';
 import 'package:mergewarden/utils/colors.dart';
+import 'package:mergewarden/utils/constants.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
+import 'package:mergewarden/utils/mg_models.dart';
 import 'package:mergewarden/view/components/info_button.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
-import 'package:mergewarden/view/ledger/stage_meta_view.dart';
 
 class _ExplainerContent extends StatelessWidget {
   const _ExplainerContent();
@@ -170,9 +171,11 @@ class _LedgerGridViewState extends State<LedgerGridView> {
     return GestureDetector(
       onTap:() => widget.onTapCard(chain),
       child: Container(
+        margin: EdgeInsets.all(8),
+        width: min(context.screenSize.width,200),//context.screenSize.width<kDesktopBreak?context.screenSize.width:
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: kBorderRadius15,
           border:  Border.all(color: cCreme.withAlpha(150))
           // boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 2))],
         ),
@@ -226,6 +229,9 @@ class _LedgerGridViewState extends State<LedgerGridView> {
                   )
                   ),
                   const SizedBox(height: 3),
+                  // if(lastItem.descriptors.isNotEmpty)
+                  //   DescriptorLabel(descriptor: lastItem.descriptors.first),
+                  // const SizedBox(height: 3),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -257,9 +263,12 @@ class _LedgerGridViewState extends State<LedgerGridView> {
                               icon:Icon(isSaved?Icons.bookmark_added_rounded:Icons.bookmark_border,color: isSaved?cCard:kTextDark,),
                           );
                         }
-                      )
+                      ),
+
                       ],
                     ),
+                  const SizedBox(height: 3),
+
                 ],
               ),
             )
@@ -302,19 +311,10 @@ class _LedgerGridViewState extends State<LedgerGridView> {
           ),
           _buildFilterStrip(),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical:8,horizontal: 12),
-              child: GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: MediaQuery.of(context).size.width > 900 ? 5 : MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  mainAxisExtent: MediaQuery.of(context).size.width < 900?MediaQuery.of(context).size.height/2.2:null,
-                  childAspectRatio:0.8,//(context.screenSize.width/5)/(context.screenSize.height/2),// 0.83,
-                ),
-                itemCount: filteredList.length,
-                itemBuilder:  (context, index) => _buildChainCard(filteredList[index]),
+            child: SingleChildScrollView(
+              child: Wrap(
+                children: List.generate ( filteredList.length,(index) => _buildChainCard(filteredList[index]),
+              ),
               ),
             ),
           ),

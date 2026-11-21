@@ -283,7 +283,9 @@ class MergeCalculator {
         title = "Eggs";
       }
     }
-    Map? data=chainItems[chainId]?.firstWhere((element) => element['stage']==stage,orElse: () => {'name':"Stage $stage"},);
+    Map? data=chainItems[chainId]?.where((element) => element['stage']==stage,
+      // orElse: () => {'name':"Stage $stage"},
+    ).first;
     title=data?['name']??'Stage $stage';
   return title;
   }

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mergewarden/model/merge_gardens.dart';
 import 'package:mergewarden/model/item_id.dart';
+import 'package:mergewarden/utils/mg_models.dart';
 import 'package:mergewarden/view/ledger/tile_format.dart';
 
 void main() {
@@ -23,7 +23,6 @@ void main() {
       spawnedItems: [const ID('spawn_1')],
       tapRewards: [const ID('tap_1')],
       notes: ['Note 1'],
-      vanishOnTap: false,
       vanishOnHarvest: false,
       vanishAfterSpawn: false,
       format: TileFormat(1, 1),
@@ -55,7 +54,6 @@ void main() {
         spawnedItems: [],
         tapRewards: [],
         notes: [],
-        vanishOnTap: false,
         vanishOnHarvest: false,
         vanishAfterSpawn: false,
         format: TileFormat(1, 1),
@@ -91,7 +89,6 @@ void main() {
         spawnedItems: [],
         tapRewards: [],
         notes: [],
-        vanishOnTap: false,
         vanishOnHarvest: false,
         vanishAfterSpawn: false,
         format: TileFormat(1, 1),

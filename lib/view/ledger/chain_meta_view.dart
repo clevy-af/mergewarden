@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mergewarden/model/merge_gardens.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/extension.dart';
+import 'package:mergewarden/utils/mg_models.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
 
-// --- STYLES ---
-const Color kCardBg = Colors.white;
-const Color kTextDark = Color(0xFF2D3436);
-const Color kTextSubtle = Colors.black54;
-const Color kAccentGreen = Color(0xFF2D6A4F);
-const Color kSurfaceBg = Color(0xFFF9F9F9);
+
 
 class ChainDetailView extends StatelessWidget {
   final MergeChain chainData;
@@ -73,7 +68,6 @@ class ChainDetailView extends StatelessWidget {
                       // mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         backButton,
-
                         if(chainData.richardTrades.isNotEmpty)
                           _sourcePill(chainData.richardTrades,"Richard Trades:"),//"Daily Checklist:"
                         // _rewardRow("Daisy's Level Quests:", "75, 80, 88, 90"),
@@ -109,6 +103,7 @@ class ChainDetailView extends StatelessWidget {
 
   // Header with Breadcrumb-style title
   Widget _buildHeader(BuildContext context) {
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,14 +113,7 @@ class ChainDetailView extends StatelessWidget {
         SizedBox(height: 8,),
         Flexible(
           child: Row(
-            children: List.generate(chainData.tags.length, (index) => ChainLabel(label: chainData.tags.elementAt(index).name),),
-            // [
-            //   ChainLabel(label: '📌 Must Have'),
-            //   ChainLabel(label:'🛠️ Good to Have'),
-            //   ChainLabel(label:'🎀 Decoration'),
-            //   // ChainLabel(label:'🪹 Spawner'),
-            //   ChainLabel(label:'👑 Premium'),
-            // ],
+            children: List.generate(chainData.tags.length, (index) => DescriptorLabel(descriptor: chainData.tags.elementAt(index)),),
           ),
         ),
       ],
@@ -151,7 +139,7 @@ class ChainDetailView extends StatelessWidget {
                  spacing: 8,
                 runSpacing: 8,
                 children: List.generate(chainData.sources.length, (index) =>  ActionChip(
-                    label: Text(chainData.sources.elementAt(index).value.split(':').last),
+                    label: Text(chainData.sources.elementAt(index).value.split(':').last.replaceAll('-', ' ')),
                   onPressed: () {
 
                   },
@@ -350,24 +338,31 @@ class ChainDetailView extends StatelessWidget {
   // );
   // }
 }
+Map<Descriptor,String> descriptorLabels={
+  Descriptor.goodToHave:'🛠️ Good to Have',
+  Descriptor.mustHave:'📌 Must Have',
+  Descriptor.decoration:'🎀 Decoration',
+  Descriptor.premium:'👑 Premium',
+};
 
-class ChainLabel extends StatelessWidget {
-  const ChainLabel({
+class DescriptorLabel extends StatelessWidget {
+  const DescriptorLabel({
     super.key,
-    required this.label,
+    required this.descriptor,
   });
 
-  final String label;
+  final Descriptor descriptor;
 
   @override
   Widget build(BuildContext context) {
+
     return Card(
       color: cCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(8)),
       margin: EdgeInsets.all(3),
       child:Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 5),
-        child: Text(label,style: TextStyle(color: Colors.white),),
+        child: Text(descriptorLabels[descriptor].toString(),style: TextStyle(color: Colors.white),),
       ),
     );
   }

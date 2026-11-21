@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mergewarden/utils/colors.dart';
 
+///rows: horizontal, x-axis. columns: vertical, y-axis.
 class TileFormat {
-  // horizontal, x-axis.
+  /// horizontal, x-axis.
   int rows;
   ///vertical, y-axis.
   int columns;
+
+  ///rows: horizontal, x-axis. columns: vertical, y-axis.
   TileFormat(this.rows,this.columns);
 
   @override

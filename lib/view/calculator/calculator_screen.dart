@@ -35,24 +35,26 @@ class CalculatorScreen extends StatelessWidget {
                 valueListenable: HiveProvider.session.listenable(keys: [sBreakdownKey,]),
                 builder: (context, value, child) {
                   final List data=value.get(sBreakdownKey)??[];
+                  final chainId=HiveProvider.appBox.get('chain');
                   if(data.isEmpty) return  Text('Fill out your target details to get started');
+                  var isWildlife = HiveProvider.appBox.get('type')=='wildlife';
+                  final double boxSize = chainId!=null?170:120;
                   return GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 180,
-                      mainAxisExtent: 180,
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: boxSize,
+                      mainAxisExtent: boxSize,
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 20,
                     ),
                     itemCount: data.length,
                     itemBuilder: (context, index) {
-                      var isWildlife = HiveProvider.appBox.get('type')=='wildlife';
                       return LevelCard(
                         level: data.elementAt(index)['stage'],
                         potions: data.elementAt(index)['potions'],
                         count: data.elementAt(index)['count'],
-                        chainId: HiveProvider.appBox.get('chain')?.toString().replaceAll(' ', isWildlife?'':'_'),
+                        chainId: chainId,
                         isWildlife: isWildlife,
                       );
                     },

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-//https://discord.com/api/webhooks/1507690191329169471/rLfeUEJAk__84kG5pnJUuNxOxECv1muKjSaFvVs-jV-YQmjf9jmm3JDlYbPPdRMzUfs5
+import 'package:mergewarden/utils/constants.dart';
 
-//github url
-//https://discord.com/api/webhooks/1507691711168512020/jDa109UpQikVra9npKpDQ1vvgvfexaj6zOVTwt5d21q1ENdWM3gdQdpuyUIUfp4nl22t
 
 Future<bool> sendBugReport(String message, String contact) async {
   final url = Uri.parse('https://formspree.io/f/xeenedrl');
@@ -48,9 +46,11 @@ class _BugReportFormState extends State<BugReportForm> {
     if (success) {
       _messageController.clear();
       _contactController.clear();
-      ScaffoldMessenger.of(context).showSnackBar(
+      if(mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Report sent to the caretaker! 🌿")),
       );
+      }
     }
   }
 
@@ -99,7 +99,7 @@ class _BugReportFormState extends State<BugReportForm> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6B8E6B),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    shape: RoundedRectangleBorder(borderRadius: kBorderRadius15),
                     elevation: 0,
                   ),
                   child: _isSending

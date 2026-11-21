@@ -6,20 +6,14 @@ import 'package:mergewarden/view/components/stat_card.dart';
 import 'package:mergewarden/view/discord_invite.dart';
 final List<Map<String, String>> activeIssues = [
   {
-    'title': 'Stickers Glitch',
-    'description': 'Some players report technical glitch when stickers open. Clicking anywhere does not help and only restarting fixes the game back; but with loss of stickers.',
-    'image': 'stickers',
-    'severity': 'Fatal',
-  },
-  {
-    'title': 'Task Glitch',
-    'description': 'Some players report technical glitches when completing daisy tasks in events. Once few completed more quests do not show up.',
+    'title': 'Ads Glitch',
+    'description': 'Some players report screen freeze when ads are viewed. No close button, black screen, only restarting fixes the game; but with loss of progress/rewards.',
     'image': 'mg_logo',
     'severity': 'Fatal',
   },
   {
-    'title': 'Rita\'s Training',
-    'description': 'You get only 30 mins of unlimited lives. Choose to ignore the event or use the time wisely.',
+    'title': 'Task Glitch',
+    'description': 'Some players report technical glitches when completing daisy tasks in events. Once few completed more quests do not show up. No fix but you can contact support for rewards.',
     'image': 'mg_logo',
     'severity': 'Workaround',
   },

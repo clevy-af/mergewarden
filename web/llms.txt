@@ -1,0 +1,33 @@
+# Merge Warden Game Companion
+
+> An interactive web assistance for Merge Gardens players to track Masterpiece discoveries, view chain info, and calculate merges for goals in the garden.
+
+## Web Page Structure & Navigation
+- **Homepage / Calculator (`/` or `/calculator`):** Primary community portal overview, announcements, and quick-access navigation.
+- **The Ledger (`/ledger`):** All possible info on all merge chains and items.
+- **The Chronicles (`/chronicles`):** Complete 24 Masterpieces discovery tracker with high-resolution screenshot export.
+- **Official Links & Resources (`/`):** Centralized hub containing verified external game links, official support, and community wikis in Side Bar.
+
+## Core Features
+- **Merge Calculator:** Calculate how many merge to make till the target item be it chain item or wildlife.
+- **Masterpiece Progress Tracking:** Visual checklist for logging all 23 discoveries.
+- **One-Click Image Export:** High-resolution PNG generation for sharing completion.
+- **Goals Tracker:** Update your calculation with your progress in game to check your completion status.
+- **Outpost Management:**  game info collection on Discord.
+- **Ledger:** View full chain and related info, like getting started, rewards, etc.
+
+## Support & Troubleshooting
+If the web application fails to load:
+1. Perform a hard refresh (`Ctrl + Shift + R` or `Cmd + Shift + R`).
+2. Try opening the site in a different web browser or an Incognito window.
+3. If the issue persists, email for support directly at **clevino.dev@gmail.com** with attached screenshots or screen recordings of the issue.
+
+If application loads, but features not working:
+1. Click report bug(bottom, sidebar).
+2. Submit report with details.
+
+## Official Game Resources
+- Futureplay Support: https://futureplaygames.theymes.com/hc/en/merge-gardens
+- Official Website: https://mergegardens.com/
+- Community Wiki: https://merge-gardens.fandom.com/wiki/Merge_Gardens_Wiki
+- Web Store: https://store.mergegardens.com/en/

@@ -3,58 +3,66 @@ import 'package:mergewarden/utils/colors.dart';
 
 class ChangelogPage extends StatelessWidget {
   const ChangelogPage({super.key});
+/*
+Coming soon
 
-  Widget _buildComingSoon({
-    required String title,
-    required String brief,
-    required IconData icon,
-  }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cLightBackground,
-        borderRadius: BorderRadius.circular(20),
-        // Dashed border look
-        border: Border.all(
-          color: Colors.grey[300]!,
-          width: 0.5,
-          style: BorderStyle.solid,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color:  Colors.lightGreen[100],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: Colors.lightGreen[400]),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        letterSpacing: 0.5
-                    )
-                ),
-                const SizedBox(height: 4),
-                Text(brief,
-                    style: TextStyle(fontSize: 13, color: Colors.black, fontStyle: FontStyle.italic)
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+calculate storage of items, capacities etc.
+
+
+
+
+ */
+  // Widget _buildComingSoon({
+  //   required String title,
+  //   required String brief,
+  //   required IconData icon,
+  // }) {
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(vertical: 12),
+  //     padding: const EdgeInsets.all(16),
+  //     decoration: BoxDecoration(
+  //       color: cLightBackground,
+  //       borderRadius: BorderRadius.circular(20),
+  //       // Dashed border look
+  //       border: Border.all(
+  //         color: Colors.grey[300]!,
+  //         width: 0.5,
+  //         style: BorderStyle.solid,
+  //       ),
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         Container(
+  //           padding: const EdgeInsets.all(10),
+  //           decoration: BoxDecoration(
+  //             color:  Colors.lightGreen[100],
+  //             borderRadius: BorderRadius.circular(12),
+  //           ),
+  //           child: Icon(icon, color: Colors.lightGreen[400]),
+  //         ),
+  //         const SizedBox(width: 16),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(title,
+  //                   style: const TextStyle(
+  //                       fontWeight: FontWeight.bold,
+  //                       color: Colors.black,
+  //                       letterSpacing: 0.5
+  //                   )
+  //               ),
+  //               const SizedBox(height: 4),
+  //               Text(brief,
+  //                   style: TextStyle(fontSize: 13, color: Colors.black, fontStyle: FontStyle.italic)
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
 
   @override
@@ -76,6 +84,15 @@ class ChangelogPage extends StatelessWidget {
                   // _buildComingSoon(brief: 'Interactive Quest list!',icon: Icons.timer, title: 'What\'s Brewing?'),
                   // const SizedBox(height: 20),
                   const Text("Ledger of the Keeper", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5D4A))),
+                  const SizedBox(height: 20),
+                  _buildLogEntry(
+                    date: "Nov 2026",
+                    version: "v1.8.3",
+                    title: "New Chains & More!",
+                    description: "Say hello to Japanese Maples and Kokeshi Dolls.👋 Info added to ledger. Stepper in goals has got an upgrade! Long press to increase/decrease count faster. mobile UI issues fixed.",
+                    icon: Icons.forest,
+                    color: Colors.deepOrange,
+                  ),
                   const SizedBox(height: 20),
                   _buildLogEntry(
                     date: "Aug 2026",

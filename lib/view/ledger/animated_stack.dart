@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mergewarden/model/merge_gardens.dart';
 import 'package:mergewarden/utils/extension.dart';
+import 'package:mergewarden/utils/mg_models.dart';
 import 'package:mergewarden/view/home.dart';
 import 'package:mergewarden/view/ledger/chain_meta_view.dart';
 import 'package:mergewarden/view/ledger/ledger.dart';

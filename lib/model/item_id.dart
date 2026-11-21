@@ -13,5 +13,5 @@ class ID {
   int get hashCode => value.hashCode;
 
   @override
-  String toString() => value;
+  String toString() => value.split(':').last;
 }

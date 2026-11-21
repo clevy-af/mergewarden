@@ -1,16 +1,13 @@
+import 'dart:math';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:mergewarden/model/merge_gardens.dart';
 import 'package:mergewarden/utils/colors.dart';
+import 'package:mergewarden/utils/constants.dart';
 import 'package:mergewarden/utils/extension.dart';
+import 'package:mergewarden/utils/mg_models.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
 import 'package:mergewarden/view/ledger/tile_format.dart';
 
-// --- STYLES ---
-const Color kCardBg = Colors.white;
-const Color kTextDark = Color(0xFF2D3436);
-const Color kTextSubtle = Colors.black54;
-const Color kAccentGreen = Color(0xFF2D6A4F);
-const Color kSurfaceBg = Color(0xFFF9F9F9);
 
 class StageMetaView extends StatelessWidget {
   final MergeItem itemData;
@@ -85,7 +82,6 @@ class StageMetaView extends StatelessWidget {
     var infoColumn = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(itemData.name, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: kTextDark)),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -118,62 +114,52 @@ class StageMetaView extends StatelessWidget {
               ),
             ],
           );
+    Widget nameAndBack = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(itemData.name, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: kTextDark)),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: ElevatedButton.icon(
+            onPressed:onBack,
+            icon: const Icon(Icons.arrow_back_rounded, size: 14),
+            label: const Text('Back', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1E2235),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 0,
+            ),
+          ),
+        )
+      ],
+    );
+
     var children = [
         // Large Item Image
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            LargeStageImage(itemData:itemData),
-          if(!isDesktop)  Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: ElevatedButton.icon(
-                onPressed:onBack,
-                icon: const Icon(Icons.arrow_back_rounded, size: 14),
-                label: const Text('Back', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E2235),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-              ),
-            ),
+      SizedBox(height:10,),
+      LargeStageImage(itemData:itemData),
 
-          ],
-        ),
-        SizedBox(width:  isDesktop?40:0,height: isDesktop?0:40,),
+      SizedBox(width:  isDesktop?40:0,height: isDesktop?10:40,),
         // Item Description & Stats
         infoColumn,
-      if(isDesktop) Spacer(),
-      if(isDesktop)  Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: ElevatedButton.icon(
-          onPressed:onBack,
-          icon: const Icon(Icons.arrow_back_rounded, size: 14),
-          label: const Text('Back', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1E2235),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 0,
-          ),
-        ),
-      ),
-
       ];
     if(isDesktop) {
-      return Row(
-        crossAxisAlignment:CrossAxisAlignment.start,
-        children: children,
+      return Column(
+        children: [
+          nameAndBack,
+          Row(
+            crossAxisAlignment:CrossAxisAlignment.start,
+            children: children,
+          ),
+        ],
       );
     }
       else {
      return Column(
        // mainAxisSize: MainAxisSize.min,
-      children: children,
+      children: [nameAndBack]+children,
          );
     }
   }
@@ -365,12 +351,14 @@ class QuotedDescription extends StatelessWidget {
         Card(
           color: Colors.white,
           // margin: EdgeInsets.all(8),
-          child: Padding(
+          child: Container(
+            width: max(kDesktopBreak/2,context.screenSize.width*0.5),
             padding: const EdgeInsets.all(12),
-            child:  Text(
+            child:  AutoSizeText(
              text,
               style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: kTextSubtle, height: 1.6),
               textAlign: TextAlign.center,
+              maxLines: 3,
             ),
           ),
         ),

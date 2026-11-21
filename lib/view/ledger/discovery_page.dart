@@ -5,13 +5,16 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:mergewarden/model/merge_gardens.dart';
+import 'package:mergewarden/model/knowledge_base.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/constants.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
+import 'package:mergewarden/utils/mg_models.dart';
 import 'package:mergewarden/view/components/info_button.dart';
+import 'package:mergewarden/view/components/stat_card.dart';
 import 'package:mergewarden/view/home.dart';
+import 'package:mergewarden/view/ledger/chain_meta_view.dart';
 import 'dart:ui' as ui;
 import 'package:web/web.dart' as web;
 
@@ -27,6 +30,8 @@ class _ChroniclesPageState extends State {
 // RepaintBoundary key for capturing checklist image
   final GlobalKey _repaintKey = GlobalKey(debugLabel: 'discovery_page');
   bool _isExporting = false;
+  bool _isInfoOn = false;
+  bool _isEggOn = false;
 
 
   Future<void> _exportAsImage() async {
@@ -188,13 +193,8 @@ class _ChroniclesPageState extends State {
       key: _repaintKey,
       child: DecoratedBox(
         decoration: BoxDecoration(color: cBackground),
-        child: Stack(
-          children: [
-            // 2. Main Content Canvas
-            SafeArea(
-              child: _buildMasterpieceGrid(_masterpieces..sort((a, b) => a.masterpiece!.compareTo(b.masterpiece!),)),
-            ),
-          ],
+        child: SafeArea(
+          child: _buildMasterpieceGrid(_masterpieces..sort((a, b) => a.masterpiece!.compareTo(b.masterpiece!),)),
         ),
       ),
     );
@@ -225,6 +225,19 @@ class _ChroniclesPageState extends State {
                   shadows: [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)],
                 ),
               ),
+              // const SizedBox(width: 12),
+              // if(!_isExporting)
+              // IconButton(onPressed: (){setState(() {
+              //   _isInfoOn=!_isInfoOn;
+              // });},
+              //   icon: Icon(_isInfoOn?Icons.info_rounded:Icons.info_outline, color: _isInfoOn?cRed:Colors.black87, size: 22),
+              // ),
+              // if(!_isExporting)
+              // IconButton(onPressed: (){setState(() {
+              //   _isEggOn=!_isEggOn;
+              // });},
+              //   icon: Icon(_isInfoOn?Icons.egg_rounded:Icons.egg_outlined, color: _isEggOn?cRed:Colors.black87, size: 22),
+              // ),
             ],
           ),
         if(!_isExporting)
@@ -277,7 +290,7 @@ class _ChroniclesPageState extends State {
           valueListenable: HiveProvider.appBox.listenable( keys: ['discoveredMasterpieces']),
           builder: (context,box,_) {
             final double spacing = 8;
-            final double cardWidth = context.screenSize.width>kDesktopBreak?130:100 -(context.isDesktop?0:10);
+            final double cardWidth = context.screenSize.width>kDesktopBreak?120:100 -(context.isDesktop?0:10);
             List<String> completed=(box.toMap()['discoveredMasterpieces']as List?)?.map((e) => e.toString(),).toList()??[];
 
             double progress = completed.length/_masterpieces.length;
@@ -307,6 +320,7 @@ class _ChroniclesPageState extends State {
                             child: _buildMasterpieceCard(masterpiece,completed.contains(masterpiece.id.value),cardWidth),
                           );
                         }).toList() +[
+                          if(!_isInfoOn)
                           SizedBox(
                             width: cardWidth, // 👈 Explicit width prevents layout calculation crashes
                             height: cardWidth,
@@ -436,35 +450,47 @@ class _ChroniclesPageState extends State {
               padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Item Emoji / Image Container
+                  // Item Image Container
                   Center(
-                    child: Image.asset(
-                      'assets/Stage_${item.stage}_-_${item.name.replaceAll(' ', '_')}.webp',
-                      height:cardWidth-50,
-                    ),
+                    child: StageItemImage(
+                      assetName: 'Stage_${item.stage}_-_${item.name.replaceAll(' ', '_')}',
+                      heightValue:cardWidth-45,
+                    ).image(),
                   ),
-
-        SizedBox( height: 8,),
-        // Item Title & Subtitle
-                  AutoSizeText(
-                   chain.title,
-                    style: const TextStyle(
-                      fontFamily: 'Audiowide',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Color(0xFF2D3436),
-                    ),
-                    maxLines: 1,
-                    minFontSize: 8,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
+        Spacer(),
+        // Item Title & Check Mark
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AutoSizeText(
+                         chain.title,
+                          style: const TextStyle(
+                            fontFamily: 'Audiowide',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Color(0xFF2D3436),
+                          ),
+                          maxLines: 1,
+                          minFontSize: 8,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      if(isCompleted)
+                        Icon(
+                          Icons.check_circle,
+                          size: 14,
+                          color: cCard,
+                        ),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            // Bottom-Left Masterpiece Number Badge
+            //Masterpiece Number Badge
             Positioned(
               top: 5,
               left: 5,
@@ -484,16 +510,37 @@ class _ChroniclesPageState extends State {
                 ),
               ),
             ),
-            if(isCompleted)
-            Positioned(
-              top: 3,
-              right: 3,
-              child: Icon(
-                Icons.check_circle,
-                size: 24,
-                color: cCard,
+
+            if(chain.produceEggs.isNotEmpty &&_isEggOn)
+              Align(
+                alignment: AlignmentGeometry.topRight,
+                child: Wrap(
+                  children: List.generate(chain.eggRewards.length,
+                        (index) => StageItemImage(
+                          heightValue:30,
+                            assetName: 'wildlife/${chain.eggRewards.elementAt(index).value.split(':').last}'
+                        ).image(),),
+                ),
               ),
-            ),
+            if(item.descriptors.isNotEmpty &&_isInfoOn)
+              Align(
+                alignment: AlignmentGeometry.centerRight,
+                child: Card(
+                  color: Colors.black54,
+                  child: Padding(
+                    padding: const EdgeInsets.all(3),
+                    child: AutoSizeText(
+                      descriptorLabels[item.descriptors.first]?.split(' ').first??'',
+                      style: const TextStyle(
+                        fontFamily: 'Audiowide',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
           ],
         ),
       ),

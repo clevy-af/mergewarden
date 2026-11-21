@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:mergewarden/utils/colors.dart';
+import 'package:mergewarden/utils/constants.dart';
 import 'package:mergewarden/utils/extension.dart';
 import 'package:mergewarden/utils/hive_provider.dart';
 import 'package:mergewarden/utils/strings.dart';
@@ -16,9 +17,12 @@ import 'package:mergewarden/view/ledger/animated_stack.dart';
 import 'package:mergewarden/view/whats_new.dart';
 import 'package:web/web.dart' as web;
 
-enum Destinations{calculator,goals,ledger,discovery}
+enum Destinations{calculator,goals,ledger,chronicles}
+
+
 class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+  const Dashboard({super.key, this.page});
+  final String? page;
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -50,7 +54,8 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void initState() {
-    _selectedPage = Destinations.values.elementAt(HiveProvider.appBox.get('homepage')??0);
+    int index= HiveProvider.appBox.get('homepage')??0;
+    _selectedPage = ![null,"/"].contains(widget.page)?Destinations.values.firstWhere((e)=>e.name==widget.page):Destinations.values.elementAt(index);
     super.initState();
   }
 
@@ -94,15 +99,9 @@ class _DashboardState extends State<Dashboard> {
                   Container(
                     height: MediaQuery.of(context).size.height,
                     // width:MediaQuery.of(context).size.width*0.9 ,
-                    padding:  EdgeInsets.symmetric(horizontal: context.isDesktop?MediaQuery.of(context).size.width*0.05:0),
-
+                    padding:  EdgeInsets.symmetric(horizontal: context.isDesktop?MediaQuery.of(context).size.width*0.02:0),
                     child:Column(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(child: AssetCacheBanner()),
-                          ],
-                        ),
                         Expanded(
                           child: [
                             CalculatorScreen(),
@@ -148,14 +147,14 @@ class ActiveIssueButton extends StatelessWidget {
   Widget build(BuildContext context) {
     if(activeIssues.isNotEmpty) {
       return IconButton(
-            tooltip: 'MG Active Issues',
+            tooltip: 'Active MG Issues',
               onPressed: () {
             Scaffold.of(scaffoldContext).openEndDrawer();
           } , icon:Row(
             children: [
               Icon( Icons.running_with_errors,color: cRed,),
               Container(
-                  decoration:BoxDecoration(color: cRed,borderRadius: BorderRadius.circular(15)),
+                  decoration:BoxDecoration(color: cRed,borderRadius: kBorderRadius15),
                   padding:EdgeInsets.symmetric(horizontal: 3),
                 child: Text(activeIssues.length.toString(),style: TextStyle(color: Colors.white),),
               )
@@ -192,12 +191,18 @@ class NavigationLine extends StatelessWidget {
             Container(
               margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: kBorderRadius15,
                   image: DecorationImage(image: AssetImage('assets/logo.webp'))
               ),
               height: 60,width: 60,
             ),
             VersionNumber(),
+            TextButton(onPressed: (){
+              showDialog(
+                context: context,
+                builder: (context) => const OfficialLinksDialog(),
+              );
+            }, child: Text('MG links',style: TextStyle(color: Colors.white),)),
             //
             // LinkButton(
             //   link: 'https://futureplaygames.zendesk.com/hc/en-us/categories/360002343379-Merge-Gardens',
@@ -290,24 +295,6 @@ class NavigationLine extends StatelessWidget {
   }
 }
 
-class LinkButton extends StatelessWidget {
-  const LinkButton({
-    super.key, required this.link, required this.text,
-  });
-  final String link;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      style: TextButton.styleFrom(
-        overlayColor: cCreme
-      ),
-      onPressed: () => web.window.open(link),
-      child: Text(text,style: TextStyle(color: Colors.white),),
-    );
-  }
-}
 
 class CalculatorSwitch extends StatefulWidget {
   const CalculatorSwitch({
@@ -380,6 +367,180 @@ class TextLogo extends StatelessWidget {
       maxLines: 3,
       textAlign: TextAlign.right,
       softWrap: true,
+    );
+  }
+}
+
+class OfficialLinksDialog extends StatelessWidget {
+  const OfficialLinksDialog({super.key});
+
+  final List<LinkItemData> links = const [
+    LinkItemData(
+      label: 'Futureplay Support',
+      url: 'https://futureplaygames.theymes.com/hc/en/merge-gardens',
+      assetPath: 'assets/futureplay_favicon.webp',
+    ),
+    LinkItemData(
+      label: 'Landing Page',
+      assetPath: 'assets/mg.webp',
+      url: 'https://mergegardens.com/',
+    ),
+    LinkItemData(
+      label: 'Wiki',
+      assetPath: 'assets/wiki_favicon.webp',
+      url: 'https://merge-gardens.fandom.com/wiki/Merge_Gardens_Wiki',
+    ),
+    LinkItemData(
+      label: 'Web Store',
+      assetPath: 'assets/store_favicon.webp',
+      url: 'https://store.mergegardens.com/en/',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: cCard,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 10),
+
+          // App/Game Logo Header
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              'assets/daisy.webp', // Replace with your local asset image if needed
+              height: 75,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.nature_people_rounded,
+                size: 60,
+                color: Color(0xFFFFD700),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+          const Text(
+            "Merge Gardens Resources",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Wrapped Links Container
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            children: links.map((linkData) => LinkButton(data: linkData)).toList(),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(
+            "CLOSE",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class LinkItemData {
+  final String label;
+  final String url;
+  final String assetPath;
+
+  const LinkItemData({required this.label, required this.url, required this.assetPath});
+
+  String get host {
+    final uri = Uri.parse(url);
+    return uri.authority ;//.replaceFirst('www.', '');
+  }
+
+}
+
+class LinkButton extends StatelessWidget {
+  final LinkItemData data;
+
+  const LinkButton({super.key, required this.data});
+
+  Future<void> _launchUrl(BuildContext context) async {
+    web.window.open(data.url);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => _launchUrl(context),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        // width: 125,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white24),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: kMinInteractiveDimension,
+              width: kMinInteractiveDimension,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+
+                image: DecorationImage(image: AssetImage(data.assetPath))
+              ),
+            ),
+            // // Favicon image from Google's service
+            // Image.asset(
+            //   data.assetPath,
+            //   height: 24,
+            //   width: 24,
+            //   errorBuilder: (context, error, stackTrace) => const Icon(
+            //     Icons.image_not_supported_sharp,
+            //     color: Color(0xFFFFD700),
+            //     size: 20,
+            //   ),
+            // ),
+            const SizedBox(height: 6),
+
+            // Cleaned Host Domain
+            Text(
+              data.host,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 10,
+              ),
+            ),
+            const SizedBox(height: 2),
+
+            // Button Label Text
+            Text(
+              data.label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

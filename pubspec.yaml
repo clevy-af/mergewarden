@@ -2,7 +2,10 @@ name: mergewarden
 description: "A MergeGardens Assistant Portal."
 publish_to: 'none'
 
-version: 1.8.2 #1.6.5
+
+
+# firebase hosting:channel:deploy dev
+version: 1.8.3 #1.6.5
 
 environment:
   sdk: ^3.8.1

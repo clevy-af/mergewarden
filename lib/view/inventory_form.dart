@@ -1,21 +1,25 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mergewarden/model/knowledge_base.dart';
+import 'package:mergewarden/model/requirements.dart';
 import 'package:mergewarden/model/target_item.dart';
 import 'package:mergewarden/utils/calculator.dart';
 import 'package:mergewarden/utils/colors.dart';
 import 'package:mergewarden/utils/constants.dart';
 import 'package:mergewarden/utils/extension.dart';
+import 'package:mergewarden/view/components/info_button.dart';
 import 'package:mergewarden/view/components/stat_card.dart';
 
 class InventoryPopup extends StatefulWidget {
   final String? chainID;
   final int targetStage;
+  final List<Inventory> inventory;
   final bool isWildlife;
   final Function(Map<int, int>) onUpdate;
 
   const InventoryPopup({
     super.key,
-    required this.onUpdate, required this.chainID, required this.targetStage, required this.isWildlife,
+    required this.onUpdate, required this.chainID, required this.targetStage, required this.isWildlife, required this.inventory,
   });
 
 
@@ -56,6 +60,7 @@ class _InventoryPopupState extends State<InventoryPopup> {
                           for (var entry in  tempInventory.entries){
                             children.add(_InventoryCard(
                               level: entry.key,
+                              maxCount: widget.inventory.firstWhere((element) => element.stage==entry.key,).count,
                               isWildlife: widget.isWildlife,
                               chainId: widget.chainID,
                               count: entry.value,
@@ -244,6 +249,42 @@ class _InventoryPopupState extends State<InventoryPopup> {
       ),
     );
   }
+    void showExplainerDialog() {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('How to Update Inventory'),
+            actionsPadding: EdgeInsets.only(bottom: 10,right: 10),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('• To get started, you will see a card with stage selector;choose one.'),
+                  const Text('\t- Target Stage Item image and name will be displayed.'),
+                  const Text('\t- Update Inventory: Add/subtract your inventory items to adjust your progress. PS:This adds/subtracts per submit, and will auto-update other stages to accommodate the item(eg. adding 5 stage 2s would update stage 3: 2, stage 2: 5, stage 1: 13.)'),
+                  const Text('\t- Steppers (+/-): To change 1 quantity tap once. To change multiple, tap and hold, the longer you hold the faster the stepper will count.'),
+                  const Text('\t- To Reset/ Start over,either subtract/add inversely. Eg, you added 5 stage 2s incorrectly, subtract 5 stage 2s to counter it. You could also use Reset from goal screen, but that would change all stage progress to 0.'),
+                  const Divider(height: 20),
+                  const Text('• To submit, click Update Calculation:'),
+                  const Text('\t- You should see the entered amount added(if some already present) to the level card.'),
+                  const Text('\t- As mentioned,other stages also auto update if merges are possible, so appropriate levels(above and below) also would add up.'),
+                  const SizedBox(height: 10),
+
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Got it!'),
+              ),
+            ],
+          );
+        },
+      );
+    }
 
   Widget _buildHeader() {
     return Column(
@@ -259,6 +300,8 @@ class _InventoryPopupState extends State<InventoryPopup> {
             ),
 
             Spacer(),
+            InfoButton(onPressed:  showExplainerDialog),
+
             CloseButton(),
           ],
         ),
@@ -275,18 +318,33 @@ class _InventoryPopupState extends State<InventoryPopup> {
 
 }
 
-class _InventoryCard extends StatelessWidget {
+class _InventoryCard extends StatefulWidget {
   final int level;
   final int count;
+  final int maxCount;
   final bool isWildlife;
   final String? chainId;
   final String? stageName;
   final ValueChanged<int> onChanged;
 
-  const _InventoryCard({required this.level, required this.count, required this.onChanged, required this.chainId, this.stageName, required this.isWildlife});
+  const _InventoryCard({required this.level, required this.count, required this.onChanged, required this.chainId, this.stageName, required this.isWildlife, required this.maxCount});
+
+  @override
+  State<_InventoryCard> createState() => _InventoryCardState();
+}
+
+class _InventoryCardState extends State<_InventoryCard> {
+
+  Timer? _timer;
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // print(widget.maxCount);
     return Container(
       width: 210,
       padding: const EdgeInsets.all(16),
@@ -300,9 +358,9 @@ class _InventoryCard extends StatelessWidget {
           TargetItemView(
             height: kMinInteractiveDimension,
               targetItem: TargetItem(
-              merge5: false, has0: false, count: count, stage: level,
-              isWildlife:isWildlife,chainId: chainId,
-            stageName: stageName
+              merge5: false, has0: false, count: widget.count, stage: widget.level,
+              isWildlife:widget.isWildlife,chainId: widget.chainId,
+            stageName: widget.stageName
           )
           ) ,
 
@@ -313,20 +371,32 @@ class _InventoryCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton.filled(
-                  style: IconButton.styleFrom(
-                    backgroundColor: cRed
+                GestureDetector(
+                  onTap: () => widget.onChanged(widget.count > 0 ? widget.count - 1 : 0),
+                  onLongPressEnd: (e)=>_timer?.cancel(),
+                  onLongPressStart: (details) => _timer=Timer.periodic(Duration( milliseconds: 100),(t)=> widget.onChanged(widget.count > 0 ? widget.count - 1 : 0)),
+                  child: Card(
+                    color: cRed,
+                    shape:  RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(50)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: const Icon(Icons.remove, size: 18, color: Colors.white),
+                    ), // Forest Green
                   ),
-                  onPressed: () => onChanged(count > 0 ? count - 1 : 0),
-                  icon: const Icon(Icons.remove, size: 18, color: Colors.white), // Terracotta Red
                 ),
-                Text("$count", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                IconButton.filled(
-                  style: IconButton.styleFrom(
-                      backgroundColor: cCard
+                Text("${widget.count}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                GestureDetector(
+                  onTap: () => widget.onChanged(widget.count<widget.maxCount?widget.count + 1:widget.count),
+                  onLongPressEnd: (e)=>_timer?.cancel(),
+                  onLongPressStart: (details) => _timer=Timer.periodic(Duration( milliseconds: 100),(t)=> widget.onChanged(widget.count<widget.maxCount?widget.count + 1:widget.count)),
+                  child: Card(
+                      color: cCard,
+                    shape:  RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(50)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: const Icon(Icons.add, size: 18, color: Colors.white),
+                    ), // Forest Green
                   ),
-                  onPressed: () => onChanged(count + 1),
-                  icon: const Icon(Icons.add, size: 18, color: Colors.white), // Forest Green
                 ),
               ],
             ),
