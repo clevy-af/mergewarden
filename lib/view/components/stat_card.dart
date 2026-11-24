@@ -546,7 +546,7 @@ class _CentralStatsCardState extends State<CentralStatsCard> {
                 const SizedBox(height: 15),
 
                 const Text(
-                      'NB: If Merge by 5 is unchecked, calculation is optimal, without extras; 5-merges till possible, then 3-merge as needed. For merge by 5, if count is odd, it will be rounded up to accommodate 5-merges only. Potions are used starting from highest stage, once per merge(5 or 3).',
+                      'NB: If Merge by 5 is unchecked, calculation is optimal, without extras; merge5s till possible, then merge3 as needed. For merge by 5 only, if count is odd, it will be rounded up to accommodate merge5s only. Potions are used starting from highest stage, once per merge(5 or 3).',
                   style: hintStyle,
                 ),
               ],

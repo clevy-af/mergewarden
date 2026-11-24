@@ -65,6 +65,8 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                 const Text('• In the top card, you can see your target details -'),
                 const Text('\t- Target Stage Item image and name, along with count.'),
                 const Text('\t- Progress of completing this goal. If this shows 100%, it means you have enough to merge up to target, if you haven\'t already.'),
+                const Text('\t- Merge Preference: Merge5 if only by 5 checked, Optimum(merge5 & 3), if left unchecked in calculator screen.'),
+                const Text('\t- Potion: number of potions in total accounted to accomplish the goal.'),
                 const Text('\t- Update Inventory: Add/subtract your inventory items to adjust your progress. PS:This adds/subtracts per submit, and will auto-update other stages to accommodate the item(eg. adding 5 stage 2s would update stage 3: 2, stage 2: 5, stage 1: 13.)'),
                 const Text('\t- Reset: Start over, like turning a new leaf.'),
                 const Text('\t- Delete: If you are done, you can remove this from goals to stop tracking it.'),
@@ -72,7 +74,7 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                 const Text('• In the list below, you will find:'),
                 const Text('\t- Stage Item image and name.'),
                 const Text('\t- Needed: number of items you need to reach the target and Have: what you have currently.'),
-                const Text('\t- Potion: number of potions used. Note that this count is not included in needed/have.'),
+                const Text('\t- Potion: number of potions used. Note that this count is not included in needed/have as it is exclusive of the merge items needed.'),
                 const Text('\t- Progress Circle: your progress in collecting items of this stage, shows checkmark if done (needed=have).'),
                 const SizedBox(height: 10),
 
@@ -187,8 +189,20 @@ class _CentralGoalCardState extends State<CentralGoalCard> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 25),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
                         child: Text("Progress: ${widget.goalData?.progress.clamp(0, 100).toStringAsFixed(widget.goalData?.progress==0?0:2)} %", style: const TextStyle(fontSize: 18, color: Colors.black,)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 25),
+                        child: Row(
+                          children: [
+                            Text("Merge Preference: ${widget.goalData?.targetItem.merge5==true?"Merge5":"Optimum(5&3)"}", style: const TextStyle(fontSize: 18, color: Colors.black,)),
+                          SizedBox(width: 8,),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Text("Potions: ${widget.goalData?.potions}", style: const TextStyle(fontSize: 18, color: Colors.black,)),
+                            ),],
+                        ),
                       ),
                       // const SizedBox(height: 30),
                       Wrap(

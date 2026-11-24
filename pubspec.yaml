@@ -5,7 +5,7 @@ publish_to: 'none'
 
 
 # firebase hosting:channel:deploy dev
-version: 1.8.3 #1.6.5
+version: 1.8.6 #1.6.5
 
 environment:
   sdk: ^3.8.1

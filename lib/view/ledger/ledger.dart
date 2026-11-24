@@ -24,7 +24,7 @@ class _ExplainerContent extends StatelessWidget {
           _buildBulletPoint('Active Tab (default is Ledger): ', 'Indicates the current active section of the application. On clicking any card, your next active tab would be the chain. And likewise for stage item. Clicking any of these labels takes you back. Alternatively, you can click back button in subsequent screens to navigate.'),
           const Divider(height: 24),
           _buildSectionHeader('2. Filters'),
-          _buildBulletPoint('Preset Filters: ', 'Quick toggles like "All", "Saved", and "Masterpiece" for quick access.'),
+          _buildBulletPoint('Preset Filters: ', ' Toggles of "All", "Saved", and "Masterpiece" for easy access.'),
           _buildBulletPoint('Alphabetical Index: ', 'A-Z buttons to jump directly to specific chain names.'),
 
           const Divider(height: 24),
@@ -33,7 +33,7 @@ class _ExplainerContent extends StatelessWidget {
           _buildBulletPoint('Visual Asset: ', 'A square showing the  first and last element for reference.'),
           _buildBulletPoint('Chain Name: ', 'Bold text identifying the chain (e.g., Amber Wishing Stars).'),
           _buildBulletPoint('Masterpiece Tag: ', 'Small sub-text for showing if the chain is a masterpiece,eg. #MASTERPIECE 12.'),
-          _buildBulletPoint('Save Button: ', 'A bookmark icon at the bottom-right to save the item for later use.'),
+          _buildBulletPoint('Save Button: ', 'A bookmark icon at the bottom-right of each card; to save the chain for easy access.'),
         ],
       ),
     );

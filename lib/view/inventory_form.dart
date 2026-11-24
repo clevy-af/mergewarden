@@ -60,7 +60,7 @@ class _InventoryPopupState extends State<InventoryPopup> {
                           for (var entry in  tempInventory.entries){
                             children.add(_InventoryCard(
                               level: entry.key,
-                              maxCount: widget.inventory.firstWhere((element) => element.stage==entry.key,).count,
+                              maxCount: widget.inventory.firstWhere((element) => element.stage==entry.key,orElse: () => Inventory(stage: entry.key, count: 0, potions: 0)).count,
                               isWildlife: widget.isWildlife,
                               chainId: widget.chainID,
                               count: entry.value,
